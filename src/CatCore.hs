@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 --
--- Module      :   a test  
+-- Module      :   the main for the core concepts data  
 ------------------------------------------------------------------------
 
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
@@ -27,18 +27,7 @@ import Lib.STproduct
 
 main :: IO ()
 main =  do  -- with tests in other modules
-    -- page13
-    -- using
-    -- using2
-    -- using3
-    -- page39
-    -- page13data
-    -- page39data
-    -- page86
-    -- page135
-    -- page135hask
-    -- pageHaskGraph
-    -- pageCCworld
+
     pageCCdata
     pageST
 
