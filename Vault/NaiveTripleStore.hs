@@ -30,7 +30,7 @@ module Vault.NaiveTripleStore (NaiveTriples (..)
     , Row (..)   
        )    where
 
-import UniformBase
+-- import UniformBase
 -- import Uniform.Error
 
 import Vault.Value
@@ -43,6 +43,7 @@ type Val = ValueSum
 -- | a store for typed triples parametrized in the rel names
 class (Eq rel) => NaiveTriples rel   where
     ntInsert:: Key -> rel -> Val ->  Store rel ->  Store rel
+    ntInsertRow:: Row rel ->  Store rel ->  Store rel
     ntDeleteAll :: Key -> Store rel ->  Store rel
     ntDeleteVal :: Key -> rel ->   Store rel ->  Store rel
     ntFind :: Maybe Key -> Maybe rel -> Maybe Val -> Store rel -> [Row rel]
@@ -67,6 +68,7 @@ toCond (Just v) = (v==)
 
 instance (Eq rel) => NaiveTriples  rel  where
     ntInsert k r v   = Store . (Row k r v :) . unStore
+    ntInsertRow row1 = Store . (row1 :) . unStore
     ntFind mk mr mv   = ntFind2 (toCond mk) (toCond mr) (toCond mv)
     ntFind2 ck cr cv   = filter (ck . rk) . filter (cr . rr) . filter (cv . rv) . unStore
     ntDeleteAll k   =  Store . filter ((k/=).rk) . unStore
