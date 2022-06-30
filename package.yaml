@@ -1,0 +1,41 @@
+name:           CatCoreConcepts
+version:        0.1
+
+ghc-options: -Wall
+synopsis: Kuhn' spatial core concept data models with categories 
+
+description: |
+    experiment to build the core concept data models with categories 
+    the focus is on query not update
+dependencies:
+  - base >= 4.7 && < 5
+  - uniformBase
+  - extra
+  - constrained-categories
+  - containers
+  - mtl   # for vault
+ 
+
+library:
+  source-dirs: .
+
+executables:
+  lav:
+    main: CatCore.hs
+    source-dirs: src
+    dependencies: 
+      - CatCoreConcepts
+
+tests:
+  test1:
+    main: Testing.hs
+    source-dirs: tests
+    # main: Lib.Lawvere_test.hs
+    dependencies: 
+      - CatCoreConcepts
+      - HTF
+      - uniformBase
+      - QuickCheck 
+      - test-invariant
+      # - numeric-prelude   # for algebra.Lawas
+

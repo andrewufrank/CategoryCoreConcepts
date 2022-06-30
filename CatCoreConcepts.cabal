@@ -1,0 +1,81 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           CatCoreConcepts
+version:        0.1
+synopsis:       Kuhn' spatial core concept data models with categories
+description:    experiment to build the core concept data models with categories 
+                the focus is on query not update
+license:        BSD2
+license-file:   LICENSE
+build-type:     Simple
+
+library
+  exposed-modules:
+      Lib.CCdata
+      Lib.ExampleData
+      Lib.ExampleSet
+      Lib.Rules
+      Lib.STproduct
+      Lib.STproductVault
+      Lib.UsingSets
+      Vault.NaiveTripleStore
+      Vault.Object
+      Vault.Value
+      Vault.Vault
+  other-modules:
+      Paths_CatCoreConcepts
+  hs-source-dirs:
+      ./
+  ghc-options: -Wall
+  build-depends:
+      base >=4.7 && <5
+    , constrained-categories
+    , containers
+    , extra
+    , mtl
+    , uniformBase
+  default-language: Haskell2010
+
+executable lav
+  main-is: CatCore.hs
+  other-modules:
+      Paths_CatCoreConcepts
+  hs-source-dirs:
+      src
+  ghc-options: -Wall
+  build-depends:
+      CatCoreConcepts
+    , base >=4.7 && <5
+    , constrained-categories
+    , containers
+    , extra
+    , mtl
+    , uniformBase
+  default-language: Haskell2010
+
+test-suite test1
+  type: exitcode-stdio-1.0
+  main-is: Testing.hs
+  other-modules:
+      Lib.Lawvere_test
+      Vault.Vault_test
+      Paths_CatCoreConcepts
+  hs-source-dirs:
+      tests
+  ghc-options: -Wall
+  build-depends:
+      CatCoreConcepts
+    , HTF
+    , QuickCheck
+    , base >=4.7 && <5
+    , constrained-categories
+    , containers
+    , extra
+    , mtl
+    , test-invariant
+    , uniformBase
+  default-language: Haskell2010
