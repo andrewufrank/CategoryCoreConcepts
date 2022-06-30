@@ -28,7 +28,7 @@ import Control.Monad.Constrained
 import UniformBase 
 import Lib.Rules (fromPfeile)
 import Vault.Value
-import Vault.Vault
+-- import Vault.Vault
 import Vault.NaiveTripleStore
 import Data.List.Extra
 import Data.Bifunctor (bimap)
@@ -49,13 +49,13 @@ data GraphRels = E | N | L  --  for edge node label
 -- -- store0 = newNaiveStore :: Store GraphRels
 -- -- store1 = ntInsert (Key 11) E (mkobjval 1) $ store0
 
-fillVault =  vaultNew
-vaultMakeObj :: [(GraphRels, Val)] -> 
-            VaultState GraphRels Key
-vaultMakeObj pairs = do
-                k1 <- vaultNewObjID
-                mapM_ (\(r,v)-> vaultInsert r k1 v) pairs
-                return k1
+-- fillVault =  vaultNew
+-- vaultMakeObj :: [(GraphRels, Val)] -> 
+--             VaultState GraphRels Key
+-- vaultMakeObj pairs = do
+--                 k1 <- vaultNewObjID
+--                 mapM_ (\(r,v)-> vaultInsert r k1 v) pairs
+--                 return k1
 
 
 
@@ -67,8 +67,8 @@ pageObj= do
     -- putIOwords ["space states 2", showT [w0, w11, w12]]
     -- putIOwords ["business states ", showT [b0, b11]]
     -- putIOwords ["combined states ", showT [s0, s1, s2, s3, s4, s41, s5, s51]]
-    let st = fillVault :: Vault GraphRels
-    putIOwords ["the vault", showT st]
+    -- let st = fillVault :: Vault GraphRels
+    -- putIOwords ["the vault", showT st]
     -- putIOwords ["injective f", showT (injective f137)]
     -- putIOwords ["surjective f", showT (surjective f137)]
     -- putIOwords ["countSections f", showT (countSections f137)]

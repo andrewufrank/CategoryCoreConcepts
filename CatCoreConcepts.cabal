@@ -20,11 +20,9 @@ library
       Lib.ExampleSet
       Lib.Rules
       Lib.STproduct
-      Lib.STproductVault
       Vault.NaiveTripleStore
       Vault.Object
       Vault.Value
-      Vault.Vault
   other-modules:
       Paths_CatCoreConcepts
   hs-source-dirs:
