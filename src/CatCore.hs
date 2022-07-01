@@ -17,8 +17,8 @@ module Main     where      -- must have Main (main) or Main where
 -- import  Lib.Page135hask
 -- import Lib.HaskGraph
 -- import Lib.CCworld 
-import Lib.CCdata
-import Lib.ExampleSet
+-- import Lib.CCdata
+-- import Lib.ExampleSet
 -- import Lib.ExampleData
 -- import Lib.Rules
 -- import Lib.UsingSets
@@ -28,7 +28,7 @@ import Lib.STproduct
 main :: IO ()
 main =  do  -- with tests in other modules
 
-    pageCCdata
+    -- pageCCdata
     pageST
 
     -- mainEx

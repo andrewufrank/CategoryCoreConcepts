@@ -35,20 +35,20 @@ import           Test.Framework
 -- import Test.QuickCheck --  (arbitraryBoundedEnum)
 
 
--- test_empty = assertEqual ([]) (ntFind Nothing Nothing Nothing newNaiveStore :: [Row GraphRels])
+test_empty = assertEqual ([]) (ntQuery Nothing Nothing Nothing newNaiveStore :: [Row GraphRels])
 -- -- an empty store must contain nothing 
 
-test_insertOne = assertEqual 
-            (Store [Row{rk = Key "t1", rr = L, rv = VT (Value "label1")}]) 
-            (ntInsertRow row1 $
-                            newNaiveStore :: Store [Row GraphRels])
+-- test_insertOne = assertEqual undefined
+-- --             (Store [Row{rk = Key "t1", rr = L, rv = VT (Value "label1")}]) 
+-- --             (ntInsertRow row1 $
+-- --                             newNaiveStore :: Store [Row GraphRels])
 
 -- test_insert = assertEqual 
 --             ([Row{rk = Key "t1", rr = L, rv = VT (Value "label1")}]) (ntFind Nothing Nothing Nothing . 
 --                             -- ntInsert k1 r1 v1 $
 --                             ntInsertRow row1 $
 --                             newNaiveStore :: [Row GraphRels])
-row1 = Row k1 r1 v1 :: Row GraphRels
+-- row1 = Row k1 r1 v1 :: Row GraphRels
 k1 = mkkey "t1"
 r1 = L
 v1 = mktext "label1"
