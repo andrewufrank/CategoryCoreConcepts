@@ -49,6 +49,8 @@ type Val = ValueSum
 class (Eq row) => NaiveTriples row  where
     -- ntInsert:: Key -> rel -> Val ->  Store rel ->  Store rel
     ntInsertRow:: row ->  Store [row] ->  Store [row]
+    ntQuery :: QueryRow rel -> Store [row] -> [row]
+    -- 
     -- ntDeleteAll :: Key -> Store rel ->  Store rel
     -- ntDeleteVal :: Key -> rel ->   Store rel ->  Store rel
     -- ntFind :: Maybe Key -> Maybe rel -> Maybe Val -> Store rel -> [Row rel]
@@ -59,10 +61,15 @@ class (Eq row) => NaiveTriples row  where
     -- ntFindRV_K r  v = map rk . ntFind Nothing (Just r) (Just v)
 
 data Row rel = Row {rk::Key, rr::rel, rv::Val}  deriving (Show, Read, Eq)
+data QueryRow rel = QueryRow 
+        { mrk :: Maybe Key
+        , mrr:: Maybe rel
+        , mrv :: Maybe Val}
+    deriving (Show, Read, Ord, Eq)
 
 newtype Store r = Store  r deriving (Show, Read, Eq, Functor)
--- unStore :: Store r -> [Row r]
--- unStore (Store rs) = rs
+unStore :: Store r -> r
+unStore (Store rs) = rs
 newNaiveStore :: (Monoid r) => Store r
 newNaiveStore = mempty
 
@@ -73,11 +80,12 @@ toCond :: Eq v => Maybe v -> (v -> Bool)
 toCond (Nothing) = const True
 toCond (Just v) = (v==)
 
-instance (Eq row) => NaiveTriples  row  where
+instance (Eq (Row rel)) => NaiveTriples (Row rel)  where
     -- ntInsert k r v   = Store . (Row k r v :) . unStore
     -- ntInsertRow row1 = Store . (row1 :) . unStore
     ntInsertRow row1 = fmap (cons row1)
-    -- ntFind mk mr mv   = ntFind2 (toCond mk) (toCond mr) (toCond mv)
+    ntQuery (QueryRow mk mr mv) = filter (toCond mk . rk ) . (toCond mr . rr) . (toCond mv . rv) . unStore
+    -- ntFind mk mr mv   = ntFind2 (toCond mk ) (toCond mr) (toCond mv)
     -- ntFind2 ck cr cv   = filter (ck . rk) . filter (cr . rr) . filter (cv . rv) . unStore
     -- ntDeleteAll k   =  Store . filter ((k/=).rk) . unStore
     -- ntDeleteVal k p  =  Store . filter (\r -> ((k/=).rk $ r) || ((p/=).rr $ r)) . unStore
