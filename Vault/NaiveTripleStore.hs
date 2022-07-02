@@ -94,13 +94,22 @@ type Triple = (Key, TestRel, Val) -- deriving (Show, Read, Ord, Eq)
 ts0, ts1 :: [Triple]
 ts0 = tsempty
 ts1 = tsinsert (k1,r1,v1) ts0
+ts2 :: [(Key, TestRel, ValueSum)]
 ts2 = tsinsert t2 ts1
 
+t1 :: (Key, TestRel, ValueSum)
 t1 = (k1, r1, v1)
+t2 :: (Key, TestRel, ValueSum)
 t2= (mkkey "t2", r1, mktext "label2")
+t3 :: (Key, TestRel, ValueSum)
 t3= (mkkey "t3", r1, mktext "label3")
+m1 :: (Maybe Key, Maybe a1, Maybe a2)
 m1 = (Just (mkkey "t1"), Nothing, Nothing)
+m2 :: (Maybe Key, Maybe a1, Maybe a2)
 m2 = (Just (mkkey "t2"), Nothing, Nothing)
+k1 :: Key
 k1 = mkkey "t1"
+r1 :: TestRel
 r1 = T1
+v1 :: ValueSum
 v1 = mktext "label1"

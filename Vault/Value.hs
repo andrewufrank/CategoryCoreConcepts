@@ -65,8 +65,9 @@ unkey (Key t) = t
 
 
 --------------------------------- VALUE 
-data Value a = Value  a
+newtype Value a = Value  a
     deriving (Eq, Ord, Read, Show, Generic, Zeros)
+unvalue :: Value a -> a
 unvalue (Value a) = a 
 
 type ValueF = Value Float
