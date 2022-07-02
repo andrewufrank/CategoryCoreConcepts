@@ -19,19 +19,10 @@
 {-# LANGUAGE DeriveFunctor    #-}
 
 module Vault.NaiveTripleStore 
---     (NaiveTriples (..)
---     , Store (..)
---     , newNaiveStore
---     -- , storeCopyKeyData
--- --        module Vault.NGtriplestore
--- --    ,  Rel4Test  (..)
---     , Key (..) ,mkkey , unkey
---     , Val 
---     , Vals (..) 
---     -- unVal4, isVal4
---     -- , B4val (..), proxyB4val, proxyFloat
---     , Row (..)   
---        )    
+    ( TripleStore (..)
+    , Action (..)
+    , pageNT
+    )    
     where
 
 import UniformBase

@@ -15,18 +15,20 @@
 {-# LANGUAGE TypeSynonymInstances  #-}
 {-# LANGUAGE DeriveAnyClass     #-}
 
-module Vault.Vault (
-    Vaults (..), Vault (..), VaultState
-    -- , ObjID, makeObjID
---    , module Vault.NaiveTriplestore
---    ,  Rel4Test  (..)
-    -- , B4val (..), proxyB4val, proxyFloat
-    , Val
-    , Vals (..)
-    -- ,  unVal4, isVal4
-    , Row (..)
---    , newNaiveStore -- for testing
-    )    where
+module Vault.Vault 
+    (
+--     Vaults (..), Vault (..), VaultState
+--     -- , ObjID, makeObjID
+-- --    , module Vault.NaiveTriplestore
+-- --    ,  Rel4Test  (..)
+--     -- , B4val (..), proxyB4val, proxyFloat
+--     , Val
+--     , Vals (..)
+--     -- ,  unVal4, isVal4
+--     , Row (..)
+-- --    , newNaiveStore -- for testing
+    )    
+    where
 
 import Control.Monad.State
 -- import Data.List (sort)
