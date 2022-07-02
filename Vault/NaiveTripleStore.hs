@@ -34,12 +34,11 @@ module Vault.NaiveTripleStore
 --        )    
     where
 
--- import UniformBase
+import UniformBase
 -- import Uniform.Error
 -- import Data.List.Extra
 
 import Vault.Value
-import UniformBase (putIOwords)
 
 
 
@@ -56,7 +55,7 @@ type Val = ValueSum
 class () => TripleStore o p v  where
     tsempty :: [(o,p,v)]
     tsinsert :: (o,p,v) -> [(o,p,v)] -> [(o,p,v)]
-    -- tsfind :: t -> [t] -> [t]
+    tsfind :: (Maybe o, Maybe p, Maybe v) -> [(o,p,v)] -> [(o,p,v)]
 
 type Triple = (Key, TestRel, Val) -- deriving (Show, Read, Ord, Eq)
 type Query = (Maybe Key, Maybe TestRel, Maybe Val)
@@ -64,7 +63,8 @@ type Query = (Maybe Key, Maybe TestRel, Maybe Val)
 instance TripleStore Key TestRel Val where 
     tsempty = []
     tsinsert t@(o,p,v) = ( t :)
-    -- tsfind t 
+    tsfind (mo, mp, mv) =  filter (toCond mo . fst3) 
+        -- . filter (cr . rr) . filter (cv . rv) 
     -- ntInsert:: Key -> rel -> Val ->  Store rel ->  Store rel
     -- ntInsertRow:: row ->  Store [row] ->  Store [row]
     -- ntDeleteAll :: Key -> Store rel ->  Store rel
@@ -80,7 +80,7 @@ instance TripleStore Key TestRel Val where
 
 pageNT :: IO ()
 pageNT = do
-    putIOwords ["\n [age NT"]
+    putIOwords ["\n [page NT"]
 
 
 
@@ -93,9 +93,9 @@ pageNT = do
 -- -- instance Semigroup (Store r)
 -- -- instance (Monoid r) => Monoid (Store r) where mempty = Store mempty
 
--- toCond :: Eq v => Maybe v -> (v -> Bool)
--- toCond (Nothing) = const True
--- toCond (Just v) = (v==)
+toCond :: Eq v => Maybe v -> (v -> Bool)
+toCond (Nothing) = const True
+toCond (Just v) = (v==)
 
 -- instance (Eq row) => NaiveTriples  row  where
 --     -- ntInsert k r v   = Store . (Row k r v :) . unStore
