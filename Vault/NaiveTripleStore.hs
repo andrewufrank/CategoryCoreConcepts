@@ -64,7 +64,10 @@ instance TripleStore Key TestRel Val where
     tsempty = []
     tsinsert t@(o,p,v) = ( t :)
     tsfind (mo, mp, mv) =  filter (toCond mo . fst3) 
-        -- . filter (cr . rr) . filter (cv . rv) 
+                        . filter (toCond mp . snd3) 
+                        . filter (toCond mv . trd3) 
+
+
     -- ntInsert:: Key -> rel -> Val ->  Store rel ->  Store rel
     -- ntInsertRow:: row ->  Store [row] ->  Store [row]
     -- ntDeleteAll :: Key -> Store rel ->  Store rel

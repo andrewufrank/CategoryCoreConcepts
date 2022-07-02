@@ -43,6 +43,7 @@ res1 = "[(Key \"t1\",T1,VT (Value \"label1\"))]"
 
 
 test_find = assertEqual (res1) (showT (tsfind (Just k1, Nothing, Nothing) ts1))
+test_find2 = assertEqual (res1) (showT (tsfind (Just k1, Just r1, Nothing) ts1))
 
 -- test_empty = assertEqual ([]) (ntFind Nothing Nothing Nothing newNaiveStore :: [Row GraphRels])
 -- -- an empty store must contain nothing 
