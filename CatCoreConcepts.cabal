@@ -15,9 +15,6 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Lib.CCdata
-      Lib.ExampleData
-      Lib.ExampleSet
       Lib.Rules
       Lib.STproduct
       Vault.NaiveTripleStore

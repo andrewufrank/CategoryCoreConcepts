@@ -87,7 +87,7 @@ instance Functor Value where
     fmap f = Value . f . unvalue 
 
 f1 = mkfloat 1.0
-t1 = mktext "eins"
+s1 = mktext "eins"
 
 data ValueSum = VF ValueF |  VT ValueT | VI ValueI | VO ValueO | VZ
     deriving (Show, Read, Ord, Eq, Generic)

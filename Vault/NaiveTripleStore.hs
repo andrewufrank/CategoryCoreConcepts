@@ -56,9 +56,12 @@ class () => TripleStore o p v  where
     tsempty :: [(o,p,v)]
     tsinsert :: (o,p,v) -> [(o,p,v)] -> [(o,p,v)]
     tsfind :: (Maybe o, Maybe p, Maybe v) -> [(o,p,v)] -> [(o,p,v)]
+    tsbatch :: [Action (o,p,v)] -> [(o,p,v)] -> [(o,p,v)]
 
 type Triple = (Key, TestRel, Val) -- deriving (Show, Read, Ord, Eq)
-type Query = (Maybe Key, Maybe TestRel, Maybe Val)
+-- type Query = (Maybe Key, Maybe TestRel, Maybe Val)
+data Action a = Ins a | Del a
+        deriving (Show, Read, Ord, Eq)
 
 instance TripleStore Key TestRel Val where 
     tsempty = []
@@ -66,7 +69,8 @@ instance TripleStore Key TestRel Val where
     tsfind (mo, mp, mv) =  filter (toCond mo . fst3) 
                         . filter (toCond mp . snd3) 
                         . filter (toCond mv . trd3) 
-
+    tsbatch [] ts = ts
+    tsbatch ((Ins t) : as) ts = tsinsert t . tsbatch as $ ts
 
     -- ntInsert:: Key -> rel -> Val ->  Store rel ->  Store rel
     -- ntInsertRow:: row ->  Store [row] ->  Store [row]

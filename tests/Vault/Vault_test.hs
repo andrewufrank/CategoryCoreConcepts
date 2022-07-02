@@ -36,14 +36,17 @@ import           Test.Framework
 
 test_empty = assertEqual ("[]") (showT (tsempty :: [Triple]))
 
-test_insert = assertEqual (res1 ) (showT ts1)
+test_insert = assertEqual (concat'["[", res1, "]"] ) (showT ts1)
 
+test_batch_insert = assertEqual (concat'["[", res2, ",", res1, "]"])
+    (showT . tsbatch [Ins t2] $ ts1)
 res1 :: Text
-res1 = "[(Key \"t1\",T1,VT (Value \"label1\"))]"
+res1 = "(Key \"t1\",T1,VT (Value \"label1\"))"
+res2 = "(Key \"t2\",T1,VT (Value \"label2\"))"
 
 
-test_find = assertEqual (res1) (showT (tsfind (Just k1, Nothing, Nothing) ts1))
-test_find2 = assertEqual (res1) (showT (tsfind (Just k1, Just r1, Nothing) ts1))
+test_find = assertEqual (concat'["[", res1, "]"]) (showT (tsfind (Just k1, Nothing, Nothing) ts1))
+test_find2 = assertEqual (concat'["[", res1, "]"]) (showT (tsfind (Just k1, Just r1, Nothing) ts1))
 
 -- test_empty = assertEqual ([]) (ntFind Nothing Nothing Nothing newNaiveStore :: [Row GraphRels])
 -- -- an empty store must contain nothing 
@@ -64,6 +67,9 @@ test_find2 = assertEqual (res1) (showT (tsfind (Just k1, Just r1, Nothing) ts1))
 ts0, ts1 :: [Triple]
 ts0 = tsempty
 ts1 = tsinsert (k1,r1,v1) ts0
+
+t1 = (k1, r1, v1)
+t2= (mkkey "t2", r1, mktext "label2")
 k1 = mkkey "t1"
 r1 = T1
 v1 = mktext "label1"
