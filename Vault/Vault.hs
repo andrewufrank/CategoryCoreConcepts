@@ -53,20 +53,6 @@ class Vaults rel where
     vaultEmpty :: Vault rel
     vaultInsert :: TripleCC rel -> Vault rel -> Vault rel
 
-
---     vaultInsert :: () => rel -> Key -> Val -> VaultState rel ()
---     vaultLookup :: () => rel -> Key -> VaultState rel (Maybe Val)
---     vaultDeleteAll :: Key -> VaultState rel ()
---     vaultDeleteVal :: rel -> Key -> VaultState rel ()
---     vaultFind :: Maybe rel -> Maybe Key -> Maybe Val -> VaultState rel [Row rel]
---     -- vaultAllDist :: (Eq rel, Ord rel) => Key -> VaultState rel [(rel, B4val)]
---     -- ^ get all distinctions with value, order is determined by enum type of rel
---     vaultCopyObj :: (Eq rel) => Key -> Key -> VaultState rel ()
---     vaultNew ::  Vault rel
---     vaultNewObjID :: VaultState rel Key
---     vaultKeyValid :: Key -> VaultState rel Bool
--- --    -- ^ check if key is in range first to last
---
 --
 data GraphRels = Edge | Node | Label  --  for edge node label
     deriving (Show, Read, Ord, Eq)
@@ -88,15 +74,34 @@ instance TripleStore Key GraphRels ValueSum where
 -------------for test 
 -- v0 :: Vault (TripleCC GraphRels)
 -- v0 = vaultEmpty
+x0, x1 :: [TripleCC GraphRels]
+x0 = tsempty 
+x1 = tsinsert (mkkey "x1", Edge, mktext "label x1") x0
+
+
 
 pageVault :: IO ()
 pageVault = do
     putIOwords ["\n [pageVault"]
+    putIOwords ["ts empty", showT x0]
+    putIOwords ["ts one", showT x1]
     -- putIOwords ["vault empty", showT v0]
 
 
     -------------old
-
+--     vaultInsert :: () => rel -> Key -> Val -> VaultState rel ()
+--     vaultLookup :: () => rel -> Key -> VaultState rel (Maybe Val)
+--     vaultDeleteAll :: Key -> VaultState rel ()
+--     vaultDeleteVal :: rel -> Key -> VaultState rel ()
+--     vaultFind :: Maybe rel -> Maybe Key -> Maybe Val -> VaultState rel [Row rel]
+--     -- vaultAllDist :: (Eq rel, Ord rel) => Key -> VaultState rel [(rel, B4val)]
+--     -- ^ get all distinctions with value, order is determined by enum type of rel
+--     vaultCopyObj :: (Eq rel) => Key -> Key -> VaultState rel ()
+--     vaultNew ::  Vault rel
+--     vaultNewObjID :: VaultState rel Key
+--     vaultKeyValid :: Key -> VaultState rel Bool
+-- --    -- ^ check if key is in range first to last
+--
 
     --     vaultInsert d k a  = modify (\v -> v{vstore= ntInsert k d a (vstore v)})
 --     vaultLookup d k  =  get >>=
