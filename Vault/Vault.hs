@@ -61,14 +61,6 @@ data GraphRels = Edge | Node | Label  --  for edge node label
 --     vaultEmpty = Vault []
 --     -- vaultInsert t = Vault .  tsinsert t . unVault
 
-instance TripleStore Key GraphRels ValueSum where 
-    tsempty = []
-    tsinsert t = ( t :)
-    tsdel t = filter (not . filterTriple t )
-    tsfind t =  filter (filterTriple t)
-    tsbatch [] ts = ts
-    tsbatch ((Ins t) : as) ts = tsinsert t . tsbatch as $ ts
-    tsbatch ((Del t) : as) ts = tsdel (toMaybes t) . tsbatch as $ ts
 
 
 -------------for test 

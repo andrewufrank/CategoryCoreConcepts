@@ -53,7 +53,7 @@ class () => TripleStore o p v  where
 data Action a = Ins a | Del a
         deriving (Show, Read, Ord, Eq)
 
-instance TripleStore Key TestRel Val where 
+instance (Eq a) => TripleStore Key a Val where 
     tsempty = []
     tsinsert t@(o,p,v) = ( t :)
     tsdel t@(mo, mp, mv) = filter (not . filterTriple t )
