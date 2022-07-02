@@ -26,7 +26,7 @@ import Control.Monad.Constrained
 -- end 
 
 import UniformBase 
-import Lib.Rules (fromPfeile)
+-- import Lib.Rules (fromPfeile)
 import Vault.Value
 -- import Vault.Vault
 import Vault.NaiveTripleStore

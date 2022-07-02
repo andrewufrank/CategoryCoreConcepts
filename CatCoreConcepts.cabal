@@ -15,10 +15,7 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Lib.Rules
-      Lib.STproduct
       Vault.NaiveTripleStore
-      Vault.Object
       Vault.Value
   other-modules:
       Paths_CatCoreConcepts
