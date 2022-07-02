@@ -40,11 +40,11 @@ import Vault.Value
 
 type TripleCC a =  (Key, a, ValueSum) 
             -- deriving (Show, Read, Ord, Eq, Generic, Zeros)
-newtype Vault  a = Vault [TripleCC a] 
+newtype Vault  a = VaultK [TripleCC a] 
                      deriving (Show, Read, Eq)
 
 unVault :: Vault a -> [TripleCC a]
-unVault (Vault as) = as
+unVault (VaultK as) = as
 
 
 -- type VaultState rel = State (Vault rel)
@@ -57,27 +57,36 @@ class Vaults rel where
 data GraphRels = Edge | Node | Label  --  for edge node label
     deriving (Show, Read, Ord, Eq)
 
--- instance () => Vaults (TripleCC GraphRels) where
---     vaultEmpty = Vault []
---     -- vaultInsert t = Vault .  tsinsert t . unVault
+instance () => Vaults (GraphRels) where
+    vaultEmpty =( VaultK []) :: Vault GraphRels
+    vaultInsert t v = VaultK .  tsinsert t   $ a1
+        where 
+                a1 :: [TripleCC GraphRels]
+                a1 = unVault v 
 
 
 
 -------------for test 
--- v0 :: Vault (TripleCC GraphRels)
--- v0 = vaultEmpty
-x0, x1 :: [TripleCC GraphRels]
+e1 :: TripleCC GraphRels  -- (Key, GraphRels, ValueSum)
+e1 = (mkkey "x1", Edge, mktext "label x1")
+x0 :: [TripleCC GraphRels]
 x0 = tsempty 
-x1 = tsinsert (mkkey "x1", Edge, mktext "label x1") x0
+x1 :: [TripleCC GraphRels]
+x1 = tsinsert  e1 x0
 
-
+v0 :: Vault ( GraphRels)
+v0 = vaultEmpty
+v1 :: Vault (GraphRels)
+v1 = vaultInsert e1 v0
 
 pageVault :: IO ()
 pageVault = do
     putIOwords ["\n [pageVault"]
     putIOwords ["ts empty", showT x0]
     putIOwords ["ts one", showT x1]
-    -- putIOwords ["vault empty", showT v0]
+
+    putIOwords ["vault empty", showT v0]
+    putIOwords ["vault with e1", showT v1]
 
 
     -------------old
