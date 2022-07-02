@@ -54,7 +54,7 @@ test_find2 = assertEqual (concat'["[", res1, "]"]) (showT (tsfind (Just k1, Just
 test_del0 = assertEqual (concat'[ res21 ] ) 
     (showT  ts2)
 test_del1 = assertEqual (concat'["[", res2, "]"] ) 
-    (showT $ tsdel m1 ts2)
+    (showT $ tsdel t1 ts2)
 
 test_delBatch = assertEqual (concat'["[", res1, "]"] ) 
     (showT $ tsbatch [Del t2] ts2)

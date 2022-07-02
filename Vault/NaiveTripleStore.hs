@@ -44,7 +44,8 @@ type Val = ValueSum
 class () => TripleStore o p v  where
     tsempty :: [(o,p,v)]
     tsinsert :: (o,p,v) -> [(o,p,v)] -> [(o,p,v)]
-    tsdel :: (Maybe o, Maybe p, Maybe v) -> [(o,p,v)] -> [(o,p,v)]
+    -- tsdel :: (Maybe o, Maybe p, Maybe v) -> [(o,p,v)] -> [(o,p,v)]
+    tsdel :: ( o,  p,  v) -> [(o,p,v)] -> [(o,p,v)]
     tsfind :: (Maybe o, Maybe p, Maybe v) -> [(o,p,v)] -> [(o,p,v)]
     tsbatch :: [Action (o,p,v)] -> [(o,p,v)] -> [(o,p,v)]
 
@@ -56,11 +57,11 @@ data Action a = Ins a | Del a
 instance (Eq a) => TripleStore Key a Val where 
     tsempty = []
     tsinsert t@(o,p,v) = ( t :)
-    tsdel t@(mo, mp, mv) = filter (not . filterTriple t )
+    tsdel t@(mo, mp, mv) = filter (not . filterTriple (toMaybes t) )
     tsfind t@(mo, mp, mv) =  filter (filterTriple t)
     tsbatch [] ts = ts
     tsbatch ((Ins t) : as) ts = tsinsert t . tsbatch as $ ts
-    tsbatch ((Del t) : as) ts = tsdel (toMaybes t) . tsbatch as $ ts
+    tsbatch ((Del t) : as) ts = tsdel t . tsbatch as $ ts
 
 
 pageNT :: IO ()

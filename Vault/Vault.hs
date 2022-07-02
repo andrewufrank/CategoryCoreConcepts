@@ -45,13 +45,15 @@ newtype Vault  a = VaultK [TripleCC a]
 
 unVault :: Vault a -> [TripleCC a]
 unVault (VaultK as) = as
-
+wrapVault :: ([TripleCC a] -> [TripleCC a]) -> Vault a -> Vault a
+wrapVault f = VaultK . f . unVault  -- not a functor!
 
 -- type VaultState rel = State (Vault rel)
 
 class Vaults rel where
     vaultEmpty :: Vault rel
     vaultInsert :: TripleCC rel -> Vault rel -> Vault rel
+    vaultDel :: TripleCC rel -> Vault rel -> Vault rel
 
 --
 data GraphRels = Edge | Node | Label  --  for edge node label
@@ -59,12 +61,13 @@ data GraphRels = Edge | Node | Label  --  for edge node label
 
 instance () => Vaults (GraphRels) where
     vaultEmpty =( VaultK []) :: Vault GraphRels
-    vaultInsert t v = VaultK .  tsinsert t   $ a1
-        where 
-                a1 :: [TripleCC GraphRels]
-                a1 = unVault v 
+    -- vaultInsert t  = VaultK .  tsinsert t   . unVault
+    vaultInsert t  = wrapVault  (tsinsert t)  
+    vaultDel t = wrapVault (tsdel t)  
 
-
+-- t2v :: TripleCC GraphRels -> VaultK (TripleCC GraphRels) 
+-- t2v a = VaultK a1
+--     where a1 = a :: TripleCC GraphRels 
 
 -------------for test 
 e1 :: TripleCC GraphRels  -- (Key, GraphRels, ValueSum)
@@ -78,6 +81,8 @@ v0 :: Vault ( GraphRels)
 v0 = vaultEmpty
 v1 :: Vault (GraphRels)
 v1 = vaultInsert e1 v0
+v2 :: Vault GraphRels
+v2 = vaultDel e1 v1
 
 pageVault :: IO ()
 pageVault = do
@@ -87,6 +92,7 @@ pageVault = do
 
     putIOwords ["vault empty", showT v0]
     putIOwords ["vault with e1", showT v1]
+    putIOwords ["vault deleted e1", showT v2]
 
 
     -------------old
