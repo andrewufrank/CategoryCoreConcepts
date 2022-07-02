@@ -36,6 +36,10 @@ import           Test.Framework
 
 test_empty = assertEqual ("[]") (showT (tsempty :: [Triple]))
 
+test_insert = assertEqual ("[(Key \"t1\",T1,VT (Value \"label1\"))]" ) (showT (tsinsert (k1,r1,v1) ts0))
+
+
+
 -- test_empty = assertEqual ([]) (ntFind Nothing Nothing Nothing newNaiveStore :: [Row GraphRels])
 -- -- an empty store must contain nothing 
 
@@ -50,6 +54,10 @@ test_empty = assertEqual ("[]") (showT (tsempty :: [Triple]))
 -- --                             ntInsertRow row1 $
 -- --                             newNaiveStore :: [Row GraphRels])
 -- row1 = Row k1 r1 v1 :: Row TestRel
+
+
+ts0 :: [Triple]
+ts0 = tsempty
 k1 = mkkey "t1"
 r1 = T1
 v1 = mktext "label1"
