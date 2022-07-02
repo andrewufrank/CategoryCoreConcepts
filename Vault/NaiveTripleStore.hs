@@ -53,17 +53,17 @@ data TestRel = T1 | T2 deriving (Show, Read, Ord, Eq)
 type Val = ValueSum 
 
 -- | a store for typed triples 
-class () => TripleStore t  where
-    tsempty :: [t]
-    tsinsert :: t -> [t] -> [t]
+class () => TripleStore o p v  where
+    tsempty :: [(o,p,v)]
+    tsinsert :: (o,p,v) -> [(o,p,v)] -> [(o,p,v)]
     -- tsfind :: t -> [t] -> [t]
 
 type Triple = (Key, TestRel, Val) -- deriving (Show, Read, Ord, Eq)
 type Query = (Maybe Key, Maybe TestRel, Maybe Val)
 
-instance TripleStore Triple where 
+instance TripleStore Key TestRel Val where 
     tsempty = []
-    tsinsert t = ( t :)
+    tsinsert t@(o,p,v) = ( t :)
     -- tsfind t 
     -- ntInsert:: Key -> rel -> Val ->  Store rel ->  Store rel
     -- ntInsertRow:: row ->  Store [row] ->  Store [row]
