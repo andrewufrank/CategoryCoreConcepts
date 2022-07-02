@@ -26,7 +26,7 @@ module Vault.Vault_test
 
 import UniformBase
 import Vault.NaiveTripleStore
-import Vault.Object 
+-- import Vault.Object 
 import Vault.Value
 
 -- import  qualified         Algebra.Laws             as Law
@@ -34,21 +34,22 @@ import           Test.Framework
 -- import           Test.Invariant           as Rule  
 -- import Test.QuickCheck --  (arbitraryBoundedEnum)
 
+test_empty = assertEqual ("[]") (showT (tsempty :: [Triple]))
 
 -- test_empty = assertEqual ([]) (ntFind Nothing Nothing Nothing newNaiveStore :: [Row GraphRels])
 -- -- an empty store must contain nothing 
 
-test_insertOne = assertEqual 
-            (Store [Row{rk = Key "t1", rr = L, rv = VT (Value "label1")}]) 
-            (ntInsertRow row1 $
-                            newNaiveStore :: Store [Row GraphRels])
+-- test_insertOne = assertEqual 
+--             (Store [Row{rk = Key "t1", rr = T1, rv = VT (Value "label1")}]) 
+--             (ntInsertRow row1 $
+--                             newNaiveStore :: Store [Row TestRel])
 
--- test_insert = assertEqual 
---             ([Row{rk = Key "t1", rr = L, rv = VT (Value "label1")}]) (ntFind Nothing Nothing Nothing . 
---                             -- ntInsert k1 r1 v1 $
---                             ntInsertRow row1 $
---                             newNaiveStore :: [Row GraphRels])
-row1 = Row k1 r1 v1 :: Row GraphRels
+-- -- test_insert = assertEqual 
+-- --             ([Row{rk = Key "t1", rr = L, rv = VT (Value "label1")}]) (ntFind Nothing Nothing Nothing . 
+-- --                             -- ntInsert k1 r1 v1 $
+-- --                             ntInsertRow row1 $
+-- --                             newNaiveStore :: [Row GraphRels])
+-- row1 = Row k1 r1 v1 :: Row TestRel
 k1 = mkkey "t1"
-r1 = L
+r1 = T1
 v1 = mktext "label1"

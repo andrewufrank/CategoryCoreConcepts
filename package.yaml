@@ -14,7 +14,7 @@ dependencies:
   - constrained-categories
   - containers
   - mtl   # for vault
- 
+  - HTF  # hope helps
 
 library:
   source-dirs: .

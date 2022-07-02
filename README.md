@@ -1,3 +1,3 @@
-# a place to experiment with haskell to implement the examples from lawvere "conceptual mathematics"
+# a place to experiment with haskell to implement a category based spatial core concept 
 
 

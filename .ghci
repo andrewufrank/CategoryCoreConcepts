@@ -11,5 +11,5 @@
 :set -fno-warn-duplicate-exports
 :set -fno-warn-missing-methods
 :set -isrc
-:load src/ClassMain.hs
+@REM :load test/Testing.hs
  
