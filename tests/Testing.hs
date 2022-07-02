@@ -13,6 +13,7 @@
 
 import           Test.Framework
 -- import  {-@ HTF_TESTS @-}         Lib.Lawvere_test
+import  {-@ HTF_TESTS @-}         Vault.NaiveTripleStore_test
 import  {-@ HTF_TESTS @-}         Vault.Vault_test
 
 main :: IO ()

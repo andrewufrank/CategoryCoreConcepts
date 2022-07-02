@@ -72,6 +72,8 @@ instance () => Vaults (GraphRels) where
 -------------for test 
 e1 :: TripleCC GraphRels  -- (Key, GraphRels, ValueSum)
 e1 = (mkkey "x1", Edge, mktext "label x1")
+e2 :: (Key, GraphRels, ValueSum)
+e2 = (mkkey "x2", Edge, mktext "label x2")
 x0 :: [TripleCC GraphRels]
 x0 = tsempty 
 x1 :: [TripleCC GraphRels]
@@ -82,7 +84,9 @@ v0 = vaultEmpty
 v1 :: Vault (GraphRels)
 v1 = vaultInsert e1 v0
 v2 :: Vault GraphRels
-v2 = vaultDel e1 v1
+v2 = vaultInsert e2 v1
+v3 :: Vault GraphRels
+v3 = vaultDel e2 v2
 
 pageVault :: IO ()
 pageVault = do
