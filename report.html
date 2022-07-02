@@ -1,0 +1,674 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<title>HLint Report</title>
+<script type='text/javascript'>
+
+/* == Algorithm for show/unshow ==
+   Each hint/file is given a number, hint# or file#
+   When we say showOnly with a class name we add the rules to
+   the css #content div {display:none}, #content div.className {display:block}
+   When going back to showAll we remove these results
+*/
+
+// CSS MANIPULATION //
+
+function deleteRules(n)
+{
+    var css = document.styleSheets[0];
+    for (var i = 0; i < n; i++)
+        css.deleteRule(css.cssRules.length-1);
+}
+
+function insertRule(s)
+{
+    var css = document.styleSheets[0];
+    css.insertRule(s, css.cssRules.length);
+}
+
+// SHOW/HIDE LOGIC //
+
+/**
+ * @param {bool} [initialise=false] - Used to signal we are loading the page, so
+ the current location doesn't match our presumed state.
+ */
+function show(id, initialise=false)
+{
+    var last;
+    if (initialise)
+    {
+        last = "";
+    }
+    else
+    {
+        last = document.location.hash.slice(1);
+    }
+
+    if (id === last) return;
+    if (id.length === 0)
+    {
+        deleteRules(3);
+        insertRule(".all {font-weight: bold;}");
+    }
+    else
+    {
+        if (last.length === 0)
+        {
+            deleteRules(1);
+            insertRule("#content div {display:none;}");
+        }
+        else
+        {
+            deleteRules(2);
+        }
+        insertRule("#content div." + id + " {display:block;}");
+        insertRule("#" + id + "{font-weight:bold;}");
+    }
+
+    if (window.history)
+        history.replaceState("", document.title, window.location.pathname + window.location.search + (id === "" ? "" : "#" + id));
+    else
+        document.location.hash = '#'.concat(id);
+}
+
+</script>
+<style type="text/css">
+/* These rules are manipulated by the script.
+   The commented form is how it looks with an id selected */
+
+.all {font-weight: bold;}      /* #content div {display:none;} */
+                               /* #content div.id {display:block;} */
+                               /* #id {font-weight: bold;} */
+
+</style>
+<style type="text/css">
+/* See http://www.webreference.com/programming/css_frames/ */
+body {
+    margin:0;
+    border:0;
+    padding:0;
+    height:100%;
+    max-height:100%;
+    font-family: sans-serif;
+    font-size:76%;
+    overflow: hidden;
+}
+
+#leftbar {
+    position:absolute;
+    top:0px;
+    left:0px;
+    width: 215px;
+    bottom: 0px;
+    overflow:auto;
+    background:rgb(202,223,255);
+    margin: 10px;
+    padding-top: 0;
+    padding-left: 7px;
+    padding-right: 7px;
+    border-radius: 5px;
+
+    display:none; /* Override if script present */
+}
+
+#content {
+    position:absolute;
+    top:0;
+    bottom:0;
+    right:0;
+    overflow:auto;
+    padding-bottom: 15px;
+    padding-right: 7px;
+
+    left:10px; /* Override if script present */
+}
+
+#leftbar ul {margin-top: 0px; padding-left: 15px;}
+#leftbar p {margin-bottom: 0px;}
+.note {color: gray; font-size: smaller;}
+
+pre {
+    font-family: "lucida console", monospace;
+    padding-left: 15px;
+    margin: 2px;
+}
+
+#content div {
+    margin-bottom: 10px;
+    margin-right: 10px;
+    padding-top: 4px;
+    border-top: 1px solid #ccc;
+}
+
+.script #content {left:250px;}
+.script #leftbar {display: block;}
+
+/* From HsColour */
+.hs-keyglyph, .hs-layout {color: red;}
+.hs-keyword {color: blue;}
+.hs-comment, .hs-comment a {color: green;}
+.hs-str, .hs-chr {color: teal;}
+</style>
+</head>
+<body>
+
+<script type='text/javascript'>
+document.body.className = "script";
+</script>
+
+<div id="leftbar" valign="top" style="min-width:200px">
+
+<p><a class="all" href="javascript:show('')">All hints</a></p>
+<ul>
+<li><a id="hint0" href="javascript:show('hint0')">Warning: Eta reduce (4)</a></li>
+<li><a id="hint1" href="javascript:show('hint1')">Warning: Functor law (2)</a></li>
+<li><a id="hint2" href="javascript:show('hint2')">Warning: Redundant bracket (17)</a></li>
+<li><a id="hint3" href="javascript:show('hint3')">Warning: Unused LANGUAGE pragma (15)</a></li>
+<li><a id="hint4" href="javascript:show('hint4')">Suggestion: Redundant $ (2)</a></li>
+<li><a id="hint5" href="javascript:show('hint5')">Suggestion: Redundant bracket (4)</a></li>
+<li><a id="hint6" href="javascript:show('hint6')">Suggestion: Use &lt;$&gt; (1)</a></li>
+<li><a id="hint7" href="javascript:show('hint7')">Suggestion: Use =&lt;&lt; (2)</a></li>
+<li><a id="hint8" href="javascript:show('hint8')">Suggestion: Use newtype instead of data (2)</a></li>
+</ul>
+
+<p><a class="all" href="javascript:show('')">All files</a></p>
+<ul>
+<li><a id="file0" href="javascript:show('file0')">./Vault/NaiveTripleStore.hs (4)</a></li>
+<li><a id="file1" href="javascript:show('file1')">./Vault/Value.hs (1)</a></li>
+<li><a id="file2" href="javascript:show('file2')">./Vault/Vault.hs (2)</a></li>
+<li><a id="file3" href="javascript:show('file3')">./old_not included/CCdata.hs (3)</a></li>
+<li><a id="file4" href="javascript:show('file4')">./old_not included/ExampleData.hs (14)</a></li>
+<li><a id="file5" href="javascript:show('file5')">./old_not included/ExampleSet.hs (6)</a></li>
+<li><a id="file6" href="javascript:show('file6')">./old_not included/Lawvere_test.hs (1)</a></li>
+<li><a id="file7" href="javascript:show('file7')">./old_not included/Rules.hs (4)</a></li>
+<li><a id="file8" href="javascript:show('file8')">./old_not included/STproduct.hs (3)</a></li>
+<li><a id="file9" href="javascript:show('file9')">./old_not included/STproductVault.hs (3)</a></li>
+<li><a id="file10" href="javascript:show('file10')">./old_not included/UsingSets.hs (4)</a></li>
+<li><a id="file11" href="javascript:show('file11')">./tests/Vault/Vault_test.hs (4)</a></li>
+</ul>
+
+</div>
+<div id="content" valign="top" width="100%">
+<p>
+    Report generated by <a href="http://community.haskell.org/~ndm/hlint/">HLint</a>
+v3.4
+    - a tool to suggest improvements to your Haskell code.
+</p>
+
+<div class="hint3 file0">
+Vault/NaiveTripleStore.hs:17:1-38: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE TypeSynonymInstances #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: Extension TypeSynonymInstances is implied by FlexibleInstances</span>
+</div>
+
+<div class="hint3 file0">
+Vault/NaiveTripleStore.hs:18:1-35: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE DeriveAnyClass #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+
+</div>
+
+<div class="hint3 file0">
+Vault/NaiveTripleStore.hs:19:1-33: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE DeriveFunctor #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+
+</div>
+
+<div class="hint2 file0">
+Vault/NaiveTripleStore.hs:67:8-16: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Nothing</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Nothing</span></pre>
+
+</div>
+
+<div class="hint3 file1">
+Vault/Value.hs:13:1-38: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE TypeSynonymInstances #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: Extension TypeSynonymInstances is implied by FlexibleInstances</span>
+</div>
+
+<div class="hint3 file2">
+Vault/Vault.hs:15:1-38: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE TypeSynonymInstances #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: Extension TypeSynonymInstances is implied by FlexibleInstances</span>
+</div>
+
+<div class="hint3 file2">
+Vault/Vault.hs:17:1-33: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE DeriveFunctor #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+
+</div>
+
+<div class="hint3 file3">
+old_not included/CCdata.hs:19:1-38: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE TypeSynonymInstances #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: Extension TypeSynonymInstances is implied by FlexibleInstances</span>
+</div>
+
+<div class="hint8 file3">
+old_not included/CCdata.hs:(62,1)-(63,50): Suggestion: Use newtype instead of data<br/>
+Found<br/>
+<pre><span class='hs-keyword'>data</span> <span class='hs-conid'>Point1d</span> <span class='hs-varid'>a</span>
+  <span class='hs-keyglyph'>=</span> <span class='hs-conid'>Point1d</span> <span class='hs-layout'>{</span><span class='hs-varid'>x1</span> <span class='hs-keyglyph'>::</span> <span class='hs-varid'>a</span><span class='hs-layout'>}</span>
+  <span class='hs-keyword'>deriving</span> <span class='hs-layout'>(</span><span class='hs-conid'>Show</span><span class='hs-layout'>,</span> <span class='hs-conid'>Read</span><span class='hs-layout'>,</span> <span class='hs-conid'>Ord</span><span class='hs-layout'>,</span> <span class='hs-conid'>Eq</span><span class='hs-layout'>,</span> <span class='hs-conid'>Generic</span><span class='hs-layout'>,</span> <span class='hs-conid'>Zeros</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>newtype</span> <span class='hs-conid'>Point1d</span> <span class='hs-varid'>a</span>
+  <span class='hs-keyglyph'>=</span> <span class='hs-conid'>Point1d</span> <span class='hs-layout'>{</span><span class='hs-varid'>x1</span> <span class='hs-keyglyph'>::</span> <span class='hs-varid'>a</span><span class='hs-layout'>}</span>
+  <span class='hs-keyword'>deriving</span> <span class='hs-layout'>(</span><span class='hs-conid'>Show</span><span class='hs-layout'>,</span> <span class='hs-conid'>Read</span><span class='hs-layout'>,</span> <span class='hs-conid'>Ord</span><span class='hs-layout'>,</span> <span class='hs-conid'>Eq</span><span class='hs-layout'>,</span> <span class='hs-conid'>Generic</span><span class='hs-layout'>,</span> <span class='hs-conid'>Zeros</span><span class='hs-layout'>)</span></pre>
+<span class='note'>Note: decreases laziness</span>
+</div>
+
+<div class="hint0 file3">
+old_not included/CCdata.hs:78:5-46: Warning: Eta reduce<br/>
+Found<br/>
+<pre><span class='hs-definition'>fromInteger</span> <span class='hs-varid'>i</span> <span class='hs-keyglyph'>=</span> <span class='hs-conid'>Point1d</span> <span class='hs-varop'>.</span> <span class='hs-varid'>fromInteger</span> <span class='hs-varop'>$</span> <span class='hs-varid'>i</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>fromInteger</span> <span class='hs-keyglyph'>=</span> <span class='hs-conid'>Point1d</span> <span class='hs-varop'>.</span> <span class='hs-varid'>fromInteger</span></pre>
+
+</div>
+
+<div class="hint3 file4">
+old_not included/ExampleData.hs:11:1-38: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE TypeSynonymInstances #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: Extension TypeSynonymInstances is implied by FlexibleInstances</span>
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:30:5-12: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Mother</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Mother</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:31:5-12: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Father</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Father</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:32:5-11: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Child</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Child</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:61:5-10: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>John</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>John</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:62:5-10: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Mary</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Mary</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:63:5-9: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Sam</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Sam</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:66:4-9: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>John</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>John</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:67:4-8: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Sam</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Sam</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:68:4-9: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Mary</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Mary</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:71:4-9: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Eggs</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Eggs</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:72:4-11: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Coffee</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Coffee</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:73:4-10: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Toast</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Toast</span></pre>
+
+</div>
+
+<div class="hint2 file4">
+old_not included/ExampleData.hs:74:4-12: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Oatmeal</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Oatmeal</span></pre>
+
+</div>
+
+<div class="hint6 file5">
+old_not included/ExampleSet.hs:35:12-52: Suggestion: Use &lt;$&gt;<br/>
+Found<br/>
+<pre><span class='hs-definition'>fmap</span> <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-layout'>(</span><span class='hs-varop'>^</span> <span class='hs-num'>2</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>$</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-comment'>-</span> <span class='hs-num'>3</span> <span class='hs-keyglyph'>..</span> <span class='hs-num'>4</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-layout'>(</span><span class='hs-varop'>^</span> <span class='hs-num'>2</span><span class='hs-layout'>)</span> <span class='hs-varop'>&lt;$&gt;</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-comment'>-</span> <span class='hs-num'>3</span> <span class='hs-keyglyph'>..</span> <span class='hs-num'>4</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint4 file5">
+old_not included/ExampleSet.hs:38:42: Suggestion: Redundant $<br/>
+Found<br/>
+<pre><span class='hs-definition'>fzipWith</span> <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-varid'>uncurry</span> <span class='hs-layout'>(</span><span class='hs-varop'>*</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span>
+  <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-num'>1</span> <span class='hs-keyglyph'>..</span> <span class='hs-num'>4</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-num'>0</span><span class='hs-layout'>,</span> <span class='hs-num'>2</span> <span class='hs-keyglyph'>..</span> <span class='hs-num'>6</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>fzipWith</span>
+  <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-varid'>uncurry</span> <span class='hs-layout'>(</span><span class='hs-varop'>*</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span>
+  <span class='hs-layout'>(</span><span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-num'>1</span> <span class='hs-keyglyph'>..</span> <span class='hs-num'>4</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-num'>0</span><span class='hs-layout'>,</span> <span class='hs-num'>2</span> <span class='hs-keyglyph'>..</span> <span class='hs-num'>6</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint7 file5">
+old_not included/ExampleSet.hs:(41,12)-(43,35): Suggestion: Use =&lt;&lt;<br/>
+Found<br/>
+<pre><span class='hs-definition'>join</span>
+  <span class='hs-varop'>.</span> <span class='hs-varid'>fmap</span> <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span><span class='hs-layout'>,</span> <span class='hs-num'>2</span> <span class='hs-varop'>*</span> <span class='hs-varid'>x</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span>
+      <span class='hs-varop'>.</span> <span class='hs-varid'>join</span>
+          <span class='hs-varop'>.</span> <span class='hs-varid'>fmap</span>
+              <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span><span class='hs-layout'>,</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span> <span class='hs-varop'>/</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>..</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span>
+              <span class='hs-varop'>.</span> <span class='hs-varid'>fmap</span> <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-layout'>(</span><span class='hs-num'>2</span> <span class='hs-varop'>**</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span><span class='hs-layout'>,</span> <span class='hs-num'>2</span> <span class='hs-varop'>*</span> <span class='hs-varid'>x</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-varop'>=&lt;&lt;</span><span class='hs-layout'>)</span>
+   <span class='hs-varop'>.</span> <span class='hs-varid'>join</span>
+       <span class='hs-varop'>.</span> <span class='hs-varid'>fmap</span>
+           <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span><span class='hs-layout'>,</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span> <span class='hs-varop'>/</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>..</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span>
+           <span class='hs-varop'>.</span> <span class='hs-varid'>fmap</span> <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-layout'>(</span><span class='hs-num'>2</span> <span class='hs-varop'>**</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint7 file5">
+old_not included/ExampleSet.hs:(42,12)-(43,35): Suggestion: Use =&lt;&lt;<br/>
+Found<br/>
+<pre><span class='hs-definition'>join</span>
+  <span class='hs-varop'>.</span> <span class='hs-varid'>fmap</span>
+      <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span><span class='hs-layout'>,</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span> <span class='hs-varop'>/</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>..</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span>
+      <span class='hs-varop'>.</span> <span class='hs-varid'>fmap</span> <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-layout'>(</span><span class='hs-num'>2</span> <span class='hs-varop'>**</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span><span class='hs-layout'>,</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span> <span class='hs-varop'>/</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>..</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span>
+ <span class='hs-varop'>=&lt;&lt;</span><span class='hs-layout'>)</span>
+  <span class='hs-varop'>.</span> <span class='hs-varid'>fmap</span> <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-layout'>(</span><span class='hs-num'>2</span> <span class='hs-varop'>**</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint1 file5">
+old_not included/ExampleSet.hs:(42,19)-(43,35): Warning: Functor law<br/>
+Found<br/>
+<pre><span class='hs-definition'>fmap</span>
+  <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span><span class='hs-layout'>,</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span> <span class='hs-varop'>/</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>..</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span>
+  <span class='hs-varop'>.</span> <span class='hs-varid'>fmap</span> <span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-layout'>(</span><span class='hs-num'>2</span> <span class='hs-varop'>**</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>fmap</span>
+  <span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>ordd</span> <span class='hs-varop'>$</span> <span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Set.fromList</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span><span class='hs-layout'>,</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span> <span class='hs-varop'>/</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>..</span> <span class='hs-varid'>x</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span> <span class='hs-varop'>+</span> <span class='hs-num'>1</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span>
+     <span class='hs-varop'>.</span> <span class='hs-varid'>ordd</span> <span class='hs-layout'>(</span><span class='hs-num'>2</span> <span class='hs-varop'>**</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint4 file5">
+old_not included/ExampleSet.hs:49:25: Suggestion: Redundant $<br/>
+Found<br/>
+<pre><span class='hs-definition'>runKleisli</span> <span class='hs-varid'>k</span> <span class='hs-varop'>$</span> <span class='hs-varid'>pi</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>runKleisli</span> <span class='hs-varid'>k</span> <span class='hs-varid'>pi</span></pre>
+
+</div>
+
+<div class="hint3 file6">
+old_not included/Lawvere_test.hs:(16,1)-(17,29): Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE OverloadedStrings, RecordWildCards #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: may require <tt>{-# LANGUAGE DisambiguateRecordFields #-}</tt> adding to the top of the file</span>
+</div>
+
+<div class="hint2 file7">
+old_not included/Rules.hs:43:30-35: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>dots</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>dots</span></pre>
+
+</div>
+
+<div class="hint5 file7">
+old_not included/Rules.hs:86:21-28: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-varid'>v</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>k</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-varid'>v</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>k</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint5 file7">
+old_not included/Rules.hs:93:12-17: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>a</span><span class='hs-layout'>,</span> <span class='hs-layout'>(</span><span class='hs-varid'>b</span> <span class='hs-conop'>:</span> <span class='hs-varid'>bs</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>a</span><span class='hs-layout'>,</span> <span class='hs-varid'>b</span> <span class='hs-conop'>:</span> <span class='hs-varid'>bs</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint0 file7">
+old_not included/Rules.hs:103:5-38: Warning: Eta reduce<br/>
+Found<br/>
+<pre><span class='hs-definition'>seq1</span> <span class='hs-varid'>fun1</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>sequence</span> <span class='hs-varop'>.</span> <span class='hs-varid'>exp1</span> <span class='hs-varop'>$</span> <span class='hs-varid'>fun1</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>seq1</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>sequence</span> <span class='hs-varop'>.</span> <span class='hs-varid'>exp1</span></pre>
+
+</div>
+
+<div class="hint3 file8">
+old_not included/STproduct.hs:15:1-38: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE TypeSynonymInstances #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: Extension TypeSynonymInstances is implied by FlexibleInstances</span>
+</div>
+
+<div class="hint0 file8">
+old_not included/STproduct.hs:117:1-34: Warning: Eta reduce<br/>
+Found<br/>
+<pre><span class='hs-definition'>l'</span> <span class='hs-varid'>wvb</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>cross</span> <span class='hs-layout'>(</span><span class='hs-varid'>uncurry</span> <span class='hs-varid'>w'</span><span class='hs-layout'>,</span> <span class='hs-varid'>id</span><span class='hs-layout'>)</span> <span class='hs-varid'>wvb</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>l'</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>cross</span> <span class='hs-layout'>(</span><span class='hs-varid'>uncurry</span> <span class='hs-varid'>w'</span><span class='hs-layout'>,</span> <span class='hs-varid'>id</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint5 file8">
+old_not included/STproduct.hs:136:13-20: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>s0</span><span class='hs-layout'>,</span> <span class='hs-layout'>(</span><span class='hs-conid'>Left</span> <span class='hs-conid'>A</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>s0</span><span class='hs-layout'>,</span> <span class='hs-conid'>Left</span> <span class='hs-conid'>A</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint3 file9">
+old_not included/STproductVault.hs:16:1-38: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE TypeSynonymInstances #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: Extension TypeSynonymInstances is implied by FlexibleInstances</span>
+</div>
+
+<div class="hint0 file9">
+old_not included/STproductVault.hs:141:1-34: Warning: Eta reduce<br/>
+Found<br/>
+<pre><span class='hs-definition'>l'</span> <span class='hs-varid'>wvb</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>cross</span> <span class='hs-layout'>(</span><span class='hs-varid'>uncurry</span> <span class='hs-varid'>w'</span><span class='hs-layout'>,</span> <span class='hs-varid'>id</span><span class='hs-layout'>)</span> <span class='hs-varid'>wvb</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>l'</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>cross</span> <span class='hs-layout'>(</span><span class='hs-varid'>uncurry</span> <span class='hs-varid'>w'</span><span class='hs-layout'>,</span> <span class='hs-varid'>id</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint5 file9">
+old_not included/STproductVault.hs:160:13-20: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>s0</span><span class='hs-layout'>,</span> <span class='hs-layout'>(</span><span class='hs-conid'>Left</span> <span class='hs-conid'>A</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>s0</span><span class='hs-layout'>,</span> <span class='hs-conid'>Left</span> <span class='hs-conid'>A</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint3 file10">
+old_not included/UsingSets.hs:11:1-38: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE TypeSynonymInstances #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: Extension TypeSynonymInstances is implied by FlexibleInstances</span>
+</div>
+
+<div class="hint8 file10">
+old_not included/UsingSets.hs:48:1-47: Suggestion: Use newtype instead of data<br/>
+Found<br/>
+<pre><span class='hs-keyword'>data</span> <span class='hs-conid'>I3</span> <span class='hs-varid'>a</span>
+  <span class='hs-keyglyph'>=</span> <span class='hs-conid'>I3</span> <span class='hs-varid'>a</span>
+  <span class='hs-keyword'>deriving</span> <span class='hs-layout'>(</span><span class='hs-conid'>Eq</span><span class='hs-layout'>,</span> <span class='hs-conid'>Ord</span><span class='hs-layout'>,</span> <span class='hs-conid'>Show</span><span class='hs-layout'>,</span> <span class='hs-conid'>Read</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>newtype</span> <span class='hs-conid'>I3</span> <span class='hs-varid'>a</span>
+  <span class='hs-keyglyph'>=</span> <span class='hs-conid'>I3</span> <span class='hs-varid'>a</span>
+  <span class='hs-keyword'>deriving</span> <span class='hs-layout'>(</span><span class='hs-conid'>Eq</span><span class='hs-layout'>,</span> <span class='hs-conid'>Ord</span><span class='hs-layout'>,</span> <span class='hs-conid'>Show</span><span class='hs-layout'>,</span> <span class='hs-conid'>Read</span><span class='hs-layout'>)</span></pre>
+<span class='note'>Note: decreases laziness</span>
+</div>
+
+<div class="hint1 file10">
+old_not included/UsingSets.hs:63:35-41: Warning: Functor law<br/>
+Found<br/>
+<pre><span class='hs-definition'>fmap</span> <span class='hs-varid'>id</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>id</span></pre>
+
+</div>
+
+<div class="hint2 file10">
+old_not included/UsingSets.hs:91:30-35: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>dots</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>dots</span></pre>
+
+</div>
+
+<div class="hint3 file11">
+tests/Vault/Vault_test.hs:15:1-38: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE TypeSynonymInstances #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+<span class='note'>Note: Extension TypeSynonymInstances is implied by FlexibleInstances</span>
+</div>
+
+<div class="hint3 file11">
+tests/Vault/Vault_test.hs:(16,1)-(17,29): Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE OverloadedStrings, RecordWildCards #-}</span></pre>
+Perhaps<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE OverloadedStrings #-}</span></pre>
+<span class='note'>Note: may require <tt>{-# LANGUAGE DisambiguateRecordFields #-}</tt> adding to the top of the file, Extension RecordWildCards is not used</span>
+</div>
+
+<div class="hint3 file11">
+tests/Vault/Vault_test.hs:19:1-46: Warning: Unused LANGUAGE pragma<br/>
+Found<br/>
+<pre><span class='hs-comment'>{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}</span></pre>
+Perhaps you should remove it.<br/>
+<pre></pre>
+
+</div>
+
+<div class="hint2 file11">
+tests/Vault/Vault_test.hs:37:26-31: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-str'>"[]"</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-str'>"[]"</span></pre>
+
+</div>
+
+</div>
+<script type='text/javascript'>
+show(window.location.hash.slice(1), true);
+</script>
+</body>
+</html>

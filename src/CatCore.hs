@@ -24,14 +24,16 @@ module Main     where      -- must have Main (main) or Main where
 -- import Lib.UsingSets
 -- import           Lib.OpenClass
 -- import Lib.STproduct
-import Vault.NaiveTripleStore
+-- import Vault.NaiveTripleStore
+import Vault.Vault
 
 main :: IO ()
 main =  do  -- with tests in other modules
 
     -- pageCCdata
     -- pageST
-    pageNT
+    -- pageNT
+    pageVault
 
     -- mainEx
 --    openMain

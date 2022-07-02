@@ -34,7 +34,7 @@ import           Test.Framework
 -- import           Test.Invariant           as Rule  
 -- import Test.QuickCheck --  (arbitraryBoundedEnum)
 
-test_empty = assertEqual ("[]") (showT (tsempty :: [Triple]))
+test_empty = assertEqual ("[]") (showT (tsempty :: [Triple4test]))
 
 test_insert = assertEqual (concat'["[", res1, "]"] ) (showT ts1)
 

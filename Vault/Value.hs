@@ -57,7 +57,7 @@ instance Vals Int where
 
 -- KEY - is used in Naive Triple Store !!! 
 
-newtype Key = Key Text        deriving (Show, Read, Ord, Eq)
+newtype Key = Key Text        deriving (Show, Read, Ord, Eq, Generic, Zeros)
 mkkey :: Text -> Key
 mkkey = Key
 unkey :: Key -> Text

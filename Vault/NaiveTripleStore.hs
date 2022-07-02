@@ -20,8 +20,13 @@
 
 module Vault.NaiveTripleStore 
     ( TripleStore (..)
+    , Triple4test
     , Action (..)
-    , pageNT
+    -- , pageNT
+    , filterTriple
+    , toMaybes
+    -- for tests
+    ,ts0,ts1,ts2,t1,t2,m1, k1,r1
     )    
     where
 
@@ -30,6 +35,7 @@ import UniformBase
 -- import Data.List.Extra
 
 import Vault.Value
+import Test.Framework.TestManager (testSuiteAsTest)
 
 
 type Val = ValueSum 
@@ -42,7 +48,7 @@ class () => TripleStore o p v  where
     tsfind :: (Maybe o, Maybe p, Maybe v) -> [(o,p,v)] -> [(o,p,v)]
     tsbatch :: [Action (o,p,v)] -> [(o,p,v)] -> [(o,p,v)]
 
-
+-- rest for tests
 
 data Action a = Ins a | Del a
         deriving (Show, Read, Ord, Eq)
@@ -80,9 +86,9 @@ filterTriple (mo, mp, mv) t = (toCond mo . fst3 $ t)
 -------------- test data
 
 data TestRel = T1 | T2 deriving (Show, Read, Ord, Eq)
-type Triple = (Key, TestRel, Val) -- deriving (Show, Read, Ord, Eq)
+type Triple4test = (Key, TestRel, Val) -- deriving (Show, Read, Ord, Eq)
 
-ts0, ts1 :: [Triple]
+ts0, ts1 :: [Triple4test]
 ts0 = tsempty
 ts1 = tsinsert (k1,r1,v1) ts0
 ts2 :: [(Key, TestRel, ValueSum)]
