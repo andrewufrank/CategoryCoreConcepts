@@ -55,6 +55,7 @@ type Val = ValueSum
 class () => TripleStore o p v  where
     tsempty :: [(o,p,v)]
     tsinsert :: (o,p,v) -> [(o,p,v)] -> [(o,p,v)]
+    tsdel :: (Maybe o, Maybe p, Maybe v) -> [(o,p,v)] -> [(o,p,v)]
     tsfind :: (Maybe o, Maybe p, Maybe v) -> [(o,p,v)] -> [(o,p,v)]
     tsbatch :: [Action (o,p,v)] -> [(o,p,v)] -> [(o,p,v)]
 
@@ -66,11 +67,11 @@ data Action a = Ins a | Del a
 instance TripleStore Key TestRel Val where 
     tsempty = []
     tsinsert t@(o,p,v) = ( t :)
-    tsfind (mo, mp, mv) =  filter (toCond mo . fst3) 
-                        . filter (toCond mp . snd3) 
-                        . filter (toCond mv . trd3) 
+    tsdel t@(mo, mp, mv) = filter (not . filterTriple t )
+    tsfind t@(mo, mp, mv) =  filter (filterTriple t)
     tsbatch [] ts = ts
     tsbatch ((Ins t) : as) ts = tsinsert t . tsbatch as $ ts
+    tsbatch ((Del t) : as) ts = tsdel (toMaybes t) . tsbatch as $ ts
 
     -- ntInsert:: Key -> rel -> Val ->  Store rel ->  Store rel
     -- ntInsertRow:: row ->  Store [row] ->  Store [row]
@@ -104,6 +105,12 @@ toCond :: Eq v => Maybe v -> (v -> Bool)
 toCond (Nothing) = const True
 toCond (Just v) = (v==)
 
+toMaybes (s,p,o) = (Just s, Just p, Just o)
+
+filterTriple (mo, mp, mv) t = (toCond mo . fst3 $ t)
+                            && (toCond mp . snd3 $ t)
+                            && (toCond mv . trd3 $ t)
+
 -- instance (Eq row) => NaiveTriples  row  where
 --     -- ntInsert k r v   = Store . (Row k r v :) . unStore
 --     -- ntInsertRow row1 = Store . (row1 :) . unStore
@@ -120,3 +127,18 @@ toCond (Just v) = (v==)
 -- --     where   oldvals = ntFind (Just kold) Nothing Nothing $ v
 -- --             newvals = map (\abc -> Row knew (rr abc) (rv abc)) oldvals -- :: [Row rel]
 -- --             st = unStore v -- :: [Row rel]
+
+
+ts0, ts1 :: [Triple]
+ts0 = tsempty
+ts1 = tsinsert (k1,r1,v1) ts0
+ts2 = tsinsert t2 ts1
+
+t1 = (k1, r1, v1)
+t2= (mkkey "t2", r1, mktext "label2")
+t3= (mkkey "t3", r1, mktext "label3")
+m1 = (Just (mkkey "t1"), Nothing, Nothing)
+m2 = (Just (mkkey "t2"), Nothing, Nothing)
+k1 = mkkey "t1"
+r1 = T1
+v1 = mktext "label1"
