@@ -59,18 +59,5 @@ test_del1 = assertEqual (concat'["[", res2, "]"] )
 test_delBatch = assertEqual (concat'["[", res1, "]"] ) 
     (showT $ tsbatch [Del t2] ts2)
 
--- test_empty = assertEqual ([]) (ntFind Nothing Nothing Nothing newNaiveStore :: [Row GraphRels])
--- -- an empty store must contain nothing 
 
--- test_insertOne = assertEqual 
---             (Store [Row{rk = Key "t1", rr = T1, rv = VT (Value "label1")}]) 
---             (ntInsertRow row1 $
---                             newNaiveStore :: Store [Row TestRel])
-
--- -- test_insert = assertEqual 
--- --             ([Row{rk = Key "t1", rr = L, rv = VT (Value "label1")}]) (ntFind Nothing Nothing Nothing . 
--- --                             -- ntInsert k1 r1 v1 $
--- --                             ntInsertRow row1 $
--- --                             newNaiveStore :: [Row GraphRels])
--- row1 = Row k1 r1 v1 :: Row TestRel
 

@@ -41,14 +41,6 @@ import UniformBase
 import Vault.Value
 
 
-
-data TestRel = T1 | T2 deriving (Show, Read, Ord, Eq)
-
--- class Store0 row where 
---     ntInserto :: row -> Store row -> Store Row
-
--- nextKey (Key i) = Key (i+1)
-
 type Val = ValueSum 
 
 -- | a store for typed triples 
@@ -59,8 +51,8 @@ class () => TripleStore o p v  where
     tsfind :: (Maybe o, Maybe p, Maybe v) -> [(o,p,v)] -> [(o,p,v)]
     tsbatch :: [Action (o,p,v)] -> [(o,p,v)] -> [(o,p,v)]
 
-type Triple = (Key, TestRel, Val) -- deriving (Show, Read, Ord, Eq)
--- type Query = (Maybe Key, Maybe TestRel, Maybe Val)
+
+
 data Action a = Ins a | Del a
         deriving (Show, Read, Ord, Eq)
 
@@ -73,61 +65,31 @@ instance TripleStore Key TestRel Val where
     tsbatch ((Ins t) : as) ts = tsinsert t . tsbatch as $ ts
     tsbatch ((Del t) : as) ts = tsdel (toMaybes t) . tsbatch as $ ts
 
-    -- ntInsert:: Key -> rel -> Val ->  Store rel ->  Store rel
-    -- ntInsertRow:: row ->  Store [row] ->  Store [row]
-    -- ntDeleteAll :: Key -> Store rel ->  Store rel
-    -- ntDeleteVal :: Key -> rel ->   Store rel ->  Store rel
-    -- ntFind :: Maybe Key -> Maybe rel -> Maybe Val -> Store rel -> [Row rel]
-    -- ntFind2 :: (Key -> Bool)  -> (rel -> Bool) -> (Val -> Bool) -> Store rel -> [Row rel]
-    -- ntFindKR_V :: Key -> rel -> Store rel -> [Val]
-    -- ntFindRV_K :: rel -> Val -> Store rel -> [Key]
-    -- ntFindKR_V k r = map rv . ntFind (Just k) (Just r) Nothing
-    -- ntFindRV_K r  v = map rk . ntFind Nothing (Just r) (Just v)
-
--- data Row rel = Row {rk::Key, rr::rel, rv::Val}  deriving (Show, Read, Eq)
 
 pageNT :: IO ()
 pageNT = do
     putIOwords ["\n [page NT"]
 
 
-
--- newtype Store r = Store  r deriving (Show, Read, Eq, Functor)
--- -- unStore :: Store r -> [Row r]
--- -- unStore (Store rs) = rs
--- -- newNaiveStore :: (Monoid r) => Store r
--- -- newNaiveStore = mempty
-
--- -- instance Semigroup (Store r)
--- -- instance (Monoid r) => Monoid (Store r) where mempty = Store mempty
-
 toCond :: Eq v => Maybe v -> (v -> Bool)
 toCond (Nothing) = const True
 toCond (Just v) = (v==)
 
+toMaybes :: (a1, a2, a3) -> (Maybe a1, Maybe a2, Maybe a3)
 toMaybes (s,p,o) = (Just s, Just p, Just o)
 
+filterTriple :: (Eq a, Eq b, Eq v) =>
+            (Maybe a, Maybe b, Maybe v) -> (a, b, v) -> Bool
 filterTriple (mo, mp, mv) t = (toCond mo . fst3 $ t)
                             && (toCond mp . snd3 $ t)
                             && (toCond mv . trd3 $ t)
 
--- instance (Eq row) => NaiveTriples  row  where
---     -- ntInsert k r v   = Store . (Row k r v :) . unStore
---     -- ntInsertRow row1 = Store . (row1 :) . unStore
---     ntInsertRow row1 = fmap (cons row1)
---     -- ntFind mk mr mv   = ntFind2 (toCond mk) (toCond mr) (toCond mv)
---     -- ntFind2 ck cr cv   = filter (ck . rk) . filter (cr . rr) . filter (cv . rv) . unStore
---     -- ntDeleteAll k   =  Store . filter ((k/=).rk) . unStore
---     -- ntDeleteVal k p  =  Store . filter (\r -> ((k/=).rk $ r) || ((p/=).rr $ r)) . unStore
 
 
--- -- | copy all data with a given key to a new key
--- -- storeCopyKeyData :: (Eq rel) => Key -> Key -> Store rel -> Store rel
--- -- storeCopyKeyData kold knew v =  Store $ newvals ++ st
--- --     where   oldvals = ntFind (Just kold) Nothing Nothing $ v
--- --             newvals = map (\abc -> Row knew (rr abc) (rv abc)) oldvals -- :: [Row rel]
--- --             st = unStore v -- :: [Row rel]
+-------------- test data
 
+data TestRel = T1 | T2 deriving (Show, Read, Ord, Eq)
+type Triple = (Key, TestRel, Val) -- deriving (Show, Read, Ord, Eq)
 
 ts0, ts1 :: [Triple]
 ts0 = tsempty
