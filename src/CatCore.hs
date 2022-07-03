@@ -35,7 +35,7 @@ main =  do  -- with tests in other modules
     pageTriple4cat
     pageST
     pageST_withTriples
-    pageST_withTriplesBusiness
+    -- pageST_withTriplesBusiness
     -- pageNT
 
     -- mainEx
