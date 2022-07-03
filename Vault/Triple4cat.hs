@@ -66,30 +66,27 @@ os2 = SS (SK 1)
 cp1 :: (Obj, Morph, Obj)
 cp1 = (os1, F, os2)
 
-newtype CatStore = CatStoreK [CPoint Obj Morph] 
+newtype CatStore o m = CatStoreK [CPoint o m] 
                      deriving (Show, Read, Eq)
 
-unCatStore :: CatStore -> [CPointGraph]
+unCatStore :: CatStore o m -> [CPoint o m]
 unCatStore (CatStoreK as) = as
-wrapCatStore :: ([CPointGraph] -> [CPointGraph]) -> CatStore -> CatStore
+wrapCatStore :: ([CPoint o m] -> [CPoint o m]) -> CatStore o m-> CatStore o m
 wrapCatStore f = CatStoreK . f . unCatStore  -- not a functor!
 
 -- -- type CatStoreState rel = State (CatStore rel)
 
--- class CatStores rel where
---     CatStoreEmpty :: CatStore
---     CatStoreInsert :: CPoint -> CatStore  -> CatStore 
---     CatStoreDel :: CPoint -> CatStore  -> CatStore 
+class CatStores o m where
+    catStoreEmpty :: CatStore o m
+    catStoreInsert :: CPoint o m -> CatStore o m  -> CatStore o m
+    catStoreDel :: CPoint o m -> CatStore o m  -> CatStore o m 
 
--- --
--- data GraphRels = Edge | Node | Label  --  for edge node label
---     deriving (Show, Read, Ord, Eq)
 
--- instance () => CatStores (GraphRels) where
---     CatStoreEmpty =( CatStoreK []) :: CatStore GraphRels
---     -- CatStoreInsert t  = CatStoreK .  tsinsert t   . unCatStore
---     CatStoreInsert t  = wrapCatStore  (tsinsert t)  
---     CatStoreDel t = wrapCatStore (tsdel t)  
+instance (TripleStore o m o) => CatStores o m where
+    catStoreEmpty =(CatStoreK []) :: CatStore o m
+    -- catStoreInsert t  = CatStoreK .  tsinsert t   . unCatStore
+    catStoreInsert t  = wrapCatStore  (tsinsert t)  
+    catStoreDel t = wrapCatStore (tsdel t)  
 
 -- -- t2v :: TripleCC GraphRels -> CatStoreK (TripleCC GraphRels) 
 -- -- t2v a = CatStoreK a1
@@ -105,8 +102,8 @@ wrapCatStore f = CatStoreK . f . unCatStore  -- not a functor!
 -- x1 :: [TripleCC GraphRels]
 -- x1 = tsinsert  e1 x0
 
--- v0 :: CatStore  
--- v0 = CatStoreEmpty
+v0 :: CatStore Obj Morph  
+v0 = catStoreEmpty
 -- v1 :: CatStore  
 -- v1 = CatStoreInsert e1 v0
 -- v2 :: CatStore GraphRels
@@ -120,7 +117,7 @@ pageTriple4cat = do
     putIOwords ["cp1", showT cp1]
 --     putIOwords ["ts one", showT x1]
 
-    -- putIOwords ["CatStore empty", showT v0]
+    putIOwords ["CatStore empty", showT v0]
 --     putIOwords ["CatStore with e1", showT v1]
 --     putIOwords ["CatStore deleted e1", showT v2]
 

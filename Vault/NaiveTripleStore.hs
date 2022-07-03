@@ -57,7 +57,7 @@ data Action a = Ins a | Del a
         deriving (Show, Read, Ord, Eq)
 
 -- | instance with fixed key (for subject) and predicate (relation)
-instance (Eq a) => TripleStore Key a Val where 
+instance (Eq o,Eq p, Eq v) => TripleStore o p v where 
     tsempty = []
     tsinsert t@(o,p,v) = ( t :)
     tsdel t@(mo, mp, mv) = filter (not . filterTriple (toMaybes t) )
