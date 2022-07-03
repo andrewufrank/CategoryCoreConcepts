@@ -65,6 +65,8 @@ os2 :: Obj
 os2 = SS (SK 1)
 cp1 :: (Obj, Morph, Obj)
 cp1 = (os1, F, os2)
+cp2 :: (Obj, Morph, Obj)
+cp2 = (os2, F, SS (SK 2))
 
 newtype CatStore o m = CatStoreK [CPoint o m] 
                      deriving (Show, Read, Eq)
@@ -93,23 +95,15 @@ instance (TripleStore o m o) => CatStores o m where
 -- --     where a1 = a :: TripleCC GraphRels 
 
 -- -------------for test 
--- e1 :: TripleCC GraphRels  -- (Key, GraphRels, ValueSum)
--- e1 = (mkkey "x1", Edge, mktext "label x1")
--- e2 :: (Key, GraphRels, ValueSum)
--- e2 = (mkkey "x2", Edge, mktext "label x2")
--- x0 :: [TripleCC GraphRels]
--- x0 = tsempty 
--- x1 :: [TripleCC GraphRels]
--- x1 = tsinsert  e1 x0
 
 v0 :: CatStore Obj Morph  
 v0 = catStoreEmpty
--- v1 :: CatStore  
--- v1 = CatStoreInsert e1 v0
--- v2 :: CatStore GraphRels
--- v2 = CatStoreInsert e2 v1
--- v3 :: CatStore GraphRels
--- v3 = CatStoreDel e2 v2
+v1 :: CatStore   Obj Morph
+v1 = catStoreInsert cp1 v0
+v2 :: CatStore  Obj Morph
+v2 = catStoreInsert cp2 v1
+v3 :: CatStore  Obj Morph
+v3 = catStoreDel cp2 v2
 
 pageTriple4cat :: IO ()
 pageTriple4cat = do
@@ -118,7 +112,7 @@ pageTriple4cat = do
 --     putIOwords ["ts one", showT x1]
 
     putIOwords ["CatStore empty", showT v0]
---     putIOwords ["CatStore with e1", showT v1]
---     putIOwords ["CatStore deleted e1", showT v2]
+    putIOwords ["CatStore with cp1", showT v1]
+    putIOwords ["CatStore added cp2, deleted cp1", showT v2]
 
 
