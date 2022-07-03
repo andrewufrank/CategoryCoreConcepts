@@ -59,8 +59,10 @@ test_del0 = assertEqual (concat'["CatStoreK [", res2, ",", res1, "]"])
 test_del1 = assertEqual (concat'["CatStoreK [",   res1, "]"])
     (showT v3)
 
--- test_delBatch = assertEqual (concat'["[", res1, "]"] ) 
---     (showT $ tsbatch [Del t2] ts2)
+test_Batch = assertEqual (concat'["CatStoreK [", res1, ",", res2, "]"] ) 
+    (showT $ a1x)
+test_delBatch = assertEqual (concat'["CatStoreK [", res1,  "]"] ) 
+    (showT $ a2x)
 
 
 

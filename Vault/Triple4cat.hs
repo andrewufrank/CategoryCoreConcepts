@@ -83,6 +83,11 @@ class CatStores o m where
     catStoreInsert :: CPoint o m -> CatStore o m  -> CatStore o m
     catStoreDel :: CPoint o m -> CatStore o m  -> CatStore o m 
 
+    catStoreBatch :: [Action (o,m,o)] -> CatStore o m  -> CatStore o m 
+    catStoreBatch [] ts = ts
+    catStoreBatch ((Ins t) : as) ts = catStoreInsert t . catStoreBatch as $ ts
+    catStoreBatch ((Del t) : as) ts = catStoreDel t . catStoreBatch as $ ts
+
 
 instance (TripleStore o m o) => CatStores o m where
     catStoreEmpty =(CatStoreK []) :: CatStore o m
@@ -105,6 +110,15 @@ v2 = catStoreInsert cp2 v1
 v3 :: CatStore  Obj Morph
 v3 = catStoreDel cp2 v2
 
+a1 :: [Action (Obj, Morph, Obj)]
+a1 = [Ins cp1, Ins cp2]
+a1x :: CatStore Obj Morph
+a1x = catStoreBatch a1 v0
+a2x :: CatStore Obj Morph
+a2x = catStoreBatch [Del cp2] a1x
+
+
+
 pageTriple4cat :: IO ()
 pageTriple4cat = do
     putIOwords ["\n [pageTriple4cat"]
@@ -114,5 +128,7 @@ pageTriple4cat = do
     putIOwords ["CatStore empty", showT v0]
     putIOwords ["CatStore with cp1", showT v1]
     putIOwords ["CatStore added cp2, deleted cp1", showT v2]
+    putIOwords ["CatStore added batch cp1 cp2", showT a1x]
+    putIOwords ["CatStore  cp2", showT a2x]
 
 
