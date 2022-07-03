@@ -37,7 +37,7 @@ import UniformBase
 -- import Data.List.Extra
 
 import Vault.Value
-import Test.Framework.TestManager (testSuiteAsTest)
+-- import Test.Framework.TestManager (testSuiteAsTest)
 
 
 type Val = ValueSum 

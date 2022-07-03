@@ -37,13 +37,32 @@ module Vault.Triple4cat
 
 -- import Control.Monad.State
 -- import Data.List (sort)
+import GHC.Generics
 import UniformBase
 import Vault.NaiveTripleStore
 -- import Vault.Value
 
+data Morph = F | T  | Null  -- for storing a graph S =s,t> T 
+    deriving (Show, Read, Ord, Eq, Generic)
+instance Zeros Morph where zero = Null
+
+data Obj = SS (Sobj Int) | TT (Tobj Int) | ZZ 
+    deriving (Show, Read, Ord, Eq, Generic)
+instance Zeros Obj where zero = ZZ
+
+data Sobj a = SK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
+data Tobj a = TK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 type CPoint a =  (Obj, Morph, Obj)  -- a function for a point
             -- deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+-- for test
+os1 :: Obj
+os1 = SS (SK 0)
+os2 :: Obj
+os2 = SS (SK 1)
+cp1 :: (Obj, Morph, Obj)
+cp1 = (os1, F, os2)
 
 -- newtype Vault  a = VaultK [TripleCC a] 
 --                      deriving (Show, Read, Eq)
@@ -93,10 +112,10 @@ type CPoint a =  (Obj, Morph, Obj)  -- a function for a point
 -- v3 :: Vault GraphRels
 -- v3 = vaultDel e2 v2
 
--- pageTriple4cat :: IO ()
--- pageTriple4cat = do
---     putIOwords ["\n [pageVault"]
---     putIOwords ["ts empty", showT x0]
+pageTriple4cat :: IO ()
+pageTriple4cat = do
+    putIOwords ["\n [pageTriple4cat"]
+    putIOwords ["cp1", showT cp1]
 --     putIOwords ["ts one", showT x1]
 
 --     putIOwords ["vault empty", showT v0]
