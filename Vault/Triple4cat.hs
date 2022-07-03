@@ -21,7 +21,14 @@
 {-# LANGUAGE DeriveGeneric    #-}
 
 module Vault.Triple4cat 
-    -- (
+    (
+      CPoint 
+    , CatStore (..)
+    ---- for tests
+    , pageTriple4cat
+    
+    , Morph (..), Obj (..), Sobj(..), Tobj(..)
+    , v0, v1, v2, v3, a1x, a2x
 --     Vaults (..), Vault (..), VaultState
 --     -- , ObjID, makeObjID
 -- --    , module Vault.NaiveTriplestore
@@ -32,7 +39,7 @@ module Vault.Triple4cat
 --     -- ,  unVal4, isVal4
 --     , Row (..)
 -- --    , newNaiveStore -- for testing
-    -- )    
+    )    
     where
 
 -- import Control.Monad.State
@@ -55,7 +62,7 @@ data Tobj a = TK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 type CPoint o m =  (o,m,o)  -- a function for a point
             -- deriving (Show, Read, Ord, Eq, Generic, Zeros)
-type CPointGraph = CPoint Obj Morph
+-- type CPointGraph = CPoint Obj Morph
 
 
 -- for test
@@ -95,9 +102,6 @@ instance (TripleStore o m o) => CatStores o m where
     catStoreInsert t  = wrapCatStore  (tsinsert t)  
     catStoreDel t = wrapCatStore (tsdel t)  
 
--- -- t2v :: TripleCC GraphRels -> CatStoreK (TripleCC GraphRels) 
--- -- t2v a = CatStoreK a1
--- --     where a1 = a :: TripleCC GraphRels 
 
 -- -------------for test 
 
