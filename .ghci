@@ -1,5 +1,6 @@
 :set -fno-warn-unused-binds 
-:set -fno-warn-unused-top-binds 
+:set -Wno-unused-top-binds 
+:set -Wno-unused-matches
 :set -fno-warn-unused-imports 
 :set -fno-warn-deprecations 
 :set -fno-warn-unused-do-bind 

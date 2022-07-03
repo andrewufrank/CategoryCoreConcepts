@@ -17,6 +17,8 @@
 {-# LANGUAGE TypeSynonymInstances  #-}
 {-# LANGUAGE DeriveAnyClass     #-}
 {-# LANGUAGE DeriveFunctor    #-}
+{-# OPTIONS_GHC -Wno-unused-matches #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 module Vault.NaiveTripleStore 
     ( TripleStore (..)
@@ -54,6 +56,7 @@ class () => TripleStore o p v  where
 data Action a = Ins a | Del a
         deriving (Show, Read, Ord, Eq)
 
+-- | instance with fixed key (for subject) and predicate (relation)
 instance (Eq a) => TripleStore Key a Val where 
     tsempty = []
     tsinsert t@(o,p,v) = ( t :)

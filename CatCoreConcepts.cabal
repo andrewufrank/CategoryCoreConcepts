@@ -16,8 +16,8 @@ build-type:     Simple
 library
   exposed-modules:
       Vault.NaiveTripleStore
+      Vault.Triple4cat
       Vault.Value
-      Vault.Vault
   other-modules:
       Paths_CatCoreConcepts
   hs-source-dirs:
@@ -56,7 +56,7 @@ test-suite test1
   main-is: Testing.hs
   other-modules:
       Vault.NaiveTripleStore_test
-      Vault.Vault_test
+      Vault.Triple4cat_test
       Paths_CatCoreConcepts
   hs-source-dirs:
       tests

@@ -18,6 +18,7 @@
 - ignore: {name: "Defined but not used"}
 - ignore: {name: "unused-top-binds"}
 - ignore: {name: "Use camelCase"}
+- ignore: {name: "Use camelCase"}
 
 
 # Specify additional command line arguments

@@ -3,6 +3,10 @@
 -- Module      :  VaultState storage
 -- uses the naive triplestore
 -- and wraps in state monad
+-- the subject (are restricted to Key text) and preicates (GraphRels)
+-- 
+-- not useful for categories (or probably anything similar)
+-- abandoned
 -----------------------------------------------------------------------------
 
 {-# LANGUAGE OverloadedStrings      #-}
