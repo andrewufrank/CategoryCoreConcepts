@@ -26,6 +26,7 @@ module Main     where      -- must have Main (main) or Main where
 import Lib.STproduct
 -- import Vault.NaiveTripleStore
 import Vault.Triple4cat
+import Lib.STproductTriple
 
 main :: IO ()
 main =  do  -- with tests in other modules
@@ -33,6 +34,7 @@ main =  do  -- with tests in other modules
     -- pageCCdata
     pageTriple4cat
     pageST
+    pageST_withTriples
     -- pageNT
 
     -- mainEx
