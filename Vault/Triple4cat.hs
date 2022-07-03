@@ -53,7 +53,7 @@ instance Zeros Obj where zero = ZZ
 data Sobj a = SK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
 data Tobj a = TK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
-type CPoint a =  (Obj, Morph, Obj)  -- a function for a point
+type CPoint =  (Obj, Morph, Obj)  -- a function for a point
             -- deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 -- for test
@@ -64,33 +64,33 @@ os2 = SS (SK 1)
 cp1 :: (Obj, Morph, Obj)
 cp1 = (os1, F, os2)
 
--- newtype Vault  a = VaultK [TripleCC a] 
---                      deriving (Show, Read, Eq)
+newtype CatStore = CatStoreK [CPoint] 
+                     deriving (Show, Read, Eq)
 
--- unVault :: Vault a -> [TripleCC a]
--- unVault (VaultK as) = as
--- wrapVault :: ([TripleCC a] -> [TripleCC a]) -> Vault a -> Vault a
--- wrapVault f = VaultK . f . unVault  -- not a functor!
+unCatStore :: CatStore -> [CPoint]
+unCatStore (CatStoreK as) = as
+wrapCatStore :: ([CPoint] -> [CPoint]) -> CatStore -> CatStore
+wrapCatStore f = CatStoreK . f . unCatStore  -- not a functor!
 
--- -- type VaultState rel = State (Vault rel)
+-- -- type CatStoreState rel = State (CatStore rel)
 
--- class Vaults rel where
---     vaultEmpty :: Vault rel
---     vaultInsert :: TripleCC rel -> Vault rel -> Vault rel
---     vaultDel :: TripleCC rel -> Vault rel -> Vault rel
+-- class CatStores rel where
+--     CatStoreEmpty :: CatStore
+--     CatStoreInsert :: CPoint -> CatStore  -> CatStore 
+--     CatStoreDel :: CPoint -> CatStore  -> CatStore 
 
 -- --
 -- data GraphRels = Edge | Node | Label  --  for edge node label
 --     deriving (Show, Read, Ord, Eq)
 
--- instance () => Vaults (GraphRels) where
---     vaultEmpty =( VaultK []) :: Vault GraphRels
---     -- vaultInsert t  = VaultK .  tsinsert t   . unVault
---     vaultInsert t  = wrapVault  (tsinsert t)  
---     vaultDel t = wrapVault (tsdel t)  
+-- instance () => CatStores (GraphRels) where
+--     CatStoreEmpty =( CatStoreK []) :: CatStore GraphRels
+--     -- CatStoreInsert t  = CatStoreK .  tsinsert t   . unCatStore
+--     CatStoreInsert t  = wrapCatStore  (tsinsert t)  
+--     CatStoreDel t = wrapCatStore (tsdel t)  
 
--- -- t2v :: TripleCC GraphRels -> VaultK (TripleCC GraphRels) 
--- -- t2v a = VaultK a1
+-- -- t2v :: TripleCC GraphRels -> CatStoreK (TripleCC GraphRels) 
+-- -- t2v a = CatStoreK a1
 -- --     where a1 = a :: TripleCC GraphRels 
 
 -- -------------for test 
@@ -103,14 +103,14 @@ cp1 = (os1, F, os2)
 -- x1 :: [TripleCC GraphRels]
 -- x1 = tsinsert  e1 x0
 
--- v0 :: Vault ( GraphRels)
--- v0 = vaultEmpty
--- v1 :: Vault (GraphRels)
--- v1 = vaultInsert e1 v0
--- v2 :: Vault GraphRels
--- v2 = vaultInsert e2 v1
--- v3 :: Vault GraphRels
--- v3 = vaultDel e2 v2
+-- v0 :: CatStore  
+-- v0 = CatStoreEmpty
+-- v1 :: CatStore  
+-- v1 = CatStoreInsert e1 v0
+-- v2 :: CatStore GraphRels
+-- v2 = CatStoreInsert e2 v1
+-- v3 :: CatStore GraphRels
+-- v3 = CatStoreDel e2 v2
 
 pageTriple4cat :: IO ()
 pageTriple4cat = do
@@ -118,8 +118,8 @@ pageTriple4cat = do
     putIOwords ["cp1", showT cp1]
 --     putIOwords ["ts one", showT x1]
 
---     putIOwords ["vault empty", showT v0]
---     putIOwords ["vault with e1", showT v1]
---     putIOwords ["vault deleted e1", showT v2]
+    -- putIOwords ["CatStore empty", showT v0]
+--     putIOwords ["CatStore with e1", showT v1]
+--     putIOwords ["CatStore deleted e1", showT v2]
 
 
