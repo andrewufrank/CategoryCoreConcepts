@@ -35,11 +35,11 @@ import Lib.Rules
 import Data.List.Extra
 import Data.Bifunctor (bimap)
 import qualified Data.Tuple as Tuple -- (snd, fst)
-import Vault.Triple4cat
+import Vault.Triple4cat hiding (T)
 
-data MorphST  = V Char | Nullst
--- w = fromPfeile [(W1,W2), (W2,W3)]
--- bb = fromPfeile [(B4,B5)]
+data MorphST  = V Char | T Char | Nullst
+-- v = fromPfeile [(W1,W2), (W2,W3)]
+-- t  = fromPfeile [(B4,B5)]
     deriving (Show, Read, Ord, Eq, Generic)
 
 instance Zeros MorphST where zero = Nullst
@@ -51,6 +51,7 @@ data ObjST = WW (Wobj Int) | BB (Bobj Int) | ZZst
 instance Zeros ObjST where zero = ZZst
 unWW :: ObjST -> Wobj Int
 unWW (WW w) = w
+unBB (BB b) = b
 
 data Wobj i = WK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial states W1, W2, W3
@@ -59,11 +60,18 @@ data Bobj i =  BK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 type CPointST = CPoint ObjST MorphST 
 
+makePfeilSpace :: Int -> Char -> Int -> (ObjST, MorphST, ObjST)
+makePfeilSpace o1 m o2 = (WW (WK o1), V m, WW (WK o2))
+
+makePfeilBusiness o1 m o2 = (BB (BK o1), T m, BB (BK o2))
+
 getTarget :: [(a, b1, b2)] -> b2
 getTarget cps = trd3 . head  $ cps  
 
 w'' :: CatStore ObjST MorphST -> ObjST -> Char -> Wobj Int
 w'' cat ow pv = unWW . getTarget . catStoreFind (Just ow, Just (V pv), Nothing) $ cat
+-- b'' :: CatStore ObjST MorphST -> ObjST -> Char -> Wobj Int
+b'' cat ow pv = unBB . getTarget . catStoreFind (Just ow, Just (T pv), Nothing) $ cat
 
 -- for test spatial 
 ow1 :: ObjST
@@ -74,20 +82,19 @@ mw1 :: MorphST
 mw1 = V 'a' 
 st1 :: (ObjST, MorphST, ObjST)
 st1 = (ow1, mw1, ow2) 
-makePfeil :: Int -> Char -> Int -> (ObjST, MorphST, ObjST)
-makePfeil o1 m o2 = (WW (WK o1), V m, WW (WK o2))
+
 st2 :: (ObjST, MorphST, ObjST)
-st2 = makePfeil 2 'b' 3 
+st2 = makePfeilSpace 2 'b' 3 
 cat0 = catStoreEmpty :: CatStore ObjST MorphST
 cat1 = catStoreInsert st1 cat0
-cat2 = catStoreBatch ([Ins (makePfeil 1 'a' 2), Ins (makePfeil 2 'b' 3)]) cat0
+cat2 = catStoreBatch ([Ins (makePfeilSpace 1 'a' 2), Ins (makePfeilSpace 2 'b' 3)]) cat0
 
 -- | construct function w' :: W -> V -> W 
 -- ft = catS
 f2_2 :: [CPoint ObjST MorphST]
 f2_2 = catStoreFind (Just ow2, Just (V 'b'), Nothing) cat2
 
-
+ 
 pageST_withTriples :: IO ()
 pageST_withTriples = do
     putIOwords ["\npageST_withTriples"]
@@ -101,10 +108,18 @@ pageST_withTriples = do
     putIOwords [" function w'' used ", showT $ w'' cat2 ow1 'a']
     putIOwords [" function w'' used ", showT $ w'' cat2 ow2 'b']
 
+-- for test business
+
+-- sb1 = makePfeil 4 'c' 5
+cat3 = catStoreBatch ([Ins (makePfeilBusiness 4 'c' 5)]) cat2
+
+
 pageST_withTriplesBusiness :: IO ()
 pageST_withTriplesBusiness = do
     putIOwords ["\npageST_withTriplesBusiness"]
-    -- putIOwords ["space states ", showT [ow1, ow2]]
+    putIOwords ["space and business pfeile ", showT cat3]
+    putIOwords [" function bb'' used ", showT $ b'' cat3 (BB(BK 4)) 'c']
+
     -- putIOwords ["pfeil 1 - w1 -> 2 ", showT [st1, st2]]
     -- putIOwords ["empty cat store", showT v0]
     -- putIOwords [" cat store", showT cat1]
