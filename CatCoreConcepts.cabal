@@ -15,6 +15,8 @@ build-type:     Simple
 
 library
   exposed-modules:
+      Lib.Rules
+      Lib.STproduct
       Vault.NaiveTripleStore
       Vault.Triple4cat
       Vault.Value
@@ -55,6 +57,7 @@ test-suite test1
   type: exitcode-stdio-1.0
   main-is: Testing.hs
   other-modules:
+      Lib.Lawvere_test
       Vault.NaiveTripleStore_test
       Vault.Triple4cat_test
       Paths_CatCoreConcepts

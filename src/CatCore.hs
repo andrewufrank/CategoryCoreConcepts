@@ -23,7 +23,7 @@ module Main     where      -- must have Main (main) or Main where
 -- import Lib.Rules
 -- import Lib.UsingSets
 -- import           Lib.OpenClass
--- import Lib.STproduct
+import Lib.STproduct
 -- import Vault.NaiveTripleStore
 import Vault.Triple4cat
 
@@ -31,9 +31,9 @@ main :: IO ()
 main =  do  -- with tests in other modules
 
     -- pageCCdata
-    -- pageST
-    -- pageNT
     pageTriple4cat
+    pageST
+    -- pageNT
 
     -- mainEx
 --    openMain

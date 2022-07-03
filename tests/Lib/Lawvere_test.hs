@@ -23,8 +23,8 @@
 module Lib.Lawvere_test
     where
 
-import Lib.Page13 
-import Lib.Page39
+-- import Lib.Page13 
+-- import Lib.Page39
 
 import Lib.Rules
 
