@@ -37,22 +37,86 @@ import Data.Bifunctor (bimap)
 import qualified Data.Tuple as Tuple -- (snd, fst)
 import Vault.Triple4cat
 
-data MorphST = W  | Nullst
+data MorphST  = V Char | Nullst
 -- w = fromPfeile [(W1,W2), (W2,W3)]
 -- bb = fromPfeile [(B4,B5)]
     deriving (Show, Read, Ord, Eq, Generic)
 
 instance Zeros MorphST where zero = Nullst
 
-data ObjST = WW (Wobj Int) | VV (Vobj Int) | ZZst
--- the spatial part: states W and actions V 
+data ObjST = WW (Wobj Int) | BB (Bobj Int) | ZZst
+-- the spatial part: states W 
+-- the business side: states B 
     deriving (Show, Read, Ord, Eq)
 instance Zeros ObjST where zero = ZZst
+unWW :: ObjST -> Wobj Int
+unWW (WW w) = w
 
 data Wobj i = WK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial states W1, W2, W3
-data Vobj i =  VK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
+data Bobj i =  BK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial actions (moves) A or B
+
+type CPointST = CPoint ObjST MorphST 
+
+getTarget :: [(a, b1, b2)] -> b2
+getTarget cps = trd3 . head  $ cps  
+
+w'' :: CatStore ObjST MorphST -> ObjST -> Char -> Wobj Int
+w'' cat ow pv = unWW . getTarget . catStoreFind (Just ow, Just (V pv), Nothing) $ cat
+
+-- for test spatial 
+ow1 :: ObjST
+ow1 = WW (WK 1)
+ow2 :: ObjST
+ow2 = WW (WK 2)
+mw1 :: MorphST
+mw1 = V 'a' 
+st1 :: (ObjST, MorphST, ObjST)
+st1 = (ow1, mw1, ow2) 
+makePfeil :: Int -> Char -> Int -> (ObjST, MorphST, ObjST)
+makePfeil o1 m o2 = (WW (WK o1), V m, WW (WK o2))
+st2 :: (ObjST, MorphST, ObjST)
+st2 = makePfeil 2 'b' 3 
+cat0 = catStoreEmpty :: CatStore ObjST MorphST
+cat1 = catStoreInsert st1 cat0
+cat2 = catStoreBatch ([Ins (makePfeil 1 'a' 2), Ins (makePfeil 2 'b' 3)]) cat0
+
+-- | construct function w' :: W -> V -> W 
+-- ft = catS
+f2_2 :: [CPoint ObjST MorphST]
+f2_2 = catStoreFind (Just ow2, Just (V 'b'), Nothing) cat2
+
+
+pageST_withTriples :: IO ()
+pageST_withTriples = do
+    putIOwords ["\npageST_withTriples"]
+    putIOwords ["space states ", showT [ow1, ow2]]
+    putIOwords ["pfeil 1 - w1 -> 2 ", showT [st1, st2]]
+    putIOwords ["empty cat store", showT v0]
+    putIOwords [" cat store", showT cat1]
+    putIOwords [" cat store", showT cat2]
+    putIOwords [" found ow2 W2", showT f2_2]
+    putIOwords [" target", showT . unWW . getTarget $ f2_2]
+    putIOwords [" function w'' used ", showT $ w'' cat2 ow1 'a']
+    putIOwords [" function w'' used ", showT $ w'' cat2 ow2 'b']
+
+pageST_withTriplesBusiness :: IO ()
+pageST_withTriplesBusiness = do
+    putIOwords ["\npageST_withTriplesBusiness"]
+    -- putIOwords ["space states ", showT [ow1, ow2]]
+    -- putIOwords ["pfeil 1 - w1 -> 2 ", showT [st1, st2]]
+    -- putIOwords ["empty cat store", showT v0]
+    -- putIOwords [" cat store", showT cat1]
+    -- putIOwords [" cat store", showT cat2]
+    -- putIOwords [" found ow2 W2", showT f2_2]
+    -- putIOwords [" target", showT . unWW . getTarget $ f2_2]
+    -- putIOwords [" function w'' used ", showT $ w'' cat2 ow1 'a']
+    -- putIOwords [" function w'' used ", showT $ w'' cat2 ow2 'b']    
+    -- putIOwords ["business states ", showT [b0, b1]]
+    -- putIOwords ["space states 2", showT [w0, w11, w12]]
+    -- putIOwords ["business states ", showT [b0, b11]]
+    -- putIOwords ["combined states ", showT [s0, s1, s2, s3, s4, s41, s5, s51]]
 
 -- data W = W1 | W2 | W3    
 --     deriving  (Show, Eq, Bounded, Enum, Ord)
@@ -159,14 +223,7 @@ data Vobj i =  VK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- s51 = f (s4, Left B)
 
 
-pageST_withTriples :: IO ()
-pageST_withTriples = do
-    putIOwords ["\npageST_withTriples"]
-    -- putIOwords ["space states ", showT [w0, w1, w2]]
-    -- putIOwords ["business states ", showT [b0, b1]]
-    -- putIOwords ["space states 2", showT [w0, w11, w12]]
-    -- putIOwords ["business states ", showT [b0, b11]]
-    -- putIOwords ["combined states ", showT [s0, s1, s2, s3, s4, s41, s5, s51]]
+
     -- -- putIOwords ["injective f", showT (injective f137)]
     -- -- putIOwords ["surjective f", showT (surjective f137)]
     -- -- putIOwords ["countSections f", showT (countSections f137)]

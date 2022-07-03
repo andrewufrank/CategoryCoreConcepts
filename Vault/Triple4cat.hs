@@ -23,7 +23,8 @@
 module Vault.Triple4cat 
     (
       CPoint 
-    , CatStore (..)
+    , CatStore (..), CatStores (..)
+    , Action (..)  -- from NaiveTripleStore
     ---- for tests
     , pageTriple4cat
     
@@ -89,18 +90,18 @@ class CatStores o m where
     catStoreEmpty :: CatStore o m
     catStoreInsert :: CPoint o m -> CatStore o m  -> CatStore o m
     catStoreDel :: CPoint o m -> CatStore o m  -> CatStore o m 
-
+    catStoreFind :: (Maybe o, Maybe m, Maybe o) -> CatStore o m  -> [CPoint o m]
     catStoreBatch :: [Action (o,m,o)] -> CatStore o m  -> CatStore o m 
     catStoreBatch [] ts = ts
     catStoreBatch ((Ins t) : as) ts = catStoreInsert t . catStoreBatch as $ ts
     catStoreBatch ((Del t) : as) ts = catStoreDel t . catStoreBatch as $ ts
 
 
-instance (TripleStore o m o) => CatStores o m where
+instance (Eq o, Eq m, TripleStore o m o) => CatStores o m where
     catStoreEmpty =(CatStoreK []) :: CatStore o m
-    -- catStoreInsert t  = CatStoreK .  tsinsert t   . unCatStore
     catStoreInsert t  = wrapCatStore  (tsinsert t)  
-    catStoreDel t = wrapCatStore (tsdel t)  
+    catStoreDel t = wrapCatStore (tsdel t) 
+    catStoreFind t = tsfind t . unCatStore
 
 
 -- -------------for test 
