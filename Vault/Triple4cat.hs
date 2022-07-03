@@ -53,8 +53,10 @@ instance Zeros Obj where zero = ZZ
 data Sobj a = SK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
 data Tobj a = TK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
-type CPoint =  (Obj, Morph, Obj)  -- a function for a point
+type CPoint o m =  (o,m,o)  -- a function for a point
             -- deriving (Show, Read, Ord, Eq, Generic, Zeros)
+type CPointGraph = CPoint Obj Morph
+
 
 -- for test
 os1 :: Obj
@@ -64,12 +66,12 @@ os2 = SS (SK 1)
 cp1 :: (Obj, Morph, Obj)
 cp1 = (os1, F, os2)
 
-newtype CatStore = CatStoreK [CPoint] 
+newtype CatStore = CatStoreK [CPoint Obj Morph] 
                      deriving (Show, Read, Eq)
 
-unCatStore :: CatStore -> [CPoint]
+unCatStore :: CatStore -> [CPointGraph]
 unCatStore (CatStoreK as) = as
-wrapCatStore :: ([CPoint] -> [CPoint]) -> CatStore -> CatStore
+wrapCatStore :: ([CPointGraph] -> [CPointGraph]) -> CatStore -> CatStore
 wrapCatStore f = CatStoreK . f . unCatStore  -- not a functor!
 
 -- -- type CatStoreState rel = State (CatStore rel)
