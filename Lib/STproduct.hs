@@ -141,6 +141,15 @@ s5 = f (s2, Right C)
 s41 = f (s3, Left A)
 s51 = f (s4, Left B)
 
+showStates f = showT [s0, s1, s2, s3, s4, s41, s5, s51]
+    where
+        s1 = f (s0, (Left A))
+        s2 = f (s1, Left B)
+        s3 = f (s0, Right C)
+        s4 = f (s1, Right C)
+        s5 = f (s2, Right C)
+        s41 = f (s3, Left A)
+        s51 = f (s4, Left B)
 
 pageST :: IO ()
 pageST = do
@@ -150,6 +159,12 @@ pageST = do
     putIOwords ["space states 2", showT [w0, w11, w12]]
     putIOwords ["business states ", showT [b0, b11]]
     putIOwords ["combined states ", showT [s0, s1, s2, s3, s4, s41, s5, s51]]
+    putIOwords ["combined states f0", showStates f0]
+    putIOwords ["combined states f1", showStates f1]
+    putIOwords ["combined states f2", showStates f2]
+    putIOwords ["combined states f3", showStates f3]
+    putIOwords ["combined states f4", showStates f4]
+
     -- putIOwords ["injective f", showT (injective f137)]
     -- putIOwords ["surjective f", showT (surjective f137)]
     -- putIOwords ["countSections f", showT (countSections f137)]

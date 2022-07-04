@@ -17,6 +17,7 @@ library
   exposed-modules:
       Lib.Rules
       Lib.STproduct
+      Lib.STproductCombine
       Lib.STproductTriple
       Vault.NaiveTripleStore
       Vault.Triple4cat

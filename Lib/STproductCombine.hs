@@ -35,8 +35,16 @@ import Lib.Rules
 import Data.List.Extra
 import Data.Bifunctor (bimap)
 import qualified Data.Tuple as Tuple -- (snd, fst)
-import Vault.Triple4cat  
+import Vault.Triple4cat ( Morph(T) )  
 import Lib.STproductTriple
+    ( w',
+      b',
+      Wobj(WK),
+      MorphST,
+      ObjST(BB, WW),
+      Bobj(BK),
+      VV(VV),
+      TT(TT) )
 
 
 
@@ -91,39 +99,51 @@ s0 = (WW(WK 1), BB(BK 4))
 -- f0 :: ((W,B),Either V T) -> (W,B)
 -- -- f ((w,p),Left v) = (w' w v, p)
 -- -- f ((w,p),Right t) = (w, b' p t)
-f0 :: ((ObjST, ObjST), Either MorphST MorphST) -> (ObjST, ObjST)
+type SP = ((ObjST, ObjST), MorphST)
+type WB = (ObjST, ObjST)
+f0 :: ((ObjST, ObjST), MorphST) -> (ObjST, ObjST)
 f0 (s, p) = either 
-                (\l -> ( w' (Tuple.fst s) l, Tuple.snd s)) 
-                (\r -> (Tuple.fst s,  b' (Tuple.snd s) r)) p
+                (\l -> ( w' (Tuple.fst s) (Left l), Tuple.snd s)) 
+                (\r -> (Tuple.fst s,  b' (Tuple.snd s) (Right r))) p  -- left or right is necessary for the search (could be stored differently in tripleStore )
 
 -- -- f1 :: Either ((W,B),V) ((W,B),T) -> (W,B)
 -- j:: ((W,B),Either V T) -> Either ((W,B),V) ((W,B),T)
 -- -- distribute
--- j ((w,b), vt) = either (\v -> Left ((w,b), v))
---                         (\t -> Right ((w,b),t)) vt 
+-- j :: (WB, MorphST) -> _  
+    -- -> (b3 -> Either ((a, b1), b4) b5)
+    -- -> Either b4 b3
+    -- -> Either ((a, b1), b4) b5
+j :: (WB, MorphST) -> Either (WB, VV) (WB, TT)
+j ((w,b), vt) = either (\v -> Left ((w,b), v))
+                        (\t -> Right ((w,b),t)) vt 
 
--- distribute :: (a, Either b c) -> Either (a,b) (a, c)
--- -- instance Distributive (->) where
--- distribute (a, Left b) = Left (a,b)
--- distribute (a, Right c) = Right (a,c)
+distribute :: (a, Either b c) -> Either (a,b) (a, c)
+-- instance Distributive (->) where
+distribute (a, Left b) = Left (a,b)
+distribute (a, Right c) = Right (a,c)
 
 -- j2:: ((W,B),Either V T) -> Either ((W,B),V) ((W,B),T)
 -- -- distribute
--- j2 ((w,b), vt) = distribute ((w,b), vt)
+j2 ((w,b), vt) = distribute ((w,b), vt)
 
 
 -- -- reorganize 
 -- h:: ((W,B),V) -> ((W,V),B)
--- h ((w,b),v) = ((w,v),b)
+h :: ((a, b1), b2) -> ((a, b2), b1)
+h ((w,b),v) = ((w,v),b)
 -- k::((W,B),T) -> (W,(B,T))
--- k ((w,b),t) = (w,(b,t))
--- -- apply each 
+k :: ((a1, a2), b) -> (a1, (a2, b))
+k ((w,b),t) = (w,(b,t))
+-- apply each 
 -- l' :: ((W,V),B) -> (W,B)  -- was w'
--- l' wvb = cross (uncurry w',id) wvb
+-- l' :: ((ObjST, MorphST), ObjST) -> (WW, ObjST)
+l' wvb = cross (uncurry w',id) wvb
 -- r' :: (W,(B,T)) -> (W,B)
--- r' = cross (id, uncurry b')
+-- r' :: (t1, (ObjST, MorphST)) -> (t1, ObjST)
+r' = cross (id, uncurry b')
 
--- f1 :: ((W,B),Either V T) -> (W,B)
+-- -- f1 :: ((W,B),Either V T) -> (W,B)
+-- f1 :: (WB, MorphST) -> (ObjST, ObjST)
 -- f1 = either (l' . h) (r' . k) . j
 
 -- -- | the final combination
@@ -135,17 +155,34 @@ f0 (s, p) = either
 -- f3 = either (cross (uncurry w', id) ) (cross (id, uncurry b') ) . either (Left . h) (Right . k) . distribute
 -- -- best solution
 -- f4 :: ((W,B),Either V T) -> (W,B)
+-- f4 :: ((ObjST, ObjST),   MorphST) -> (ObjST, ObjST)
 -- f4 = either (first (uncurry w') ) (second (uncurry b') ) . bimap h k . distribute
 
 f=f0
-s1 = f (s0, (V 'a'))
-s2 = f (s1, Left B)
-s3 = f (s0, Right C)
-s4 = f (s1, Right C)
-s5 = f (s2, Right C)
-s41 = f (s3, Left A)
-s51 = f (s4, Left B)
+s1 = f (s0, Left (VV 'a'))
+s2 = f (s1, Left (VV 'b')) --Left B)
+s3 = f (s0, Right (TT 'c'))
+s4 = f (s1, Right (TT 'c'))
+s5 = f (s2, Right (TT 'c'))
+s41 = f (s3, Left (VV 'a'))
+s51 = f (s4, Left (VV 'b'))
 
+showStates f = showT [s0, s1, s2, s3, s4, s41, s5, s51]
+    where
+    s1 = f (s0, Left (VV 'a'))
+    s2 = f (s1, Left (VV 'b')) --Left B)
+    s3 = f (s0, Right (TT 'c'))
+    s4 = f (s1, Right (TT 'c'))
+    s5 = f (s2, Right (TT 'c'))
+    s41 = f (s3, Left (VV 'a'))
+    s51 = f (s4, Left (VV 'b'))        
+
+pageSTproductCombines :: IO ()
+pageSTproductCombines = do
+    putIOwords ["\npagepageSTproductCombines"]
+    putIOwords ["combined states ", showT [s0, s1, s2, s3, s4, s41, s5, s51]]
+    putIOwords ["combined states f0", showStates f0]
+    -- putIOwords ["combined states ", showStates f1]
 
 
     -- -- putIOwords ["injective f", showT (injective f137)]

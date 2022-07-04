@@ -127,6 +127,8 @@ pageST_withTriplesBusiness = do
     putIOwords ["space and business pfeile ", showT cat3]
     putIOwords [" function bb'' used ", showT $ b'' cat3 (BB(BK 4)) (Right $ TT 'c')]
 
--- b' = b'' cat3
--- w' = w'' cat3 
+b' :: ObjST -> MorphST -> ObjST
+b' = b'' cat3
+w' :: ObjST -> MorphST -> ObjST
+w' = w'' cat3 
 
