@@ -148,7 +148,7 @@ pageST_withTriples = do
     putIOwords [" cat store", showT cat1]
     putIOwords [" cat store", showT cat2]
     putIOwords [" found ow2 W2", showT f2_2]
-    putIOwords [" target", showT . unWW . getTarget $ f2_2]
+    putIOwords [" target", showT . getTarget $ f2_2]
     putIOwords [" function w'' used ", showT $ w'' cat2 ow1 (Left $ VV 'a')]
     putIOwords [" function w'' used ", showT $ w'' cat2 ow2 (Left $ VV 'b')]
 
