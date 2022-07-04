@@ -103,6 +103,13 @@ f3 = morph (cross (uncurry w', id) ) (cross (id, uncurry b') ) . morph (Va . h) 
 f4 :: ((WB),MorphST' VV TT) -> (WB)
 f4 = morph (first (uncurry w') ) (second (uncurry b') ) . morph (Va . h) (Ta . k) . distribute
         -- bimap needs special code for MorphST bimap' h k 
+f5 :: ((WB),MorphST' VV TT) -> (WB)
+f5 = morph (first (uncurry w') . h) (second (uncurry b') . k ) . distribute
+        -- a solution simplified from f3, avoids first/second which exists only for sums of two
+-- f6 :: ((WB),MorphST' VV TT) -> (WB)
+f6 :: ((ObjST, ObjST), MorphST' VV TT) -> (ObjST, ObjST)
+f6 = morph (cross (uncurry w', id) . h) 
+            (cross (id, uncurry b') . k)   . distribute
 
 
 showStates :: (((ObjST, ObjST), MorphST) -> (ObjST, ObjST)) -> Text
@@ -125,6 +132,8 @@ pageSTproductCombines = do
     putIOwords ["combined states f2", showStates f1]
     putIOwords ["combined states f3", showStates f1]
     putIOwords ["combined states f4", showStates f1]
+    putIOwords ["combined states f5", showStates f1]
+    putIOwords ["combined states f6", showStates f1]
 
 
 

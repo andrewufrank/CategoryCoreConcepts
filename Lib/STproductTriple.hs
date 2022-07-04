@@ -66,6 +66,7 @@ unTa (Ta tt) = tt
 morph :: (t1 -> p) -> (t2 -> p) -> MorphST' t1 t2 -> p
 morph f _ (Va vv) = f vv
 morph _ g (Ta tt) = g tt 
+-- could be extended to three or more types in sum 
 
 data ObjST = WW (Wobj Int) | BB (Bobj Int) | ZZst
 -- the spatial part: states W 
