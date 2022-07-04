@@ -18,6 +18,7 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE DeriveAnyClass     #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Lib.STproductTriple
      where
@@ -36,17 +37,26 @@ import Data.List.Extra
 import Data.Bifunctor (bimap)
 import qualified Data.Tuple as Tuple -- (snd, fst)
 import Vault.Triple4cat
-    ( Action(Ins),
+    ( Action(..),
       CPoint,
       CatStore,
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
                 catStoreFind) )
 
-type MorphST  = Either (VV)  (TT)  
+-- type MorphST  = Either (VV)  (TT)  
     -- deriving (Show, Read, Ord, Eq, Generic)
 newtype VV = VV Char deriving (Show, Read, Ord, Eq, Generic)
 newtype TT = TT Char deriving (Show, Read, Ord, Eq, Generic)
 -- instance Zeros MorphST where zero = Nullst
+
+data MorphST' v t = Va v | Ta t| ZZact
+    deriving (Show, Read, Ord, Eq, Generic)
+type MorphST = MorphST' VV TT
+instance Zeros MorphST where zero = ZZact
+unVa :: MorphST -> VV
+unVa (Va vv) = vv
+unTa :: MorphST -> TT
+unTa (Ta tt) = tt
 
 data ObjST = WW (Wobj Int) | BB (Bobj Int) | ZZst
 -- the spatial part: states W 
@@ -65,11 +75,11 @@ data Bobj i =  BK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 type CPointST = CPoint ObjST MorphST 
 
-makePfeilSpace :: Int -> Char -> Int -> (ObjST, Either VV b, ObjST)
-makePfeilSpace o1 m o2 = (WW (WK o1), Left (VV m), WW (WK o2))
+makePfeilSpace :: Int -> Char -> Int -> (ObjST, MorphST, ObjST)
+makePfeilSpace o1 m o2 = (WW (WK o1), Va (VV m), WW (WK o2))
 
-makePfeilBusiness :: Int -> Char -> Int -> (ObjST, Either a TT, ObjST)
-makePfeilBusiness o1 m o2 = (BB (BK o1), Right (TT m), BB (BK o2))
+makePfeilBusiness :: Int -> Char -> Int -> (ObjST, MorphST, ObjST)
+makePfeilBusiness o1 m o2 = (BB (BK o1), Ta (TT m), BB (BK o2))
 
 getTarget :: [(a, b1, b2)] -> b2
 getTarget cps = trd3 . head  $ cps  
@@ -84,7 +94,7 @@ ow1 :: ObjST
 ow1 = WW (WK 1)
 ow2 :: ObjST
 ow2 = WW (WK 2)
-mw1 = Left (VV 'a' )
+mw1 = Va (VV 'a' )
 -- st1 :: (ObjST, MorphST, ObjST)
 st1 = (ow1, mw1, ow2) 
 
@@ -99,7 +109,7 @@ cat2 = catStoreBatch ([Ins (makePfeilSpace 1 'a' 2), Ins (makePfeilSpace 2 'b' 3
 
 -- -- | construct function w' :: W -> V -> W 
 f2_2 :: [CPoint ObjST MorphST]
-f2_2 = catStoreFind (Just ow2, Just . Left $ (VV 'b'), Nothing) cat2
+f2_2 = catStoreFind (Just ow2, Just . Va $ (VV 'b'), Nothing) cat2
 
  
 pageST_withTriples :: IO ()
@@ -112,8 +122,8 @@ pageST_withTriples = do
     putIOwords [" cat store", showT cat2]
     putIOwords [" found ow2 W2", showT f2_2]
     putIOwords [" target", showT . unWW . getTarget $ f2_2]
-    putIOwords [" function w'' used ", showT $ w'' cat2 ow1 (Left $ VV 'a')]
-    putIOwords [" function w'' used ", showT $ w'' cat2 ow2 (Left $ VV 'b')]
+    putIOwords [" function w'' used ", showT $ w'' cat2 ow1 (Va $ VV 'a')]
+    putIOwords [" function w'' used ", showT $ w'' cat2 ow2 (Va $ VV 'b')]
 
 -- for test business
 
@@ -125,13 +135,13 @@ pageST_withTriplesBusiness :: IO ()
 pageST_withTriplesBusiness = do
     putIOwords ["\npageST_withTriplesBusiness"]
     putIOwords ["space and business pfeile ", showT cat3]
-    putIOwords [" function bb'' used ", showT $ b'' cat3 (BB(BK 4)) (Right $ TT 'c')]
+    putIOwords [" function bb'' used ", showT $ b'' cat3 (BB(BK 4)) (Ta $ TT 'c')]
 
-b' :: ObjST -> MorphST -> ObjST
-b' = b'' cat3
+b' :: ObjST -> TT -> ObjST
+b' o t = b'' cat3 o (Ta t)
 -- b'ts :: ObjST -> TT -> ObjST -- similar to STproduct
 -- b'ts = b'' cat3 -- not a good idea - no unMorph function easy
 --      requires different storage 
-w' :: ObjST -> MorphST -> ObjST
-w' = w'' cat3 
+w' :: ObjST -> VV -> ObjST
+w' o v =    w'' cat3 o (Va v)
 

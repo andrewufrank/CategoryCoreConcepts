@@ -28,6 +28,8 @@ import Vault.NaiveTripleStore
 import Vault.Triple4cat
 import Lib.STproductTriple
 import Lib.STproductCombine
+
+
 main :: IO ()
 main =  do  -- with tests in other modules
 
