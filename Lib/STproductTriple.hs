@@ -129,6 +129,9 @@ pageST_withTriplesBusiness = do
 
 b' :: ObjST -> MorphST -> ObjST
 b' = b'' cat3
+-- b'ts :: ObjST -> TT -> ObjST -- similar to STproduct
+-- b'ts = b'' cat3 -- not a good idea - no unMorph function easy
+--      requires different storage 
 w' :: ObjST -> MorphST -> ObjST
 w' = w'' cat3 
 

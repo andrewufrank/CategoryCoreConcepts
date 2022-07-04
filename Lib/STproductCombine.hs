@@ -136,10 +136,10 @@ k :: ((a1, a2), b) -> (a1, (a2, b))
 k ((w,b),t) = (w,(b,t))
 -- apply each 
 -- l' :: ((W,V),B) -> (W,B)  -- was w'
--- l' :: ((ObjST, MorphST), ObjST) -> (WW, ObjST)
+l' :: ((ObjST, MorphST), ObjST) -> (ObjST, ObjST)
 l' wvb = cross (uncurry w',id) wvb
 -- r' :: (W,(B,T)) -> (W,B)
--- r' :: (t1, (ObjST, MorphST)) -> (t1, ObjST)
+r' :: (ObjST, (ObjST, TT)) -> (ObjST, ObjST)
 r' = cross (id, uncurry b')
 
 -- -- f1 :: ((W,B),Either V T) -> (W,B)
