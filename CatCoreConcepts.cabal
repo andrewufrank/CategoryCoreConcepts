@@ -27,8 +27,7 @@ library
       ./
   ghc-options: -Wall
   build-depends:
-      HTF
-    , base >=4.7 && <5
+      base >=4.7 && <5
     , constrained-categories
     , containers
     , extra
@@ -45,7 +44,6 @@ executable lav
   ghc-options: -Wall
   build-depends:
       CatCoreConcepts
-    , HTF
     , base >=4.7 && <5
     , constrained-categories
     , containers

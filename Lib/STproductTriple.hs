@@ -22,10 +22,11 @@
 
 module Lib.STproductTriple
     (ObjST (..)
-    , MorphST(..), MorphST'(Va, Ta)
-    -- , Va, Ta
+    , MorphST(..)
+    -- , MorphST'(Left, Right)
+    -- , Left, Right
     , Wobj(..), Bobj(..)
-    , morph, distribute
+    -- , either, distribute
     , b', w', h, k
     , TT(..), VV(..)
     -- for test 
@@ -38,9 +39,10 @@ module Lib.STproductTriple
 import Prelude ()
 import Control.Category.Constrained.Prelude
 import qualified Control.Category.Hask as Hask
-import Control.Monad.Constrained
+import Control.Monad.Constrained  
 -- end 
 
+-- import Control.Category.Distributive -- gives conflict, for distribute
 import UniformBase 
 import Lib.Rules
 -- import Vault.Values
@@ -54,29 +56,30 @@ import Vault.Triple4cat
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
                 catStoreFind) )
 
--- type MorphST  = Either (VV)  (TT)  
-    -- deriving (Show, Read, Ord, Eq, Generic)
+type MorphST  = Either (VV)  (TT)  
+-- data MorphST' v t = Left v | Right t| ZZact
+--     deriving (Show, Read, Ord, Eq, Generic)
+-- type MorphST = MorphST' VV TT
+
 newtype VV = VV Char deriving (Show, Read, Ord, Eq, Generic)
 newtype TT = TT Char deriving (Show, Read, Ord, Eq, Generic)
 -- instance Zeros MorphST where zero = Nullst
 
-data MorphST' v t = Va v | Ta t| ZZact
-    deriving (Show, Read, Ord, Eq, Generic)
-type MorphST = MorphST' VV TT
-instance Zeros MorphST where zero = ZZact
-unVa :: MorphST -> VV
-unVa (Va vv) = vv
-unTa :: MorphST -> TT
-unTa (Ta tt) = tt
+-- instance Zeros MorphST where zero = ZZact
 
--- from Prelude as model for morph -- needed 
+-- unVa :: MorphST -> VV
+-- unVa (Left vv) = vv
+-- unTa :: MorphST -> TT
+-- unTa (Right tt) = tt
+
+-- from Prelude as model for either -- needed 
 -- either                  :: (a -> c) -> (b -> c) -> Either a b -> c
 -- either f _ (Left x)     =  f x
 -- either _ g (Right y)    =  g y
 
-morph :: (t1 -> p) -> (t2 -> p) -> MorphST' t1 t2 -> p
-morph f _ (Va vv) = f vv
-morph _ g (Ta tt) = g tt 
+-- either :: (t1 -> p) -> (t2 -> p) -> MorphST' t1 t2 -> p
+-- either f _ (Left vv) = f vv
+-- either _ g (Right tt) = g tt 
 -- could be extended to three or more types in sum 
 
 data ObjST = WW (Wobj Int) | BB (Bobj Int) | ZZst
@@ -97,10 +100,10 @@ data Bobj i =  BK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 type CPointST = CPoint ObjST MorphST 
 
 makePfeilSpace :: Int -> Char -> Int -> (ObjST, MorphST, ObjST)
-makePfeilSpace o1 m o2 = (WW (WK o1), Va (VV m), WW (WK o2))
+makePfeilSpace o1 m o2 = (WW (WK o1), Left (VV m), WW (WK o2))
 
 makePfeilBusiness :: Int -> Char -> Int -> (ObjST, MorphST, ObjST)
-makePfeilBusiness o1 m o2 = (BB (BK o1), Ta (TT m), BB (BK o2))
+makePfeilBusiness o1 m o2 = (BB (BK o1), Right (TT m), BB (BK o2))
 
 getTarget :: [(a, b1, b2)] -> b2
 getTarget cps = trd3 . head  $ cps  
@@ -112,18 +115,18 @@ b'' cat ow pv =  getTarget . catStoreFind (Just ow, Just (pv), Nothing) $ cat
 
 -- the functions really used
 b' :: ObjST -> TT -> ObjST
-b' o t = b'' cat3 o (Ta t)
+b' o t = b'' cat3 o (Right t)
 -- b'ts :: ObjST -> TT -> ObjST -- similar to STproduct
 -- b'ts = b'' cat3 -- not a good idea - no unMorph function easy
 --      requires different storage 
 w' :: ObjST -> VV -> ObjST
-w' o v =    w'' cat3 o (Va v)
+w' o v =    w'' cat3 o (Left v)
     -- state is the loaded triple store (later)
 
 -- the step function 
 
-f6 :: ((ObjST, ObjST), MorphST' VV TT) -> (ObjST, ObjST)
-f6 = morph (cross (uncurry w', id) . h) 
+f6 :: ((ObjST, ObjST), MorphST) -> (ObjST, ObjST)
+f6 = either (cross (uncurry w', id) . h) 
             (cross (id, uncurry b') . k)   . distribute
 
 -- helpers:
@@ -137,16 +140,17 @@ k ((w,b),t) = (w,(b,t))
 
 -- distribute :: (a, Either b c) -> Either (a,b) (a, c)
 -- instance Distributive (->) where
-distribute :: (a, MorphST' b1 b2) -> MorphST' (a, b1) (a, b2)
-distribute (a, Va b) = Va (a,b)
-distribute (a, Ta c) = Ta (a,c)
+
+-- distribute :: (a, MorphST' b1 b2) -> MorphST' (a, b1) (a, b2)
+distribute (a, Left b) = Left (a,b)
+distribute (a, Right c) = Right (a,c)
 
 -- for test spatial 
 ow1 :: ObjST
 ow1 = WW (WK 1)
 ow2 :: ObjST
 ow2 = WW (WK 2)
-mw1 = Va (VV 'a' )
+mw1 = Left (VV 'a' )
 -- st1 :: (ObjST, MorphST, ObjST)
 st1 = (ow1, mw1, ow2) 
 
@@ -161,7 +165,7 @@ cat2 = catStoreBatch ([Ins (makePfeilSpace 1 'a' 2), Ins (makePfeilSpace 2 'b' 3
 
 -- -- | construct function w' :: W -> V -> W 
 f2_2 :: [CPoint ObjST MorphST]
-f2_2 = catStoreFind (Just ow2, Just . Va $ (VV 'b'), Nothing) cat2
+f2_2 = catStoreFind (Just ow2, Just . Left $ (VV 'b'), Nothing) cat2
 
  
 pageST_withTriples :: IO ()
@@ -174,8 +178,8 @@ pageST_withTriples = do
     putIOwords [" cat store", showT cat2]
     putIOwords [" found ow2 W2", showT f2_2]
     putIOwords [" target", showT . unWW . getTarget $ f2_2]
-    putIOwords [" function w'' used ", showT $ w'' cat2 ow1 (Va $ VV 'a')]
-    putIOwords [" function w'' used ", showT $ w'' cat2 ow2 (Va $ VV 'b')]
+    putIOwords [" function w'' used ", showT $ w'' cat2 ow1 (Left $ VV 'a')]
+    putIOwords [" function w'' used ", showT $ w'' cat2 ow2 (Left $ VV 'b')]
 
 -- for test business
 
@@ -187,7 +191,7 @@ pageST_withTriplesBusiness :: IO ()
 pageST_withTriplesBusiness = do
     putIOwords ["\npageST_withTriplesBusiness"]
     putIOwords ["space and business pfeile ", showT cat3]
-    putIOwords [" function bb'' used ", showT $ b'' cat3 (BB(BK 4)) (Ta $ TT 'c')]
+    putIOwords [" function bb'' used ", showT $ b'' cat3 (BB(BK 4)) (Right $ TT 'c')]
 
 -- start state
 s0 :: (ObjST, ObjST)
@@ -197,13 +201,13 @@ s0 = (WW(WK 1), BB(BK 4))
 showStates :: (((ObjST, ObjST), MorphST) -> (ObjST, ObjST)) -> Text
 showStates f = showT [s0, s1, s2, s3, s4, s41, s5, s51]
     where
-    s1 = f (s0, Va (VV 'a'))
-    s2 = f (s1, Va (VV 'b')) --Va B)
-    s3 = f (s0, Ta (TT 'c'))
-    s4 = f (s1, Ta (TT 'c'))
-    s5 = f (s2, Ta (TT 'c'))
-    s41 = f (s3, Va (VV 'a'))
-    s51 = f (s4, Va (VV 'b'))        
+    s1 = f (s0, Left (VV 'a'))
+    s2 = f (s1, Left (VV 'b')) --Left B)
+    s3 = f (s0, Right (TT 'c'))
+    s4 = f (s1, Right (TT 'c'))
+    s5 = f (s2, Right (TT 'c'))
+    s41 = f (s3, Left (VV 'a'))
+    s51 = f (s4, Left (VV 'b'))        
 
 pageSTproductCombines :: IO ()
 pageSTproductCombines = do
