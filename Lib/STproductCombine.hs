@@ -18,6 +18,7 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE DeriveAnyClass     #-}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
 
 module Lib.STproductCombine
      where
@@ -106,16 +107,15 @@ f0 (s, p) = either
                 (\l -> ( w' (Tuple.fst s) (Left l), Tuple.snd s)) 
                 (\r -> (Tuple.fst s,  b' (Tuple.snd s) (Right r))) p  -- left or right is necessary for the search (could be stored differently in tripleStore )
 
--- -- f1 :: Either ((W,B),V) ((W,B),T) -> (W,B)
 -- j:: ((W,B),Either V T) -> Either ((W,B),V) ((W,B),T)
 -- -- distribute
--- j :: (WB, MorphST) -> _  
-    -- -> (b3 -> Either ((a, b1), b4) b5)
-    -- -> Either b4 b3
-    -- -> Either ((a, b1), b4) b5
 j :: (WB, MorphST) -> Either (WB, VV) (WB, TT)
 j ((w,b), vt) = either (\v -> Left ((w,b), v))
                         (\t -> Right ((w,b),t)) vt 
+-- j_ts :: (WB, MorphST) -> Either (WB, MorphST) (WB, MorphST)
+-- result changed to Either (.. Either)
+j_ts ((w,b), vt) = either (\v -> Left ((w,b), Left v))
+                        (\t -> Right ((w,b), Right t)) vt 
 
 distribute :: (a, Either b c) -> Either (a,b) (a, c)
 -- instance Distributive (->) where
@@ -143,8 +143,8 @@ l' wvb = cross (uncurry w',id) wvb
 r' = cross (id, uncurry b')
 
 -- -- f1 :: ((W,B),Either V T) -> (W,B)
--- f1 :: (WB, MorphST) -> (ObjST, ObjST)
--- f1 = either (l' . h) (r' . k) . j
+f1 :: (WB, MorphST) -> (ObjST, ObjST)
+f1 = either (l' . h) (r' . k) . j_ts
 
 -- -- | the final combination
 -- -- (W,B) are the two sets of states
@@ -182,7 +182,7 @@ pageSTproductCombines = do
     putIOwords ["\npagepageSTproductCombines"]
     putIOwords ["combined states ", showT [s0, s1, s2, s3, s4, s41, s5, s51]]
     putIOwords ["combined states f0", showStates f0]
-    -- putIOwords ["combined states ", showStates f1]
+    putIOwords ["combined states f1", showStates f1]
 
 
     -- -- putIOwords ["injective f", showT (injective f137)]
