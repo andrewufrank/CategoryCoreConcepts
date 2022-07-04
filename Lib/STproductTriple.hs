@@ -42,7 +42,6 @@ import qualified Control.Category.Hask as Hask
 import Control.Monad.Constrained  
 -- end 
 
--- import Control.Category.Distributive -- gives conflict, for distribute
 import UniformBase 
 import Lib.Rules
 -- import Vault.Values
@@ -63,41 +62,20 @@ type MorphST  = Either (VV)  (TT)
 
 newtype VV = VV Char deriving (Show, Read, Ord, Eq, Generic)
 newtype TT = TT Char deriving (Show, Read, Ord, Eq, Generic)
--- instance Zeros MorphST where zero = Nullst
-
--- instance Zeros MorphST where zero = ZZact
-
--- unVa :: MorphST -> VV
--- unVa (Left vv) = vv
--- unTa :: MorphST -> TT
--- unTa (Right tt) = tt
-
--- from Prelude as model for either -- needed 
--- either                  :: (a -> c) -> (b -> c) -> Either a b -> c
--- either f _ (Left x)     =  f x
--- either _ g (Right y)    =  g y
-
--- either :: (t1 -> p) -> (t2 -> p) -> MorphST' t1 t2 -> p
--- either f _ (Left vv) = f vv
--- either _ g (Right tt) = g tt 
--- could be extended to three or more types in sum 
 
 data ObjST = WW (Wobj Int) | BB (Bobj Int) | ZZst
--- the spatial part: states W 
--- the business side: states B 
     deriving (Show, Read, Ord, Eq)
+-- ^ the spatial part: states W 
+-- ^ the business side: states B 
 instance Zeros ObjST where zero = ZZst
-unWW :: ObjST -> Wobj Int
-unWW (WW w) = w
-unBB :: ObjST -> Bobj Int
-unBB (BB b) = b
+
 
 data Wobj i = WK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial states W1, W2, W3
 data Bobj i =  BK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial actions (moves) A or B
 
-type CPointST = CPoint ObjST MorphST 
+-- type CPointST = CPoint ObjST MorphST 
 
 makePfeilSpace :: Int -> Char -> Int -> (ObjST, MorphST, ObjST)
 makePfeilSpace o1 m o2 = (WW (WK o1), Left (VV m), WW (WK o2))
@@ -116,30 +94,23 @@ b'' cat ow pv =  getTarget . catStoreFind (Just ow, Just (pv), Nothing) $ cat
 -- the functions really used
 b' :: ObjST -> TT -> ObjST
 b' o t = b'' cat3 o (Right t)
--- b'ts :: ObjST -> TT -> ObjST -- similar to STproduct
--- b'ts = b'' cat3 -- not a good idea - no unMorph function easy
---      requires different storage 
+
 w' :: ObjST -> VV -> ObjST
 w' o v =    w'' cat3 o (Left v)
     -- state is the loaded triple store (later)
 
 -- the step function 
-
 f6 :: ((ObjST, ObjST), MorphST) -> (ObjST, ObjST)
 f6 = either (cross (uncurry w', id) . h) 
             (cross (id, uncurry b') . k)   . distribute
 
--- helpers:
--- -- reorganize 
+-- helpers:  reorganize 
 -- h:: ((W,B),V) -> ((W,V),B)
 h :: ((a, b1), VV) -> ((a, VV), b1)
 h ((w,b),v) = ((w,v),b)
 -- k::((W,B),T) -> (W,(B,T))
 k :: ((a1, a2), TT) -> (a1, (a2, TT))
 k ((w,b),t) = (w,(b,t))
-
--- distribute :: (a, Either b c) -> Either (a,b) (a, c)
--- instance Distributive (->) where
 
 -- distribute :: (a, MorphST' b1 b2) -> MorphST' (a, b1) (a, b2)
 distribute (a, Left b) = Left (a,b)
