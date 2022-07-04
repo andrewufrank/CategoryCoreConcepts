@@ -59,8 +59,8 @@ morph _ g (Ta tt) = g tt
 -- bimap f _ (Left a) = Left (f a)
 -- bimap _ g (Right b) = Right (g b)
 
-bimap' :: (t1 -> p) -> (t2 -> p) -> MorphST' t1 t2 -> p
-bimap' f g = morph f g 
+-- bimap' :: (t1 -> p) -> (t2 -> p) -> MorphST' t1 t2 -> p
+-- bimap' f g = morph f g 
 
 -- -- combined 
 s0 :: (ObjST, ObjST)
@@ -106,10 +106,10 @@ distribute (a, Ta c) = Ta (a,c)
 
 -- -- reorganize 
 -- h:: ((W,B),V) -> ((W,V),B)
-h :: ((a, b1), b2) -> ((a, b2), b1)
+h :: ((a, b1), VV) -> ((a, VV), b1)
 h ((w,b),v) = ((w,v),b)
 -- k::((W,B),T) -> (W,(B,T))
-k :: ((a1, a2), b) -> (a1, (a2, b))
+k :: ((a1, a2), TT) -> (a1, (a2, TT))
 k ((w,b),t) = (w,(b,t))
 -- apply each 
 -- l' :: ((W,V),B) -> (W,B)  -- was w'
@@ -131,7 +131,9 @@ f2 = morph (cross (uncurry w', id) . h) (cross (id, uncurry b') . k) . distribut
 f3 = morph (cross (uncurry w', id) ) (cross (id, uncurry b') ) . morph (Va . h) (Ta . k) . distribute
 -- best solution
 -- f4 :: ((W,B),Either V T) -> (W,B)
--- f4 = morph (first (uncurry w') ) (second (uncurry b') ) . bimap' h k . distribute
+f4 :: ((WB),MorphST' VV TT) -> (WB)
+f4 = morph (first (uncurry w') ) (second (uncurry b') ) . morph (Va . h) (Ta . k) . distribute
+        -- bimap needs special code for MorphST bimap' h k 
 
 
 showStates :: (((ObjST, ObjST), MorphST) -> (ObjST, ObjST)) -> Text
@@ -153,6 +155,7 @@ pageSTproductCombines = do
     putIOwords ["combined states f1", showStates f1]
     putIOwords ["combined states f2", showStates f1]
     putIOwords ["combined states f3", showStates f1]
+    putIOwords ["combined states f4", showStates f1]
 
 
 
