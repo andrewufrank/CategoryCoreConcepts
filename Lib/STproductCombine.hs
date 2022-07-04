@@ -40,28 +40,6 @@ import Vault.Triple4cat ( Morph(T) )
 import Lib.STproductTriple
  
 
--- -- caseMorph :: m v -> wb -> m ((wb),v)
--- caseMorph :: MorphST' v t -> (a,b) ->  (v -> s) -> (t -> s) -> MorphST' ((a,b),v) ((a,b),t)
--- caseMorph (Va vv) (w,b)  op1 _ = Va (op1 vv)
---     where op1 x = ((w,b),x)
--- caseMorph (Ta tt) (w,b) _ op2 = Ta (op2 tt)
---     where op2 x = ((w,b),x)
-
--- from Prelude 
--- either                  :: (a -> c) -> (b -> c) -> Either a b -> c
--- either f _ (Left x)     =  f x
--- either _ g (Right y)    =  g y
-
-morph :: (t1 -> p) -> (t2 -> p) -> MorphST' t1 t2 -> p
-morph f _ (Va vv) = f vv
-morph _ g (Ta tt) = g tt 
-
--- bimap f _ (Left a) = Left (f a)
--- bimap _ g (Right b) = Right (g b)
-
--- bimap' :: (t1 -> p) -> (t2 -> p) -> MorphST' t1 t2 -> p
--- bimap' f g = morph f g 
-
 -- -- combined 
 s0 :: (ObjST, ObjST)
 s0 = (WW(WK 1), BB(BK 4))
@@ -87,22 +65,13 @@ j ((w,b), vt) = morph (\v -> Va ((w,b), v))
 -- j ((w,b), vt) = either (\v -> Va ((w,b), v))
 --                         (\t -> Ta ((w,b),t)) vt 
 
-
--- j_ts :: ((a, b), MorphST' v1 t1) -> MorphST' ((a, b), MorphST' v1 t2) ((a, b), MorphST' v2 t1)
--- j_ts ((w,b), vt) = morph (\v -> Va ((w,b), Va v))
---                         (\t -> Ta ((w,b), Ta t)) vt 
-
 -- distribute :: (a, Either b c) -> Either (a,b) (a, c)
 -- instance Distributive (->) where
 distribute :: (a, MorphST' b1 b2) -> MorphST' (a, b1) (a, b2)
 distribute (a, Va b) = Va (a,b)
 distribute (a, Ta c) = Ta (a,c)
 
--- -- j2:: ((W,B),Either V T) -> Either ((W,B),V) ((W,B),T)
--- -- -- distribute
--- j2 :: ((a, b), MorphST' b1 b2) -> MorphST' ((a, b), b1) ((a, b), b2)
--- j2 ((w,b), vt) = distribute ((w,b), vt)
-
+ 
 
 -- -- reorganize 
 -- h:: ((W,B),V) -> ((W,V),B)

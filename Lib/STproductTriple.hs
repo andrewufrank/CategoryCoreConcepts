@@ -58,6 +58,15 @@ unVa (Va vv) = vv
 unTa :: MorphST -> TT
 unTa (Ta tt) = tt
 
+-- from Prelude as model for morph -- needed 
+-- either                  :: (a -> c) -> (b -> c) -> Either a b -> c
+-- either f _ (Left x)     =  f x
+-- either _ g (Right y)    =  g y
+
+morph :: (t1 -> p) -> (t2 -> p) -> MorphST' t1 t2 -> p
+morph f _ (Va vv) = f vv
+morph _ g (Ta tt) = g tt 
+
 data ObjST = WW (Wobj Int) | BB (Bobj Int) | ZZst
 -- the spatial part: states W 
 -- the business side: states B 
