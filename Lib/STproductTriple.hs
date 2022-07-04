@@ -21,7 +21,18 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Lib.STproductTriple
-     where
+    (ObjST (..)
+    , MorphST(..), MorphST'(Va, Ta)
+    -- , Va, Ta
+    , Wobj(..), Bobj(..)
+    , morph, distribute
+    , b', w', h, k
+    , TT(..), VV(..)
+    -- for test 
+    , pageST_withTriples
+    , pageST_withTriplesBusiness
+    , pageSTproductCombines
+    )     where
 
 -- change prelude for constrainded-categories
 import Prelude ()
@@ -99,6 +110,37 @@ w'' cat ow pv =  getTarget . catStoreFind (Just ow, Just (pv), Nothing) $ cat
 b'' :: () => CatStore ObjST MorphST -> ObjST -> MorphST -> ObjST
 b'' cat ow pv =  getTarget . catStoreFind (Just ow, Just (pv), Nothing) $ cat
 
+-- the functions really used
+b' :: ObjST -> TT -> ObjST
+b' o t = b'' cat3 o (Ta t)
+-- b'ts :: ObjST -> TT -> ObjST -- similar to STproduct
+-- b'ts = b'' cat3 -- not a good idea - no unMorph function easy
+--      requires different storage 
+w' :: ObjST -> VV -> ObjST
+w' o v =    w'' cat3 o (Va v)
+    -- state is the loaded triple store (later)
+
+-- the step function 
+
+f6 :: ((ObjST, ObjST), MorphST' VV TT) -> (ObjST, ObjST)
+f6 = morph (cross (uncurry w', id) . h) 
+            (cross (id, uncurry b') . k)   . distribute
+
+-- helpers:
+-- -- reorganize 
+-- h:: ((W,B),V) -> ((W,V),B)
+h :: ((a, b1), VV) -> ((a, VV), b1)
+h ((w,b),v) = ((w,v),b)
+-- k::((W,B),T) -> (W,(B,T))
+k :: ((a1, a2), TT) -> (a1, (a2, TT))
+k ((w,b),t) = (w,(b,t))
+
+-- distribute :: (a, Either b c) -> Either (a,b) (a, c)
+-- instance Distributive (->) where
+distribute :: (a, MorphST' b1 b2) -> MorphST' (a, b1) (a, b2)
+distribute (a, Va b) = Va (a,b)
+distribute (a, Ta c) = Ta (a,c)
+
 -- for test spatial 
 ow1 :: ObjST
 ow1 = WW (WK 1)
@@ -147,11 +189,24 @@ pageST_withTriplesBusiness = do
     putIOwords ["space and business pfeile ", showT cat3]
     putIOwords [" function bb'' used ", showT $ b'' cat3 (BB(BK 4)) (Ta $ TT 'c')]
 
-b' :: ObjST -> TT -> ObjST
-b' o t = b'' cat3 o (Ta t)
--- b'ts :: ObjST -> TT -> ObjST -- similar to STproduct
--- b'ts = b'' cat3 -- not a good idea - no unMorph function easy
---      requires different storage 
-w' :: ObjST -> VV -> ObjST
-w' o v =    w'' cat3 o (Va v)
+-- start state
+s0 :: (ObjST, ObjST)
+s0 = (WW(WK 1), BB(BK 4))
+
+
+showStates :: (((ObjST, ObjST), MorphST) -> (ObjST, ObjST)) -> Text
+showStates f = showT [s0, s1, s2, s3, s4, s41, s5, s51]
+    where
+    s1 = f (s0, Va (VV 'a'))
+    s2 = f (s1, Va (VV 'b')) --Va B)
+    s3 = f (s0, Ta (TT 'c'))
+    s4 = f (s1, Ta (TT 'c'))
+    s5 = f (s2, Ta (TT 'c'))
+    s41 = f (s3, Va (VV 'a'))
+    s51 = f (s4, Va (VV 'b'))        
+
+pageSTproductCombines :: IO ()
+pageSTproductCombines = do
+    putIOwords ["\npagepageSTproductCombines"]
+    putIOwords ["combined states f6", showStates f6]
 
