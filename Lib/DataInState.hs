@@ -19,6 +19,7 @@
 {-# LANGUAGE DeriveAnyClass     #-}
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
+{-# OPTIONS_GHC -Wno-unused-do-bind #-}
 
 module Lib.DataInState
     ( module Lib.DataInState
@@ -74,13 +75,37 @@ pageDataInState = do
     putIOwords ["the cat3 file", showT cat3 ]
     putIOwords ["the sequence of evalState"]
     -- putIOwords ["evalstate ", showT $ runState del_c cat3]
-    putIOwords ["evalstate ", showT $ runState (exOne) (0)]
+    putIOwords ["runState exOne", showT $ runState (exOne) (0)]
+    putIOwords ["runState id_c", showT $ runState (id_c) (cat3)]
+    putIOwords ["runState id_batch d_c", showT $ runState (id_batch d_c) (cat3)]
+    putIOwords ["runState id_batch d_c", showT $ runState (id_op1) (cat3)]
 
--- type StoreStateMonad = State Store STactions
+type StoreStateMonad = State Store  
 
--- type STactions = [Action (ObjST, MorphST, ObjST)]
+type STactions = [Action (ObjST, MorphST, ObjST)]
 
--- d_c = [Del (makePfeilBusiness 4 'c' 5)]   :: STactions
+d_c :: STactions
+d_c = [Del (makePfeilBusiness 4 'c' 5)]   :: STactions
+d_a = [Del (makePfeilSpace 1 'a' 2)]   :: STactions
+
+id_c :: StoreStateMonad Int 
+-- ^ do nothing in monad (for test)
+id_c = do 
+    return 0 
+
+id_batch :: STactions -> StoreStateMonad Int 
+-- ^ apply the actions in the batch 
+id_batch a = do 
+    c <- get 
+    let res = catStoreBatch a c
+    put res
+    return 0 
+
+id_op1 :: StoreStateMonad Int
+id_op1 = do 
+    id_batch d_c 
+    id_batch d_a
+    return 0
 
 -- init_cat cc = do 
 --     state (zero, cc)
