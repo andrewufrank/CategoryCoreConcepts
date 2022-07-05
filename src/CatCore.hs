@@ -29,13 +29,14 @@ module Main     where      -- must have Main (main) or Main where
 -- import Lib.Rules
 -- import Lib.UsingSets
 -- import           Lib.OpenClass
-
-import Lib.STproduct
+-- import Vault.Tris
+import Lib.STproduct ()
 import Vault.NaiveTripleStore
 import Vault.Triple4cat
 import Lib.STproductTriple
 -- import Lib.STproductCombine
-import Lib.DataInState
+-- import Lib.DataInState
+import Vault.TrisFiles 
 import UniformBase
 
 main :: IO ()

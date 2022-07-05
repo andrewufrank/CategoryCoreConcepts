@@ -21,6 +21,7 @@ library
       Lib.STproductTriple
       Vault.NaiveTripleStore
       Vault.Triple4cat
+      Vault.TrisFiles
       Vault.Value
   other-modules:
       Paths_CatCoreConcepts

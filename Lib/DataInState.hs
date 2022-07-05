@@ -63,6 +63,8 @@ instance TypedFiles7 Text Store where
   wrap7 = read . t2s
   unwrap7 = showT
 
+-- example state
+
 pageDataInState :: ErrIO ()
 pageDataInState = do
     putIOwords ["\n pageDataInState"]
