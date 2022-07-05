@@ -18,17 +18,18 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE DeriveAnyClass     #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+-- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Lib.STproductTriple
     (ObjST (..)
-    , MorphST(..)
+    , MorphST
     -- , MorphST'(Left, Right)
     -- , Left, Right
     , Wobj(..), Bobj(..)
     -- , either, distribute
     , b', w', h, k
     , TT(..), VV(..)
+    , makePfeilSpace, makePfeilBusiness
     -- for test 
     , pageST_withTriples
     , pageST_withTriplesBusiness
@@ -39,7 +40,7 @@ module Lib.STproductTriple
 import Prelude ()
 import Control.Category.Constrained.Prelude
 import qualified Control.Category.Hask as Hask
-import Control.Monad.Constrained  
+-- import Control.Monad.Constrained  
 -- end 
 
 import UniformBase 
@@ -148,6 +149,7 @@ pageST_withTriples = do
     putIOwords [" cat store", showT cat1]
     putIOwords [" cat store", showT cat2]
     putIOwords [" found ow2 W2", showT f2_2]
+    putIOwords [" target", showT . getTarget $ f2_2]
     putIOwords [" target", showT . getTarget $ f2_2]
     putIOwords [" function w'' used ", showT $ w'' cat2 ow1 (Left $ VV 'a')]
     putIOwords [" function w'' used ", showT $ w'' cat2 ow2 (Left $ VV 'b')]

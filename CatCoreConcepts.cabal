@@ -15,6 +15,7 @@ build-type:     Simple
 
 library
   exposed-modules:
+      Lib.DataInState
       Lib.Rules
       Lib.STproduct
       Lib.STproductTriple
