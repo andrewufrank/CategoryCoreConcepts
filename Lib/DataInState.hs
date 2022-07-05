@@ -79,6 +79,7 @@ pageDataInState = do
     putIOwords ["runState id_c", showT $ runState (id_c) (cat3)]
     putIOwords ["runState id_batch d_c", showT $ runState (id_batch d_c) (cat3)]
     putIOwords ["runState id_batch d_c", showT $ runState (id_op1) (cat3)]
+    putIOwords ["runState id_find", showT $ runState (id_find) (cat3)]
 
 type StoreStateMonad = State Store  
 
@@ -100,6 +101,13 @@ id_batch a = do
     let res = catStoreBatch a c
     put res
     return 0 
+
+id_find :: StoreStateMonad [CPoint ObjST MorphST]
+id_find = do 
+    c <- get
+
+    let res = catStoreFind (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
+    return res 
 
 id_op1 :: StoreStateMonad Int
 id_op1 = do 
