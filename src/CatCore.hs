@@ -3,7 +3,13 @@
 -- Module      :   the main for the core concepts data  
 ------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wno-missing-signatures #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
+{-# LANGUAGE OverloadedStrings     #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Main     where      -- must have Main (main) or Main where
@@ -30,6 +36,7 @@ import Vault.Triple4cat
 import Lib.STproductTriple
 -- import Lib.STproductCombine
 import Lib.DataInState
+import UniformBase
 
 main :: IO ()
 main =  do  -- with tests in other modules
@@ -42,6 +49,10 @@ main =  do  -- with tests in other modules
     -- pageSTproductCombines
     -- pageSTproductCombines2
     -- pageNT
+    startProg "CatCore" mainErrIO 
+
+mainErrIO :: ErrIO ()
+mainErrIO = do 
     pageDataInState
 
 
