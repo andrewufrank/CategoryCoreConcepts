@@ -35,8 +35,10 @@ import Vault.NaiveTripleStore
 import Vault.Triple4cat
 import Lib.STproductTriple
 -- import Lib.STproductCombine
--- import Lib.DataInState
+import Lib.DataInState
 import Vault.TrisFiles 
+
+
 import UniformBase
 
 main :: IO ()
@@ -54,6 +56,7 @@ main =  do  -- with tests in other modules
 
 mainErrIO :: ErrIO ()
 mainErrIO = do 
+    -- pageTris
     pageDataInState
 
 

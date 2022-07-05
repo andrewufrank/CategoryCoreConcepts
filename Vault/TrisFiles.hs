@@ -28,8 +28,9 @@ objects: a sigle value (no theme yet)
 
 module Vault.TrisFiles
     (read8, write8, catStoreFileType
+    , Store
     -- for test 
-    , pageDataInState) where 
+    , pageTris) where 
         
         
         -- normal prelude
@@ -77,9 +78,9 @@ instance TypedFiles7 Text Store where
 
 -- example state
 
-pageDataInState :: ErrIO ()
-pageDataInState = do
-    putIOwords ["\n vault pageDataInState"]
+pageTris :: ErrIO ()
+pageTris = do
+    putIOwords ["\n vault pageTris"]
     putIOwords ["cat3\n", showT cat3]
     putIOwords ["cat3 read back \n", showT cat3']
 

@@ -25,10 +25,10 @@ module Lib.DataInState
     )     where
 
 -- change prelude for constrainded-categories
-import Prelude ()
-import Control.Category.Constrained.Prelude
-import qualified Control.Category.Hask as Hask
-import Control.Monad.Constrained  
+-- import Prelude ()
+-- import Control.Category.Constrained.Prelude
+-- import qualified Control.Category.Hask as Hask
+-- import Control.Monad.Constrained  
 -- end 
 
 import UniformBase 
@@ -43,40 +43,63 @@ import Vault.Triple4cat
     --   CatStore,
     --   CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
     --             catStoreFind) )
-import Lib.STproductTriple
+-- import Lib.STproductTriple
 import Control.Monad.State
+import Lib.STproductTriple
+import Vault.TrisFiles ( catStoreFileType, Store ) 
 
---  the test data (Space & Business)
-type Store = CatStore ObjST MorphST
-cat0 = catStoreEmpty :: Store
-cat2 = catStoreBatch ([Ins (makePfeilSpace 1 'a' 2), Ins (makePfeilSpace 2 'b' 3)]) cat0
-cat3 = catStoreBatch ([Ins (makePfeilBusiness 4 'c' 5)]) cat2
-
-cat3show = "CatStoreK [(BB (BK 4),Right (TT 'c'),BB (BK 5)),(WW (WK 1),Left (VV 'a'),WW (WK 2)),(WW (WK 2),Left (VV 'b'),WW (WK 3))]"
-cat3' = read cat3show :: Store
-
--- for typed files 
-catStoreFileType :: TypedFile5 Text Store
-catStoreFileType = makeTyped (Extension "tris")  :: TypedFile5 Text Store
-
-instance TypedFiles7 Text Store where
-  wrap7 = read . t2s
-  unwrap7 = showT
 
 -- example state
+type ExState = Int 
+type ExMonad = State ExState
 
-pageDataInState :: ErrIO ()
+exnext :: ExState -> ExState
+exnext x = 1 + x
+
+exOne:: State ExState ExState 
+exOne = do 
+            i <- get 
+            let j = exnext i
+            put j
+            return 99
+
 pageDataInState = do
     putIOwords ["\n pageDataInState"]
-    putIOwords ["cat3\n", showT cat3]
-    putIOwords ["cat3 read back \n", showT cat3']
 
 -- show & read can be used to store the data 
     let dataFile = makeAbsFile "/home/frank/CoreConcepts/cat3"
     
-    write8 dataFile catStoreFileType cat3 
-    cat3'' <- read8 dataFile catStoreFileType 
-    write8 (makeAbsFile "/home/frank/CoreConcepts/cat3after") catStoreFileType cat3''
+    cat3 <- read8 dataFile catStoreFileType 
+ 
+    putIOwords ["the cat3 file", showT cat3 ]
+    putIOwords ["the sequence of evalState"]
+    -- putIOwords ["evalstate ", showT $ runState del_c cat3]
+    putIOwords ["evalstate ", showT $ runState (exOne) (0)]
+
+-- type StoreStateMonad = State Store STactions
+
+-- type STactions = [Action (ObjST, MorphST, ObjST)]
+
+-- d_c = [Del (makePfeilBusiness 4 'c' 5)]   :: STactions
+
+-- init_cat cc = do 
+--     state (zero, cc)
+--     return ()
+
+-- del_c = do 
+--     c3 <- get 
+--     let 
+--         c2 = catStoreBatch ([Del (makePfeilBusiness 4 'c' 5)]) c3 
+--     put c2 
+--     return () 
+
+-- inc
+
+
+
+pageDataInState :: ErrIO ()
+
+
                                         -- could go to test
 
 
