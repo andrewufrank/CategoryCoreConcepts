@@ -93,7 +93,17 @@ find_node_edge i = do
         r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
         return . head $ r1
 
+find_node_edge2 :: () =>  Node -> StoreStateMonad  (ObjST)
+-- ^ start with node get edge
+find_node_edge2 i = do 
+        r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
+        return . getTarget3  $ r1
 
+find_node_edge4 :: () =>  Node -> StoreStateMonad  (Edge)
+-- ^ start with node get edge
+find_node_edge4 i = do 
+        r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
+        return . unEdgeTag . getTarget3  $ r1
 
 
 
@@ -104,11 +114,16 @@ part2 = do
 
     let datafn = makeAbsFile "/home/frank/CoreConcepts/edgeNode123"
     nt1 <- read8 datafn catStoreFileType 
+    putIOwords ["the store", showT nt1]
 
     let res1 = evalState  (find testQuery) nt1
     putIOwords  ["the result of testQuery", showT res1]
     let res2 = evalState  (find_node_edge (Node 1)) nt1
     putIOwords  ["the result of node edge query", showT res2]
+    let res3 = evalState  (find_node_edge2 (Node 1)) nt1
+    putIOwords  ["the result of node edge query", showT res3]
+    let res4 = evalState  (find_node_edge4 (Node 1)) nt1
+    putIOwords  ["the result of node edge query", showT res4]
 
 -- type MorphST  = Either S T  
 -- -- ^ the morphism from NodeTag to EdgeTag 

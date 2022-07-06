@@ -60,7 +60,7 @@ mainErrIO :: ErrIO ()
 mainErrIO = do 
     -- pageTris
     -- pageDataInState
-    pageEdgeNodeGraph
+    -- pageEdgeNodeGraph
     part2
 
 
