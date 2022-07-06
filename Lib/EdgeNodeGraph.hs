@@ -50,7 +50,7 @@ import qualified Control.Category.Hask as Hask
 -- end 
 
 import UniformBase 
-import Control.Monad.State
+import Control.Monad.State hiding (return)
 
 import Lib.Rules
 -- import Vault.Values
@@ -140,6 +140,9 @@ pageEdgeNodeGraph = do
     let datafn = makeAbsFile "/home/frank/CoreConcepts/edgeNode123"
     write8 datafn catStoreFileType cat2 
 
+    putIOwords ["runState id_find", showT $ runState (id_find (Just $ Node . NK $ 1, Just ss, Nothing) ) (cat2)]
+    putIOwords ["evalState id_find wk2", showT $ evalState (id_find_1st 1) (cat2)]
+
 
 -- for writing to file
 -- for typed files 
@@ -156,6 +159,20 @@ instance TypedFiles7 Text Store where
 type StoreStateMonad = State Store  
 type Store = CatStore ObjST MorphST
 
+type CatStoreQuery o m = (Maybe o, Maybe m, Maybe o)
+type CatStoreQ = CatStoreQuery ObjST MorphST
+
+id_find :: CatStoreQ -> StoreStateMonad [CPoint ObjST MorphST]
+-- ^ a monadic wrapper for catStoreFind applied to state
+id_find t = do 
+    c <- get
+
+    let res = catStoreFind t c 
+    -- (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
+    return res 
+
+id_find_1st :: Int -> StoreStateMonad [CPoint ObjST MorphST]
+id_find_1st i = id_find (Just . Node . NK $ i, Nothing, Nothing) 
 
 -- getTarget :: [(a, b1, b2)] -> b2
 -- getTarget cps = trd3 . head  $ cps  

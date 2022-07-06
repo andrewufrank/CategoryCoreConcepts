@@ -115,6 +115,7 @@ id_find t = do
     -- (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
     return res 
 
+id_find_1st :: Int -> StoreStateMonad [CPoint ObjST MorphST]
 id_find_1st i = id_find (Just . WW. WK $ i, Nothing, Nothing) 
 
 id_op1 :: StoreStateMonad Int
