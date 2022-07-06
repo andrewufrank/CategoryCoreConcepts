@@ -52,7 +52,6 @@ main =  do  -- with tests in other modules
     -- pageSTproductCombines
     -- pageSTproductCombines2
     -- pageNT
-    pageEdgeNodeGraph
 
     startProg "CatCore" mainErrIO 
 
@@ -60,6 +59,7 @@ mainErrIO :: ErrIO ()
 mainErrIO = do 
     -- pageTris
     pageDataInState
+    pageEdgeNodeGraph
 
 
 

@@ -50,6 +50,8 @@ import qualified Control.Category.Hask as Hask
 -- end 
 
 import UniformBase 
+import Control.Monad.State
+
 import Lib.Rules
 -- import Vault.Values
 import Data.List.Extra
@@ -126,7 +128,7 @@ cat2 = catStoreBatch (
 e1 :: ObjST
 e1 = s'  cat2 $ Node (NK 1)
 
-pageEdgeNodeGraph :: IO ()
+pageEdgeNodeGraph :: ErrIO ()
 pageEdgeNodeGraph = do
     putIOwords ["\n pageEdgeNodeGraph"]
     putIOwords ["data for 1-2-3", showT cat2]
@@ -134,6 +136,25 @@ pageEdgeNodeGraph = do
     putIOwords ["e", showT e1]
 
     putIOwords ["find node from edge e", showT . ti'  cat2 $ e1]
+
+    let datafn = makeAbsFile "/home/frank/CoreConcepts/edgeNode123"
+    write8 datafn catStoreFileType cat2 
+
+
+-- for writing to file
+-- for typed files 
+catStoreFileType :: TypedFile5 Text Store
+catStoreFileType = makeTyped (Extension "tris")  :: TypedFile5 Text Store
+
+instance TypedFiles7 Text Store where
+  wrap7 = read . t2s
+  unwrap7 = showT
+
+
+
+-- for state monad
+type StoreStateMonad = State Store  
+type Store = CatStore ObjST MorphST
 
 
 -- getTarget :: [(a, b1, b2)] -> b2
