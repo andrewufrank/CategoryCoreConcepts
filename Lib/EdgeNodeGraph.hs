@@ -3,7 +3,7 @@
 -- Module      :  building edge node graph data in the triple store  
 {- a graph with half-edges (preparing for quad edges in guibas stolfi triangulations
 
-two objects: Edge Node 
+two objects: EdgeTag NodeTag 
 two morphism: s :: T -> S and t :: T -> S (see lavwere)
 
 store in CatStore and statemonad 
@@ -34,7 +34,7 @@ module Lib.EdgeNodeGraph
     -- -- , either, distribute
     -- , b', w', h, k
     -- , T(..), S(..)
-    -- , makePfeilSpace, makePfeilBusiness
+    -- , makeEdgeSpace, makeEdgeBusiness
     -- -- for test 
     -- , pageST_withTriples
     -- , pageST_withTriplesBusiness
@@ -65,47 +65,58 @@ import Vault.Triple4cat
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
                 catStoreFind) )
 
-type MorphST  = Either (S)  (T)  
--- ^ the morphism from Node to Edge 
+type MorphST  = Either S T  
+-- ^ the morphism from NodeTag to EdgeTag 
 
-ss :: Either S b
-ss = Left S 
-tt :: Either a T
-tt = Right T 
+sMorph :: Either S b
+sMorph = Left S 
+tMorph :: Either a T
+tMorph = Right T 
 
 
 data S = S  deriving (Show, Read, Ord, Eq, Generic)
 data T = T  deriving (Show, Read, Ord, Eq, Generic)
 
-data ObjST = Node (Nobj Int) | Edge (Eobj Char) | ZZst
+data ObjST = NodeTag (NodeType Int) | EdgeTag (EdgeType Char) | ZZst
     deriving (Show, Read, Ord, Eq)
--- ^ the objects Node and Edge
+-- ^ the objects NodeTag and EdgeTag
 instance Zeros ObjST where zero = ZZst
 
+unEdgeTag :: ObjST -> Edge 
+unEdgeTag (EdgeTag t) = t 
+unEdgeTag x = errorT ["unEdgeTag - not an Edge", showT x]
 
-data Eobj i = EK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
+unNodeTag :: ObjST -> Node
+unNodeTag (NodeTag t) = t 
+unNodeTag x = errorT ["unNodeTag - not a Node", showT x]
+
+data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial states W1, W2, W3
-data Nobj i =  NK i deriving (Show, Read, Ord, Eq, Generic, Zeros)
+data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial actions (moves) A or B
+
+type Node = NodeType Int 
+type Edge = EdgeType Char
 
 -- type CPointST = CPoint ObjST MorphST 
 
-makePfeilFrom :: Int -> Char -> (ObjST, MorphST, ObjST)
+makeEdgeFrom :: Int -> Char -> (ObjST, MorphST, ObjST)
 -- | node, edge: value to store for an s (from edge to node, the from node)
-makePfeilFrom o1 o2 = (Node (NK o1), Left (S), Edge (EK o2))
+makeEdgeFrom o1 o2 = (NodeTag (Node o1), sMorph, EdgeTag (Edge o2))
 
-makePfeilTo :: Int -> Char ->   (ObjST, MorphST, ObjST)
-makePfeilTo o1 o2 = (Node (NK o1), Right (T), Edge (EK o2))
+makeEdgeTo :: Int -> Char ->   (ObjST, MorphST, ObjST)
+makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
-s' :: () => CatStore ObjST MorphST -> ObjST ->   ObjST
+-- s' :: () => CatStore ObjST MorphST -> Node ->   Edge
 -- | get the edge from a given node, folling the s path
 -- could eventually by multiple!
-s' cat ow =  getTarget3 . catStoreFind (Just ow, Just ss, Nothing) $ cat
+s' :: Eq b => CatStore ObjST (Either S b) -> Node   -> Edge 
+s' cat ow =  unEdgeTag . getTarget3 . catStoreFind (Just . NodeTag $ ow, Just sMorph, Nothing) $ cat
 
-ti' :: () => CatStore ObjST MorphST -> ObjST ->   ObjST
+ti' :: () => CatStore ObjST MorphST -> Edge ->   Node
 -- | get the node from a given edge, folling the s path
 -- could eventually by multiple!
-ti' cat ow =  getTarget1 . catStoreFind (Nothing, Just tt, Just ow) $ cat
+ti' cat ow = unNodeTag .  getTarget1 . catStoreFind (Nothing, Just tMorph, Just . EdgeTag $ ow) $ cat
 
 getTarget3 :: [(a, b, c)] -> c
 -- | get target (pos3) from a singleton result 
@@ -122,20 +133,20 @@ cat0 :: CatStore ObjST MorphST
 cat0 = catStoreEmpty :: CatStore ObjST MorphST
 cat2 :: CatStore ObjST MorphST
 cat2 = catStoreBatch (
-    [ Ins (makePfeilFrom 1 'e')
-    , Ins (makePfeilTo   2 'e')
-    , Ins (makePfeilFrom 2 'f')
-    , Ins (makePfeilTo   3 'f')
+    [ Ins (makeEdgeFrom 1 'e')
+    , Ins (makeEdgeTo   2 'e')
+    , Ins (makeEdgeFrom 2 'f')
+    , Ins (makeEdgeTo   3 'f')
     ]) cat0
 
-e1 :: ObjST
-e1 = s'  cat2 $ Node (NK 1)
+e1 :: EdgeType Char
+e1 = s'  cat2  (Node 1)
 
 pageEdgeNodeGraph :: ErrIO ()
 pageEdgeNodeGraph = do
     putIOwords ["\n pageEdgeNodeGraph"]
     putIOwords ["data for 1-2-3", showT cat2]
-    putIOwords ["find edge starting at 1", showT . s'  cat2 $ Node (NK 1)]
+    putIOwords ["find edge starting at 1", showT . s'  cat2 $ (Node 1)]
     putIOwords ["e", showT e1]
 
     putIOwords ["find node from edge e", showT . ti'  cat2 $ e1]
@@ -143,9 +154,12 @@ pageEdgeNodeGraph = do
     let datafn = makeAbsFile "/home/frank/CoreConcepts/edgeNode123"
     write8 datafn catStoreFileType cat2 
 
-    putIOwords ["runState id_find", showT $ runState (id_find (Just $ Node . NK $ 1, Just ss, Nothing) ) (cat2)]
-    putIOwords ["evalState id_find wk2", showT $ evalState (id_find_1st 1) (cat2)]
+    putIOwords ["evalState id_find",   showT $ evalState findEx1 (cat2) ]
+    -- putIOwords ["evalState id_find edge to node 1:", showT (evalState findEx2 (cat2))]
 
+findEx1 =  (id_find  (Just $ NodeTag . Node $ 1, Just sMorph, Nothing) )
+
+-- findEx2 = (id_find_1st (Node 1))
 
 -- for writing to file
 -- for typed files 
@@ -165,14 +179,18 @@ type Store = CatStore ObjST MorphST
 type CatStoreQuery o m = (Maybe o, Maybe m, Maybe o)
 type CatStoreQ = CatStoreQuery ObjST MorphST
 
-id_find :: CatStoreQ -> StoreStateMonad [CPoint ObjST MorphST]
+-- id_find :: CatStoreQ -> StoreStateMonad [CPoint ObjST MorphST]
 -- ^ a monadic wrapper for catStoreFind applied to state
+id_find :: (MonadState (CatStore o m2) m1, Eq o, Eq m2) =>
+        (Maybe o, Maybe m2, Maybe o) -> m1 [CPoint o m2]
 id_find t = do 
     c <- get
 
     let res = catStoreFind t c 
     -- (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
-    return res 
+    return  res 
 
-id_find_1st :: Int -> StoreStateMonad [CPoint ObjST MorphST]
-id_find_1st i = id_find (Just . Node . NK $ i, Nothing, Nothing) 
+-- id_find_1st :: Node -- ^ 
+--   -> StoreStateMonad [CPoint o m2]
+
+-- id_find_1st i =    id_find  (Just . NodeTag $ i, Nothing, Nothing) 
