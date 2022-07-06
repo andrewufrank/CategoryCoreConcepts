@@ -64,7 +64,34 @@ import Vault.Triple4cat
       CatStore,
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
                 catStoreFind) )
-import Lib.EdgeNodeGraph
+import Lib.EdgeNodeGraph 
+
+-- findEx1 =  (id_find  (Just $ NodeTag . Node $ 1, Just sMorph, Nothing) )
+
+-- findEx2 = (id_find_1st (Node 1))
+
+-- id_find :: CatStoreQ -> StoreStateMonad [CPoint ObjST MorphST]
+-- ^ a monadic wrapper for catStoreFind applied to state
+find :: (MonadState (CatStore o m2) m1, Eq o, Eq m2) =>
+        (Maybe o, Maybe m2, Maybe o) -> m1 [CPoint o m2]
+find t = do 
+    c <- get
+
+    let res = catStoreFind t c 
+    -- (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
+    return  res 
+
+testQuery :: (Maybe ObjST, Maybe a1, Maybe a2)
+testQuery = (Just . NodeTag . Node $ 1, Nothing, Nothing) 
+-- id_find_1st :: Node -- ^ 
+--   -> StoreStateMonad [CPoint o m2]
+
+
+find_node_edge :: () =>
+        Node -> StoreStateMonad  [CPoint ObjST MorphST]
+-- ^ start with node get edge
+find_node_edge i =    find  (Just . NodeTag $ i, Nothing, Nothing) 
+
 
 
 
@@ -72,7 +99,13 @@ import Lib.EdgeNodeGraph
 
 part2 :: ErrIO ()
 part2 = do 
-    putIOwords ["part 2 trying to get perfect"]
+    putIOwords ["\n part 2 trying to get perfect functions and inverses between node and edge (s and t"]
+
+    let datafn = makeAbsFile "/home/frank/CoreConcepts/edgeNode123"
+    nt1 <- read8 datafn catStoreFileType 
+
+    let res1 = evalState  (find testQuery) nt1
+    putIOwords  ["the result of testQuery", showT res1]
 
 -- type MorphST  = Either S T  
 -- -- ^ the morphism from NodeTag to EdgeTag 

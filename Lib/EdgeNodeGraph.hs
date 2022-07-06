@@ -154,14 +154,10 @@ pageEdgeNodeGraph = do
     let datafn = makeAbsFile "/home/frank/CoreConcepts/edgeNode123"
     write8 datafn catStoreFileType cat2 
 
-    putIOwords ["evalState id_find",   showT $ evalState findEx1 (cat2) ]
+    -- putIOwords ["evalState id_find",   showT $ evalState findEx1 (cat2) ]
     -- putIOwords ["evalState id_find edge to node 1:", showT (evalState findEx2 (cat2))]
 
     
-findEx1 =  (id_find  (Just $ NodeTag . Node $ 1, Just sMorph, Nothing) )
-
--- findEx2 = (id_find_1st (Node 1))
-
 -- for writing to file
 -- for typed files 
 catStoreFileType :: TypedFile5 Text Store
@@ -179,20 +175,4 @@ type Store = CatStore ObjST MorphST
 
 type CatStoreQuery o m = (Maybe o, Maybe m, Maybe o)
 type CatStoreQ = CatStoreQuery ObjST MorphST
-
--- id_find :: CatStoreQ -> StoreStateMonad [CPoint ObjST MorphST]
--- ^ a monadic wrapper for catStoreFind applied to state
-id_find :: (MonadState (CatStore o m2) m1, Eq o, Eq m2) =>
-        (Maybe o, Maybe m2, Maybe o) -> m1 [CPoint o m2]
-id_find t = do 
-    c <- get
-
-    let res = catStoreFind t c 
-    -- (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
-    return  res 
-
--- id_find_1st :: Node -- ^ 
---   -> StoreStateMonad [CPoint o m2]
-
--- id_find_1st i =    id_find  (Just . NodeTag $ i, Nothing, Nothing) 
 
