@@ -56,8 +56,8 @@ import Control.Monad.State
 -- import Lib.Rules
 -- import Vault.Values
 -- import Data.List.Extra
-import Data.Bifunctor (bimap)
-import qualified Data.Tuple as Tuple -- (snd, fst)
+-- import Data.Bifunctor (bimap)
+-- import qualified Data.Tuple as Tuple -- (snd, fst)
 import Vault.Triple4cat
     ( Action(..),
       CPoint,
@@ -87,10 +87,11 @@ testQuery = (Just . NodeTag . Node $ 1, Nothing, Nothing)
 --   -> StoreStateMonad [CPoint o m2]
 
 
-find_node_edge :: () =>
-        Node -> StoreStateMonad  [CPoint ObjST MorphST]
+find_node_edge :: () =>  Node -> StoreStateMonad  (CPoint ObjST MorphST)
 -- ^ start with node get edge
-find_node_edge i =    find  (Just . NodeTag $ i, Nothing, Nothing) 
+find_node_edge i = do 
+        r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
+        return . head $ r1
 
 
 
@@ -106,6 +107,8 @@ part2 = do
 
     let res1 = evalState  (find testQuery) nt1
     putIOwords  ["the result of testQuery", showT res1]
+    let res2 = evalState  (find_node_edge (Node 1)) nt1
+    putIOwords  ["the result of node edge query", showT res2]
 
 -- type MorphST  = Either S T  
 -- -- ^ the morphism from NodeTag to EdgeTag 
