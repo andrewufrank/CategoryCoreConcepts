@@ -99,11 +99,17 @@ find_node_edge2 i = do
         r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
         return . getTarget3  $ r1
 
-find_node_edge4 :: () =>  Node -> StoreStateMonad  (Edge)
+sFun :: () =>  Node -> StoreStateMonad  (Edge)
 -- ^ start with node get edge
-find_node_edge4 i = do 
-        r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
+-- get the s related edge, fails on relation
+sFun i = do 
+        r1  <- find  (Just . NodeTag $ i, Just sMorph, Nothing) 
         return . unEdgeTag . getTarget3  $ r1
+tInv :: () =>  Edge -> StoreStateMonad  Node
+-- ^ start with edge get node using t 
+tInv i = do 
+        r1  <- find  (Nothing, Just tMorph, Just . EdgeTag $ i) 
+        return . unNodeTag . getTarget1  $ r1
 
 
 
@@ -122,8 +128,13 @@ part2 = do
     putIOwords  ["the result of node edge query", showT res2]
     let res3 = evalState  (find_node_edge2 (Node 1)) nt1
     putIOwords  ["the result of node edge query", showT res3]
-    let res4 = evalState  (find_node_edge4 (Node 1)) nt1
+    let res4 = evalState  (sFun (Node 1)) nt1
     putIOwords  ["the result of node edge query", showT res4]
+    let res5 = evalState  (tInv (Edge 'e')) nt1
+    putIOwords  ["the result of edge node t query", showT res5]
+    let res6 = evalState  (tInv =<< sFun (Node 1)) nt1
+    -- to make it like . composition (otherwse use >>= )
+    putIOwords  ["the result of node - s - tinv - node", showT res6]
 
 -- type MorphST  = Either S T  
 -- -- ^ the morphism from NodeTag to EdgeTag 
