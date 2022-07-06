@@ -88,11 +88,19 @@ makePfeilFrom o1 o2 = (Node (NK o1), Left (S), Edge (EK o2))
 makePfeilTo :: Int -> Char ->   (ObjST, MorphST, ObjST)
 makePfeilTo o1 o2 = (Node (NK o1), Right (T), Edge (EK o2))
 
+-- data for test 
+cat0 = catStoreEmpty :: CatStore ObjST MorphST
+cat2 = catStoreBatch (
+    [ Ins (makePfeilFrom 1 'e')
+    , Ins (makePfeilTo   2 'f')
+    , Ins (makePfeilFrom 2 'e')
+    , Ins (makePfeilTo   3 'f')
+    ]) cat0
 
 pageEdgeNodeGraph :: IO ()
 pageEdgeNodeGraph = do
-    putIOwords ["\npagepageSTproductCombines"]
-    -- putIOwords ["combined states f6", showStates f6]
+    putIOwords ["\n pageEdgeNodeGraph"]
+    putIOwords ["combined states f6", showT cat2]
 
 
 -- getTarget :: [(a, b1, b2)] -> b2
