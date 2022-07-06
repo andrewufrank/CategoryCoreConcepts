@@ -4,6 +4,8 @@
 {- how to provide the data to the functions 
     cat theory deals mostly with functions with no args 
 
+    this is a module only for testing - example
+
 -}
 --------------------------------------------------------------------------- 
 {-# LANGUAGE FlexibleContexts      #-}
@@ -79,7 +81,8 @@ pageDataInState = do
     putIOwords ["runState id_c", showT $ runState (id_c) (cat3)]
     putIOwords ["runState id_batch d_c", showT $ runState (id_batch d_c) (cat3)]
     putIOwords ["runState id_batch d_c", showT $ runState (id_op1) (cat3)]
-    putIOwords ["runState id_find", showT $ runState (id_find) (cat3)]
+    putIOwords ["runState id_find", showT $ runState (id_find (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing)) (cat3)]
+    putIOwords ["evalState id_find wk2", showT $ evalState (id_find_1st 2) (cat3)]
 
 type StoreStateMonad = State Store  
 
@@ -102,12 +105,17 @@ id_batch a = do
     put res
     return 0 
 
-id_find :: StoreStateMonad [CPoint ObjST MorphST]
-id_find = do 
+type CatStoreQuery o m = (Maybe o, Maybe m, Maybe o)
+type CatStoreQ = CatStoreQuery ObjST MorphST
+id_find :: CatStoreQ -> StoreStateMonad [CPoint ObjST MorphST]
+id_find t = do 
     c <- get
 
-    let res = catStoreFind (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
+    let res = catStoreFind t c 
+    -- (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
     return res 
+
+id_find_1st i = id_find (Just . WW. WK $ i, Nothing, Nothing) 
 
 id_op1 :: StoreStateMonad Int
 id_op1 = do 
