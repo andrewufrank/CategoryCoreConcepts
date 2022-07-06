@@ -38,6 +38,7 @@ import Lib.STproductTriple
 import Lib.DataInState
 import Vault.TrisFiles 
 import Lib.EdgeNodeGraph
+import Lib.EdgeNodeGraphOps
 
 import UniformBase
 
@@ -58,8 +59,8 @@ main =  do  -- with tests in other modules
 mainErrIO :: ErrIO ()
 mainErrIO = do 
     -- pageTris
-    pageDataInState
+    -- pageDataInState
     pageEdgeNodeGraph
-
+    part2
 
 
