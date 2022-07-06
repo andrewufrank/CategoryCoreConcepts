@@ -37,7 +37,7 @@ import Lib.STproductTriple
 -- import Lib.STproductCombine
 import Lib.DataInState
 import Vault.TrisFiles 
-
+import Lib.EdgeNodeGraph
 
 import UniformBase
 
@@ -52,6 +52,8 @@ main =  do  -- with tests in other modules
     -- pageSTproductCombines
     -- pageSTproductCombines2
     -- pageNT
+    pageEdgeNodeGraph
+
     startProg "CatCore" mainErrIO 
 
 mainErrIO :: ErrIO ()
