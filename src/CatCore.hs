@@ -59,7 +59,7 @@ main =  do  -- with tests in other modules
 mainErrIO :: ErrIO ()
 mainErrIO = do 
     -- pageTris
-    -- pageDataInState
+    pageDataInState
 
 
 

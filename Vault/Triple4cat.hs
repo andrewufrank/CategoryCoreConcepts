@@ -97,6 +97,8 @@ class CatStores o m where
     catStoreBatch ((Del t) : as) ts = catStoreDel t . catStoreBatch as $ ts
 
 
+
+
 instance (Eq o, Eq m, TripleStore o m o) => CatStores o m where
     catStoreEmpty =(CatStoreK []) :: CatStore o m
     catStoreInsert t  = wrapCatStore  (tsinsert t)  

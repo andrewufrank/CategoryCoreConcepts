@@ -65,6 +65,12 @@ import Vault.Triple4cat
 type MorphST  = Either (S)  (T)  
 -- ^ the morphism from Node to Edge 
 
+ss :: Either S b
+ss = Left S 
+tt :: Either a T
+tt = Right T 
+
+
 data S = S  deriving (Show, Read, Ord, Eq, Generic)
 data T = T  deriving (Show, Read, Ord, Eq, Generic)
 
@@ -88,19 +94,46 @@ makePfeilFrom o1 o2 = (Node (NK o1), Left (S), Edge (EK o2))
 makePfeilTo :: Int -> Char ->   (ObjST, MorphST, ObjST)
 makePfeilTo o1 o2 = (Node (NK o1), Right (T), Edge (EK o2))
 
+s' :: () => CatStore ObjST MorphST -> ObjST ->   ObjST
+-- | get the edge from a given node, folling the s path
+-- could eventually by multiple!
+s' cat ow =  getTarget3 . catStoreFind (Just ow, Just ss, Nothing) $ cat
+
+ti' :: () => CatStore ObjST MorphST -> ObjST ->   ObjST
+-- | get the node from a given edge, folling the s path
+-- could eventually by multiple!
+ti' cat ow =  getTarget1 . catStoreFind (Nothing, Just tt, Just ow) $ cat
+
+getTarget3 :: [(a, b, c)] -> c
+-- | get target (pos3) from a singleton result 
+-- just a helper
+getTarget3 cps = trd3 . head  $ cps  
+
+getTarget1 :: [(a, b, c)] -> a
+-- | get target (pos 1 ) from a singleton result 
+-- just a helper
+getTarget1 cps = fst3 . head  $ cps 
+
 -- data for test 
 cat0 = catStoreEmpty :: CatStore ObjST MorphST
 cat2 = catStoreBatch (
     [ Ins (makePfeilFrom 1 'e')
-    , Ins (makePfeilTo   2 'f')
-    , Ins (makePfeilFrom 2 'e')
+    , Ins (makePfeilTo   2 'e')
+    , Ins (makePfeilFrom 2 'f')
     , Ins (makePfeilTo   3 'f')
     ]) cat0
+
+e1 :: ObjST
+e1 = s'  cat2 $ Node (NK 1)
 
 pageEdgeNodeGraph :: IO ()
 pageEdgeNodeGraph = do
     putIOwords ["\n pageEdgeNodeGraph"]
-    putIOwords ["combined states f6", showT cat2]
+    putIOwords ["data for 1-2-3", showT cat2]
+    putIOwords ["find edge starting at 1", showT . s'  cat2 $ Node (NK 1)]
+    putIOwords ["e", showT e1]
+
+    putIOwords ["find node from edge e", showT . ti'  cat2 $ e1]
 
 
 -- getTarget :: [(a, b1, b2)] -> b2
