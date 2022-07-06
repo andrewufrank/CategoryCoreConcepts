@@ -50,11 +50,12 @@ import qualified Control.Category.Hask as Hask
 -- end 
 
 import UniformBase 
-import Control.Monad.State hiding (return)
+import Control.Monad.State
+    ( MonadState(get), evalState, runState, State )
 
-import Lib.Rules
+-- import Lib.Rules
 -- import Vault.Values
-import Data.List.Extra
+-- import Data.List.Extra
 import Data.Bifunctor (bimap)
 import qualified Data.Tuple as Tuple -- (snd, fst)
 import Vault.Triple4cat
@@ -117,7 +118,9 @@ getTarget1 :: [(a, b, c)] -> a
 getTarget1 cps = fst3 . head  $ cps 
 
 -- data for test 
+cat0 :: CatStore ObjST MorphST
 cat0 = catStoreEmpty :: CatStore ObjST MorphST
+cat2 :: CatStore ObjST MorphST
 cat2 = catStoreBatch (
     [ Ins (makePfeilFrom 1 'e')
     , Ins (makePfeilTo   2 'e')
@@ -173,107 +176,3 @@ id_find t = do
 
 id_find_1st :: Int -> StoreStateMonad [CPoint ObjST MorphST]
 id_find_1st i = id_find (Just . Node . NK $ i, Nothing, Nothing) 
-
--- getTarget :: [(a, b1, b2)] -> b2
--- getTarget cps = trd3 . head  $ cps  
-
--- w'' :: () => CatStore ObjST MorphST -> ObjST -> MorphST -> ObjST
--- w'' cat ow pv =  getTarget . catStoreFind (Just ow, Just (pv), Nothing) $ cat
--- b'' :: () => CatStore ObjST MorphST -> ObjST -> MorphST -> ObjST
--- b'' cat ow pv =  getTarget . catStoreFind (Just ow, Just (pv), Nothing) $ cat
-
--- -- the functions really used
--- b' :: ObjST -> T -> ObjST
--- b' o t = b'' cat3 o (Right t)
-
--- w' :: ObjST -> S -> ObjST
--- w' o v =    w'' cat3 o (Left v)
---     -- state is the loaded triple store (later)
-
--- -- the step function 
--- f6 :: ((ObjST, ObjST), MorphST) -> (ObjST, ObjST)
--- f6 = either (cross (uncurry w', id) . h) 
---             (cross (id, uncurry b') . k)   . distribute
-
--- -- helpers:  reorganize 
--- -- h:: ((W,B),V) -> ((W,V),B)
--- h :: ((a, b1), S) -> ((a, S), b1)
--- h ((w,b),v) = ((w,v),b)
--- -- k::((W,B),T) -> (W,(B,T))
--- k :: ((a1, a2), T) -> (a1, (a2, T))
--- k ((w,b),t) = (w,(b,t))
-
--- -- distribute :: (a, MorphST' b1 b2) -> MorphST' (a, b1) (a, b2)
--- distribute (a, Left b) = Left (a,b)
--- distribute (a, Right c) = Right (a,c)
-
--- -- for test spatial 
--- ow1 :: ObjST
--- ow1 = Node (WK 1)
--- ow2 :: ObjST
--- ow2 = Node (WK 2)
--- mw1 = Left (S 'a' )
--- -- st1 :: (ObjST, MorphST, ObjST)
--- st1 = (ow1, mw1, ow2) 
-
--- st2 :: (ObjST, MorphST, ObjST)
--- -- st2 :: (ObjST, Either S T, ObjST)
--- st2 = makePfeilSpace 2 'b' 3 
--- cat0 = catStoreEmpty :: CatStore ObjST MorphST
--- cat1 :: CatStore ObjST (MorphST)
--- cat1 = catStoreInsert st1 cat0
--- cat2 :: CatStore ObjST MorphST
--- cat2 = catStoreBatch ([Ins (makePfeilSpace 1 'a' 2), Ins (makePfeilSpace 2 'b' 3)]) cat0
-
--- -- -- | construct function w' :: W -> V -> W 
--- f2_2 :: [CPoint ObjST MorphST]
--- f2_2 = catStoreFind (Just ow2, Just . Left $ (S 'b'), Nothing) cat2
-
- 
--- pageST_withTriples :: IO ()
--- pageST_withTriples = do
---     putIOwords ["\npageST_withTriples"]
---     putIOwords ["space states ", showT [ow1, ow2]]
---     putIOwords ["pfeil 1 - w1 -> 2 ", showT [st1, st2]]
---     putIOwords ["empty cat store", showT cat0]
---     putIOwords [" cat store", showT cat1]
---     putIOwords [" cat store", showT cat2]
---     putIOwords [" found ow2 W2", showT f2_2]
---     putIOwords [" target", showT . getTarget $ f2_2]
---     putIOwords [" target", showT . getTarget $ f2_2]
---     putIOwords [" function w'' used ", showT $ w'' cat2 ow1 (Left $ S 'a')]
---     putIOwords [" function w'' used ", showT $ w'' cat2 ow2 (Left $ S 'b')]
-
--- -- for test business
-
--- -- -- sb1 = makePfeil 4 'c' 5
--- cat3 = catStoreBatch ([Ins (makePfeilBusiness 4 'c' 5)]) cat2
-
-
--- pageST_withTriplesBusiness :: IO ()
--- pageST_withTriplesBusiness = do
---     putIOwords ["\npageST_withTriplesBusiness"]
---     putIOwords ["space and business pfeile ", showT cat3]
---     putIOwords [" function bb'' used ", showT $ b'' cat3 (Edge(BK 4)) (Right $ T 'c')]
-
--- -- start state
--- s0 :: (ObjST, ObjST)
--- s0 = (Node(WK 1), Edge(BK 4))
-
-
--- showStates :: (((ObjST, ObjST), MorphST) -> (ObjST, ObjST)) -> Text
--- showStates f = showT [s0, s1, s2, s3, s4, s41, s5, s51]
---     where
---     s1 = f (s0, Left (S 'a'))
---     s2 = f (s1, Left (S 'b')) --Left B)
---     s3 = f (s0, Right (T 'c'))
---     s4 = f (s1, Right (T 'c'))
---     s5 = f (s2, Right (T 'c'))
---     s41 = f (s3, Left (S 'a'))
---     s51 = f (s4, Left (S 'b'))        
-
--- pageSTproductCombines :: IO ()
--- pageSTproductCombines = do
---     putIOwords ["\npagepageSTproductCombines"]
---     putIOwords ["combined states f6", showStates f6]
-
