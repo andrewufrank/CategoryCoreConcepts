@@ -39,7 +39,8 @@ import Lib.DataInState
 import Vault.TrisFiles 
 import Lib.EdgeNodeGraph
 import Lib.EdgeNodeGraphOps
-
+import Lib.EdgeNodeDistance 
+import Lib.Point
 import UniformBase
 
 main :: IO ()
@@ -62,5 +63,7 @@ mainErrIO = do
     -- pageDataInState
     -- pageEdgeNodeGraph
     part2
+    pageEdgeNodeDistance
+    pagePoint
 
 
