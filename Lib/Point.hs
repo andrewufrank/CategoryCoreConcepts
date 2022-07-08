@@ -8,7 +8,7 @@ two morphism: distance :: Point -> Point -> Distance
 
 Coord and Distance are Float (simplistic)
 
-for computation of distance use package hgeom 
+for computation of distance use a couple of functions locally 
 
  
 
@@ -55,24 +55,12 @@ import UniformBase
 import Control.Monad.State
     ( MonadState(get), evalState, runState, State )
 
--- import Lib.Rules
--- import Vault.Values
--- import Data.List.Extra
--- import Data.Bifunctor (bimap)
--- import qualified Data.Tuple as Tuple -- (snd, fst)
 import Vault.Triple4cat
     ( Action(..),
       CPoint,
       CatStore,
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
                 catStoreFind) )
--- import Lib.EdgeNodeGraph(Node, Edge, NodeType (..), EdgeType, getTarget3, StoreStateMonad)   
--- import Lib.EdgeNodeGraph(Node, Edge, NodeType (..), EdgeType, getTarget3, StoreStateMonad)   
--- import Lib.EdgeNodeGraphOps (sFun ) 
--- import qualified Graphics.Gloss as Gloss
--- import qualified Graphics.Gloss.Data.Vector as Gloss
--- import  qualified Graphics.Gloss.Data.Point.Arithmetic  as Gloss ((-))
--- import qualified Graphics.Gloss.Data.Point.Arithmetic as Gloss 
 
 -- helpers
 type Store = CatStore ObjPoint MorphPoint
@@ -115,9 +103,13 @@ data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Distance | ZZm
     deriving (Show, Read, Ord, Eq, Generic )
 -- instance MorphPoint Zeros where zero = ZZm
 
+xyMorph :: MorphPoint
 xyMorph = XYtag XY 
+distanceMorph :: MorphPoint
 distanceMorph = DistTag Distance 
+sMorph :: MorphPoint
 sMorph = Stag S 
+tMorph :: MorphPoint
 tMorph = Ttag T
 
 -- data ObjPoint = PointTag (PointType Text)  -- is ObjPoint in other 
@@ -244,10 +236,12 @@ compDist p1 p2 = Length .   mag $ (sub p1 p2) --(unPoint2 p1) (unPoint2 p2))
 
 -- | Trivial function for subtracting co-ordinate pairs
 -- sub :: Num x => Point2 -> (x, x) -> (x, x)
+sub :: Point2 -> Point2 -> Point2
 sub (Point2 x1 x2) (Point2 y1 y2) = Point2 (x1 - x2) (y1 - y2)
 
 -- | Compute the sum of squares or dot product of a given pair of co-ordinates
 -- dotProduct :: Num x => (x, x) -> (x, x) -> x
+dotProduct :: Point2 -> Point2 -> Float
 dotProduct (Point2 x1 x2) (Point2 y1 y2) = (x1 * x2) + (y1 * y2)
 
 -- -- | Conversion of pair fromIntegral
@@ -256,6 +250,7 @@ dotProduct (Point2 x1 x2) (Point2 y1 y2) = (x1 * x2) + (y1 * y2)
 
 -- | Compute magnitude
 -- mag :: Floating x => (x, x) -> x
+mag :: Point2 -> Float
 mag x = sqrt (dotProduct x x)
 
 --------------------data 
@@ -280,3 +275,22 @@ pagePoint = do
     let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2
     putIOwords ["the distance 1 t 2", showT d1]
     -- let (Edge 'e')
+
+{-
+-- | Trivial function for subtracting co-ordinate pairs
+sub :: Num x => (x, x) -> (x, x) -> (x, x)
+sub (x1, y1) (x2, y2) = (x1 - x2, y1 - y2)
+
+-- | Compute the sum of squares or dot product of a given pair of co-ordinates
+dotProduct :: Num x => (x, x) -> (x, x) -> x
+dotProduct (x1, y1) (x2, y2) = (x1 * x2) + (y1 * y2)
+
+-- | Conversion of pair fromIntegral
+fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
+fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
+
+-- | Compute magnitude
+mag :: Floating x => (x, x) -> x
+mag x = sqrt (dotProduct x x)
+
+-}
