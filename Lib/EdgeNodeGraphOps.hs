@@ -151,6 +151,7 @@ isSingleton a = 1 == length a
 openSingleton [a] = a
 openSingleton x = errorT ["openSingleton - not", showT x ]
 
+getSingle1 :: [(ObjST, Either S T, ObjST)] -> ObjST
 getSingle1 = fst3 . openSingleton
 -- ^ unwrap the first if singleton 
 getSingle3 = trd3 . openSingleton
