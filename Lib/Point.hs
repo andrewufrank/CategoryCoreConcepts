@@ -66,14 +66,24 @@ import Vault.Triple4cat
       CatStore,
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
                 catStoreFind) )
-import Lib.EdgeNodeGraph 
+import Lib.EdgeNodeGraph(S, T, NodeType, EdgeType)   
 import qualified Graphics.Gloss as Gloss
 
 ----------- the category
 
-type MorphPoint = Distance 
+data XY = XY 
+    deriving (Show, Read, Ord, Eq, Generic)
+data Distance = Distance 
+    deriving (Show, Read, Ord, Eq, Generic)
 
-data Distance = Distance deriving (Show, Read, Ord, Eq, Generic, Zeros)
+-- | the morphism in the category, required for store
+data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Distance 
+    deriving (Show, Read, Ord, Eq, Generic )
+
+xyMorph = XYtag XY 
+distanceMorph = DistTag Distance 
+sMorph = Stag S 
+tMorph = Ttag T
 
 -- data ObjPoint = PointTag (PointType Text)  -- is ObjST in other 
 -- data PointType t = PT Point 2 t deriving (Show, Read, Ord, Eq, Generic, Zeros)
@@ -86,11 +96,34 @@ data Length = Length Float
 -- a distance value, should be a subobj of Value 
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
-data ObjPoint = PointType Point2 | ValueType Length  
-    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+data PointType c = Point deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
--- p1 = HGP.Point2 1 1
+data ValueType c = Value c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
+-- | the objects in the category - required for store
+data ObjPoint = NodeTag (NodeType Int) | EdgeTag (EdgeType Char) | PointTag (PointType Point2) | ValueTag (ValueType Length)  | ZZpoint
+    deriving (Show, Read, Ord, Eq, Generic)
+instance Zeros ObjPoint where zero = ZZpoint
+
+unEdgeTag (EdgeTag t) = t 
+unEdgeTag x = errorT ["unEdgeTag - not an Edge", showT x]
+
+unNodeTag (NodeTag t) = t 
+unNodeTag x = errorT ["unNodeTag - not a Node", showT x]
+unPointTag (PointTag t) = t 
+unPointTag x = errorT ["unNodeTag - not a Node", showT x]
+unValueTag (ValueTag t) = t 
+unValueTag x = errorT ["unNodeTag - not a Node", showT x]
+
+makePoint :: Int ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
+makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 (x, y)))
+-- makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
+
+--------------------data 
+cat2 = catStoreBatch (
+    [ Ins (makePoint 1 0 0)
+    , Ins (makePoint 2 1 1)
+    ]) cat0
 --------------- ---------------------example
 pagePoint :: ErrIO ()
 pagePoint = do
