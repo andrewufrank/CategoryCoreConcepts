@@ -28,9 +28,9 @@ for computation of distance use package hgeom
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Lib.Point
-    -- (ObjST (..)
-    -- , MorphST
-    -- -- , MorphST'(Left, Right)
+    -- (ObjPoint (..)
+    -- , MorphPoint
+    -- -- , MorphPoint'(Left, Right)
     -- -- , Left, Right
     -- , Wobj(..), Bobj(..)
     -- -- , either, distribute
@@ -67,7 +67,8 @@ import Vault.Triple4cat
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
                 catStoreFind) )
 -- import Lib.EdgeNodeGraph(Node, Edge, NodeType (..), EdgeType, getTarget3, StoreStateMonad)   
--- import Lib.EdgeNodeGraphOps (getSingle3 ) 
+-- import Lib.EdgeNodeGraph(Node, Edge, NodeType (..), EdgeType, getTarget3, StoreStateMonad)   
+-- import Lib.EdgeNodeGraphOps (sFun ) 
 import qualified Graphics.Gloss as Gloss
 import qualified Graphics.Gloss.Data.Vector as Gloss
 import  qualified Graphics.Gloss.Data.Point.Arithmetic  as Gloss ((-))
@@ -119,7 +120,7 @@ distanceMorph = DistTag Distance
 sMorph = Stag S 
 tMorph = Ttag T
 
--- data ObjPoint = PointTag (PointType Text)  -- is ObjST in other 
+-- data ObjPoint = PointTag (PointType Text)  -- is ObjPoint in other 
 -- data PointType t = PT Point 2 t deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
@@ -161,7 +162,7 @@ unValueTag :: ObjPoint -> ValueType Length
 unValueTag (ValueTag t) = t 
 unValueTag x = errorT ["unNodeTag - not a Node", showT x]
 
--- id_find :: CatStoreQ -> StoreStateMonad [CPoint ObjST MorphST]
+-- id_find :: CatStoreQ -> StoreStateMonad [CPoint ObjPoint MorphPoint]
 -- ^ a monadic wrapper for catStoreFind applied to state
 find :: (MonadState (CatStore o m2) m1, Eq o, Eq m2) =>
         (Maybe o, Maybe m2, Maybe o) -> m1 [CPoint o m2]
@@ -178,6 +179,13 @@ find_node_edge i = do
         r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
         return . head $ r1
 
+makeEdgeFrom :: Int -> Char -> (ObjPoint, MorphPoint, ObjPoint)
+-- | node, edge: value to store for an s (from edge to node, the from node)
+makeEdgeFrom o1 o2 = (NodeTag (Node o1), sMorph, EdgeTag (Edge o2))
+
+makeEdgeTo :: Int -> Char ->   (ObjPoint, MorphPoint, ObjPoint)
+makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
+
 
 makePoint :: Int ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
 makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 (x, y)))
@@ -193,6 +201,27 @@ xyFun i = do
         r1  <- find  (Just . NodeTag $ i, Just xyMorph, Nothing) 
         return . unPointTag . getSingle3  $ r1
 
+sFun :: () =>  Node -> StoreStateMonad  (Edge)
+-- ^ start with node get edge
+-- get the s related edge, fails on relation
+sFun i = do 
+        r1  <- find  (Just . NodeTag $ i, Just sMorph, Nothing) 
+        return . unEdgeTag . getSingle3  $ r1
+tFun :: () =>  Node -> StoreStateMonad  (Edge)
+-- ^ start with node get edge using t
+tFun i = do 
+        r1  <- find  (Just . NodeTag $ i, Just tMorph, Nothing) 
+        return . unEdgeTag . getSingle3  $ r1
+sInvFun :: () =>  Edge -> StoreStateMonad  Node
+-- ^ start with edge get node using s
+sInvFun i = do 
+        r1  <- find  (Nothing, Just sMorph, Just . EdgeTag $ i) 
+        return . unNodeTag . getSingle1  $ r1
+tInvFun :: () =>  Edge -> StoreStateMonad  Node
+-- ^ start with edge get node using t 
+tInvFun i = do 
+        r1  <- find  (Nothing, Just tMorph, Just . EdgeTag $ i) 
+        return . unNodeTag . getSingle1  $ r1        
 distanceFun2   :: () =>  Node -> Node -> StoreStateMonad  (Length)     
 distanceFun2 n1 n2 = do 
     p1 <- xyFun n1 
@@ -200,6 +229,14 @@ distanceFun2 n1 n2 = do
     -- let d = Gloss.magV ((Gloss.(-)) (unPoint2 p1) (unPoint2 p2)) 
     let d = Gloss.magV (sub (unPoint2 p1) (unPoint2 p2)) 
     return . Length $ d 
+lengthEdge :: Edge -> StoreStateMonad (Length)
+lengthEdge  e = do 
+    n1 <- sInvFun e 
+    n2 <- tInvFun e 
+    l <- distanceFun2 n1 n2 
+    return l 
+    
+compDist p1 p2 = Length .   Gloss.magV $ (sub (unPoint2 p1) (unPoint2 p2))  
 
 unPoint2 :: Point2 -> Gloss.Point
 unPoint2 (Point2 f) = f
@@ -212,7 +249,11 @@ cat0 :: CatStore ObjPoint MorphPoint
 cat0 = catStoreEmpty
 cat2 :: CatStore ObjPoint MorphPoint
 cat2 = catStoreBatch (
-    [ Ins (makePoint 1 0 0)
+    [Ins (makeEdgeFrom 1 'e')
+    , Ins (makeEdgeTo   2 'e')
+    , Ins (makeEdgeFrom 2 'f')
+    , Ins (makeEdgeTo   3 'f')
+    , Ins (makePoint 1 0 0)
     , Ins (makePoint 2 1 1)
     ]) cat0
 --------------- ---------------------example
@@ -224,3 +265,4 @@ pagePoint = do
     putIOwords ["the point for node 1", showT p1]
     let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2
     putIOwords ["the distance 1 t 2", showT d1]
+    -- let (Edge 'e')
