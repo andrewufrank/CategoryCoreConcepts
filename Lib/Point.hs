@@ -67,7 +67,31 @@ import Vault.Triple4cat
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
                 catStoreFind) )
 import Lib.EdgeNodeGraph 
+import qualified Graphics.Gloss as Gloss
 
+----------- the category
+
+type MorphPoint = Distance 
+
+data Distance = Distance deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+-- data ObjPoint = PointTag (PointType Text)  -- is ObjST in other 
+-- data PointType t = PT Point 2 t deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+data Point2 = Point2 Gloss.Point -- (Float, Float)  -- the data type from gloss 
+-- a point in 2d (simplistic from gloss)
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+    
+data Length = Length Float  
+-- a distance value, should be a subobj of Value 
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+data ObjPoint = PointType Point2 | ValueType Length  
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+-- p1 = HGP.Point2 1 1
+
+--------------- ---------------------example
 pagePoint :: ErrIO ()
 pagePoint = do
     putIOwords ["\n pagePoint"]
