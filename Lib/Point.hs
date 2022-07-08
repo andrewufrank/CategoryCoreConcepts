@@ -69,9 +69,9 @@ import Vault.Triple4cat
 -- import Lib.EdgeNodeGraph(Node, Edge, NodeType (..), EdgeType, getTarget3, StoreStateMonad)   
 -- import Lib.EdgeNodeGraph(Node, Edge, NodeType (..), EdgeType, getTarget3, StoreStateMonad)   
 -- import Lib.EdgeNodeGraphOps (sFun ) 
-import qualified Graphics.Gloss as Gloss
-import qualified Graphics.Gloss.Data.Vector as Gloss
-import  qualified Graphics.Gloss.Data.Point.Arithmetic  as Gloss ((-))
+-- import qualified Graphics.Gloss as Gloss
+-- import qualified Graphics.Gloss.Data.Vector as Gloss
+-- import  qualified Graphics.Gloss.Data.Point.Arithmetic  as Gloss ((-))
 -- import qualified Graphics.Gloss.Data.Point.Arithmetic as Gloss 
 
 -- helpers
@@ -131,7 +131,7 @@ data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 type Node = NodeType Int 
 type Edge = EdgeType Char
 
-data Point2 = Point2 Gloss.Point -- (Float, Float)  -- the data type from gloss 
+data Point2 = Point2 Float Float  -- the data type from gloss 
 -- a point in 2d (simplistic from gloss)
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
     
@@ -188,7 +188,7 @@ makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
 
 makePoint :: Int ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
-makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 (x, y)))
+makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
 -- makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
 xy' :: CatStore ObjPoint MorphPoint -> Node -> Point2
@@ -227,22 +227,36 @@ distanceFun2 n1 n2 = do
     p1 <- xyFun n1 
     p2 <- xyFun n2 
     -- let d = Gloss.magV ((Gloss.(-)) (unPoint2 p1) (unPoint2 p2)) 
-    let d = Gloss.magV (sub (unPoint2 p1) (unPoint2 p2)) 
+    let d = mag (sub ( p1) ( p2)) 
     return . Length $ d 
 lengthEdge :: Edge -> StoreStateMonad (Length)
-lengthEdge  e = do 
-    n1 <- sInvFun e 
-    n2 <- tInvFun e 
-    l <- distanceFun2 n1 n2 
-    return l 
-    
-compDist p1 p2 = Length .   Gloss.magV $ (sub (unPoint2 p1) (unPoint2 p2))  
+lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
+    -- n1 <- sInvFun e 
+    -- n2 <- tInvFun e 
+    -- l <- distanceFun2 n1 n2 
+    -- return $ l 
+    -- f <$> x <*> y >>
+compDist :: Point2 -> Point2 -> Length
+compDist p1 p2 = Length .   mag $ (sub p1 p2) --(unPoint2 p1) (unPoint2 p2))  
 
-unPoint2 :: Point2 -> Gloss.Point
-unPoint2 (Point2 f) = f
+-- unPoint2 :: Point2 -> Gloss.Point
+-- unPoint2 (Point2 f) = f
 
-sub :: Num x => (x, x) -> (x, x) -> (x, x)
-sub (x1, y1) (x2, y2) = (x1 - x2, y1 - y2)
+-- | Trivial function for subtracting co-ordinate pairs
+-- sub :: Num x => Point2 -> (x, x) -> (x, x)
+sub (Point2 x1 x2) (Point2 y1 y2) = Point2 (x1 - x2) (y1 - y2)
+
+-- | Compute the sum of squares or dot product of a given pair of co-ordinates
+-- dotProduct :: Num x => (x, x) -> (x, x) -> x
+dotProduct (Point2 x1 x2) (Point2 y1 y2) = (x1 * x2) + (y1 * y2)
+
+-- -- | Conversion of pair fromIntegral
+-- fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
+-- fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
+
+-- | Compute magnitude
+-- mag :: Floating x => (x, x) -> x
+mag x = sqrt (dotProduct x x)
 
 --------------------data 
 cat0 :: CatStore ObjPoint MorphPoint

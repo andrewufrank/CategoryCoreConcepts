@@ -37,7 +37,6 @@ library
     , constrained-categories
     , containers
     , extra
-    , gloss
     , mtl
     , uniformBase
   default-language: Haskell2010
@@ -55,7 +54,6 @@ executable lav
     , constrained-categories
     , containers
     , extra
-    , gloss
     , mtl
     , uniformBase
   default-language: Haskell2010
@@ -79,7 +77,6 @@ test-suite test1
     , constrained-categories
     , containers
     , extra
-    , gloss
     , mtl
     , test-invariant
     , uniformBase

@@ -16,7 +16,7 @@ dependencies:
   - mtl   # for vault
 #  - HTF  # hope help
 #  - category-extras  # for distributive, conflict
-  - gloss  #needs apt install libgl1-mesa-dev freeglut3-dev
+  # - gloss  #needs apt install libgl1-mesa-dev freeglut3-dev
 
 library:
   source-dirs: .
