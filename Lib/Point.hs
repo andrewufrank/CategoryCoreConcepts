@@ -66,7 +66,7 @@ import Vault.Triple4cat
       CatStore,
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
                 catStoreFind) )
-import Lib.EdgeNodeGraph(S, T, NodeType, EdgeType)   
+import Lib.EdgeNodeGraph(S (..), T (..), NodeType (..), EdgeType)   
 import qualified Graphics.Gloss as Gloss
 
 ----------- the category
@@ -96,22 +96,26 @@ data Length = Length Float
 -- a distance value, should be a subobj of Value 
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
-data PointType c = Point deriving (Show, Read, Ord, Eq, Generic, Zeros)
+-- data PointType c = PointType Point2 deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 data ValueType c = Value c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 -- | the objects in the category - required for store
-data ObjPoint = NodeTag (NodeType Int) | EdgeTag (EdgeType Char) | PointTag (PointType Point2) | ValueTag (ValueType Length)  | ZZpoint
+data ObjPoint = NodeTag (NodeType Int) | EdgeTag (EdgeType Char) | PointTag (Point2) | ValueTag (ValueType Length)  | ZZpoint
     deriving (Show, Read, Ord, Eq, Generic)
 instance Zeros ObjPoint where zero = ZZpoint
 
+unEdgeTag :: ObjPoint -> EdgeType Char
 unEdgeTag (EdgeTag t) = t 
 unEdgeTag x = errorT ["unEdgeTag - not an Edge", showT x]
 
+unNodeTag :: ObjPoint -> NodeType Int
 unNodeTag (NodeTag t) = t 
 unNodeTag x = errorT ["unNodeTag - not a Node", showT x]
+unPointTag :: ObjPoint -> Point2
 unPointTag (PointTag t) = t 
 unPointTag x = errorT ["unNodeTag - not a Node", showT x]
+unValueTag :: ObjPoint -> ValueType Length
 unValueTag (ValueTag t) = t 
 unValueTag x = errorT ["unNodeTag - not a Node", showT x]
 
@@ -120,6 +124,9 @@ makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 (x, y)))
 -- makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
 --------------------data 
+cat0 :: CatStore ObjPoint MorphPoint
+cat0 = catStoreEmpty
+cat2 :: CatStore ObjPoint MorphPoint
 cat2 = catStoreBatch (
     [ Ins (makePoint 1 0 0)
     , Ins (makePoint 2 1 1)
