@@ -143,7 +143,8 @@ unPointTag x = errorT ["unNodeTag - not a Node", showT x]
 unValueTag :: ObjPoint -> ValueType Length
 unValueTag (ValueTag t) = t 
 unValueTag x = errorT ["unNodeTag - not a Node", showT x]
-
+unCostTag (CostTag t) = t 
+unCostTag x = errorT ["unCostTag -  not a Cost", showT x]
 
 -- code depending on MonadState
 type Store = CatStore ObjPoint MorphPoint
@@ -210,25 +211,29 @@ tInvFun :: () =>  Edge -> StoreStateMonad  Node
 tInvFun i = do 
         r1  <- find  (Nothing, Just tMorph, Just . EdgeTag $ i) 
         return . unNodeTag . getSingle1  $ r1    
+tCostFun i = do 
+        r1  <- find  (Nothing, Just tcMorph, Just . EdgeTag $ i) 
+        return . unCostTag. getSingle1  $ r1    
 
 
 
 lengthEdge :: Edge -> StoreStateMonad (Length)
 lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
         -- the first is a pure function, the other are all 4 monadic
-costOutgoingEdges :: Node -> StoreStateMonad [Node]
+costOutgoingEdges :: Node -> StoreStateMonad [(Node, Cost)]
 costOutgoingEdges n = do 
         es :: [Edge] <- sRel n 
         ns :: [Node] <- mapM tInvFun es 
-        return ns
+        cs :: [Cost] <- mapM tCostFun es
+        return . zip ns $ cs
 
 --------------------data 
 
 graph123 :: [Action (ObjPoint, MorphPoint, ObjPoint)]
 graph123 = [Ins (makeEdgeFrom 'e' 1)
-    , Ins (makeEdgeTo    'e' 2)
+    , Ins (makeEdgeTo    'f' 1)
     , Ins (makeEdgeFrom   'f' 2)
-    , Ins (makeEdgeTo     'f' 3)
+    , Ins (makeEdgeTo     'g' 2)
     , Ins (makePoint 'e' 0 0)
     , Ins (makePoint 'f' 1 1)
     ]
@@ -263,5 +268,8 @@ pagePoint = do
     -- putIOwords ["the distance 1 t 2", showT d1]
     let le = evalState (lengthEdge (Edge 1)) cat2
     putIOwords ["the length of the edge 1", showT le]
+
+    let nc = evalState (costOutgoingEdges (Node 'a')) cat2
+    putIOwords ["the node-cost pairs at Node a", showT nc]
 
  
