@@ -68,6 +68,7 @@ import Vault.Triple4cat
                 catStoreFind), 
         getSingle1, getSingle3,
         getTarget1, getTarget3)
+import Lib.Points 
 
 -- helpers
 type Store = CatStore ObjPoint MorphPoint
@@ -110,17 +111,17 @@ data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 type Node = NodeType Int 
 type Edge = EdgeType Char
 
-data Point2 = Point2 Float Float  -- the data type from gloss 
--- a point in 2d (simplistic from gloss)
-    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+-- data Point2 = Point2 Float Float  -- the data type from gloss 
+-- -- a point in 2d (simplistic from gloss)
+--     deriving (Show, Read, Ord, Eq, Generic, Zeros)
     
-data Length = Length Float  
+-- data Length = Length Float  
 -- a distance value, should be a subobj of Value 
-    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+    -- deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 -- data PointType c = PointType Point2 deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
-data ValueType c = Value c deriving (Show, Read, Ord, Eq, Generic, Zeros)
+-- data ValueType c = Value c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 -- | the objects in the category - required for store
 data ObjPoint = NodeTag (NodeType Int) | EdgeTag (EdgeType Char) | PointTag (Point2) | ValueTag (ValueType Length)  | ZZpoint
@@ -221,24 +222,24 @@ compDist p1 p2 = Length .   mag $ (sub p1 p2) --(unPoint2 p1) (unPoint2 p2))
 -- unPoint2 :: Point2 -> Gloss.Point
 -- unPoint2 (Point2 f) = f
 
--- | Trivial function for subtracting co-ordinate pairs
--- sub :: Num x => Point2 -> (x, x) -> (x, x)
-sub :: Point2 -> Point2 -> Point2
-sub (Point2 x1 x2) (Point2 y1 y2) = Point2 (x1 - x2) (y1 - y2)
+-- -- | Trivial function for subtracting co-ordinate pairs
+-- -- sub :: Num x => Point2 -> (x, x) -> (x, x)
+-- sub :: Point2 -> Point2 -> Point2
+-- sub (Point2 x1 x2) (Point2 y1 y2) = Point2 (x1 - x2) (y1 - y2)
 
--- | Compute the sum of squares or dot product of a given pair of co-ordinates
--- dotProduct :: Num x => (x, x) -> (x, x) -> x
-dotProduct :: Point2 -> Point2 -> Float
-dotProduct (Point2 x1 x2) (Point2 y1 y2) = (x1 * x2) + (y1 * y2)
+-- -- | Compute the sum of squares or dot product of a given pair of co-ordinates
+-- -- dotProduct :: Num x => (x, x) -> (x, x) -> x
+-- dotProduct :: Point2 -> Point2 -> Float
+-- dotProduct (Point2 x1 x2) (Point2 y1 y2) = (x1 * x2) + (y1 * y2)
 
--- -- | Conversion of pair fromIntegral
--- fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
--- fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
+-- -- -- | Conversion of pair fromIntegral
+-- -- fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
+-- -- fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
 
--- | Compute magnitude
--- mag :: Floating x => (x, x) -> x
-mag :: Point2 -> Float
-mag x = sqrt (dotProduct x x)
+-- -- | Compute magnitude
+-- -- mag :: Floating x => (x, x) -> x
+-- mag :: Point2 -> Float
+-- mag x = sqrt (dotProduct x x)
 
 --------------------data 
 cat0 :: CatStore ObjPoint MorphPoint

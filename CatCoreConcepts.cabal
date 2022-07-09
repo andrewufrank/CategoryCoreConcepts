@@ -20,6 +20,7 @@ library
       Lib.EdgeNodeGraph
       Lib.EdgeNodeGraphOps
       Lib.Point
+      Lib.Points
       Lib.Rules
       Lib.STproduct
       Lib.STproductTriple
