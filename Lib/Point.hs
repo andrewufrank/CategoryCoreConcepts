@@ -70,12 +70,6 @@ import Vault.Triple4cat
         getTarget1, getTarget3)
 import Lib.Points 
 
--- helpers
-type Store = CatStore ObjPoint MorphPoint
-type StoreStateMonad = State Store  
-
-
-
 ----------- the category
 
 data XY = XY 
@@ -91,6 +85,7 @@ data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Distance | ZZm
     deriving (Show, Read, Ord, Eq, Generic )
 -- instance MorphPoint Zeros where zero = ZZm
 
+-- constants for the tags (some have an argument, some not)
 xyMorph :: MorphPoint
 xyMorph = XYtag XY 
 distanceMorph :: MorphPoint
@@ -100,9 +95,8 @@ sMorph = Stag S
 tMorph :: MorphPoint
 tMorph = Ttag T
 
--- data ObjPoint = PointTag (PointType Text)  -- is ObjPoint in other 
--- data PointType t = PT Point 2 t deriving (Show, Read, Ord, Eq, Generic, Zeros)
-
+------------------ the objects 
+---- the xxTypes serve to allow further specifications
 data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial states W1, W2, W3
 data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
@@ -111,17 +105,7 @@ data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 type Node = NodeType Int 
 type Edge = EdgeType Char
 
--- data Point2 = Point2 Float Float  -- the data type from gloss 
--- -- a point in 2d (simplistic from gloss)
---     deriving (Show, Read, Ord, Eq, Generic, Zeros)
-    
--- data Length = Length Float  
--- a distance value, should be a subobj of Value 
-    -- deriving (Show, Read, Ord, Eq, Generic, Zeros)
-
--- data PointType c = PointType Point2 deriving (Show, Read, Ord, Eq, Generic, Zeros)
-
--- data ValueType c = Value c deriving (Show, Read, Ord, Eq, Generic, Zeros)
+------ the object sum type  with tags 
 
 -- | the objects in the category - required for store
 data ObjPoint = NodeTag (NodeType Int) | EdgeTag (EdgeType Char) | PointTag (Point2) | ValueTag (ValueType Length)  | ZZpoint
@@ -142,23 +126,20 @@ unValueTag :: ObjPoint -> ValueType Length
 unValueTag (ValueTag t) = t 
 unValueTag x = errorT ["unNodeTag - not a Node", showT x]
 
--- id_find :: CatStoreQ -> StoreStateMonad [CPoint ObjPoint MorphPoint]
+
+-- code depending on MonadState
+type Store = CatStore ObjPoint MorphPoint
+type StoreStateMonad = State Store  
+
 -- ^ a monadic wrapper for catStoreFind applied to state
 find :: (MonadState (CatStore o m2) m1, Eq o, Eq m2) =>
         (Maybe o, Maybe m2, Maybe o) -> m1 [CPoint o m2]
 find t = do 
     c <- get
-
     let res = catStoreFind t c 
-    -- (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
     return  res 
 
--- find_node_edge :: (MonadState (CatStore ObjPoint ms) StoreStateMonad, Eq ms) =>  Node -> StoreStateMonad  (CPoint ObjPoint ms)
--- -- ^ start with node get edge
--- find_node_edge i = do 
---         r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
---         return . head $ r1
-
+-- the makes for all ...
 makeEdgeFrom :: Int -> Char -> (ObjPoint, MorphPoint, ObjPoint)
 -- | node, edge: value to store for an s (from edge to node, the from node)
 makeEdgeFrom o1 o2 = (NodeTag (Node o1), sMorph, EdgeTag (Edge o2))
@@ -171,8 +152,7 @@ makePoint :: Int ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
 makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
 -- makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
--- xy' :: CatStore ObjPoint MorphPoint -> Node -> Point2
--- xy' cat ow =  unPointTag . getTarget3 . catStoreFind (Just . NodeTag $ ow, Just xyMorph, Nothing) $ cat
+-- the functions and relatiosn to acess the store 
 
 xyFun :: () =>  Node -> StoreStateMonad  (Point2)
 -- ^ start with node get point (x y coordinates)
@@ -201,46 +181,24 @@ tInvFun :: () =>  Edge -> StoreStateMonad  Node
 -- ^ start with edge get node using t 
 tInvFun i = do 
         r1  <- find  (Nothing, Just tMorph, Just . EdgeTag $ i) 
-        return . unNodeTag . getSingle1  $ r1        
-distanceFun2   :: () =>  Node -> Node -> StoreStateMonad  (Length)     
-distanceFun2 n1 n2 = do 
-    p1 <- xyFun n1 
-    p2 <- xyFun n2 
-    -- let d = Gloss.magV ((Gloss.(-)) (unPoint2 p1) (unPoint2 p2)) 
-    let d = mag (sub ( p1) ( p2)) 
-    return . Length $ d 
+        return . unNodeTag . getSingle1  $ r1    
+
+
+-- distanceFun2   :: () =>  Node -> Node -> StoreStateMonad  (Length)     
+-- distanceFun2 n1 n2 = do 
+--     p1 <- xyFun n1 
+--     p2 <- xyFun n2 
+--     -- let d = Gloss.magV ((Gloss.(-)) (unPoint2 p1) (unPoint2 p2)) 
+--     let d = mag (sub ( p1) ( p2)) 
+--     return . Length $ d 
+
 lengthEdge :: Edge -> StoreStateMonad (Length)
 lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
     -- n1 <- sInvFun e 
     -- n2 <- tInvFun e 
     -- l <- distanceFun2 n1 n2 
-    -- return $ l 
-    -- f <$> x <*> y >>
-compDist :: Point2 -> Point2 -> Length
-compDist p1 p2 = Length .   mag $ (sub p1 p2) --(unPoint2 p1) (unPoint2 p2))  
 
--- unPoint2 :: Point2 -> Gloss.Point
--- unPoint2 (Point2 f) = f
-
--- -- | Trivial function for subtracting co-ordinate pairs
--- -- sub :: Num x => Point2 -> (x, x) -> (x, x)
--- sub :: Point2 -> Point2 -> Point2
--- sub (Point2 x1 x2) (Point2 y1 y2) = Point2 (x1 - x2) (y1 - y2)
-
--- -- | Compute the sum of squares or dot product of a given pair of co-ordinates
--- -- dotProduct :: Num x => (x, x) -> (x, x) -> x
--- dotProduct :: Point2 -> Point2 -> Float
--- dotProduct (Point2 x1 x2) (Point2 y1 y2) = (x1 * x2) + (y1 * y2)
-
--- -- -- | Conversion of pair fromIntegral
--- -- fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
--- -- fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
-
--- -- | Compute magnitude
--- -- mag :: Floating x => (x, x) -> x
--- mag :: Point2 -> Float
--- mag x = sqrt (dotProduct x x)
-
+ 
 --------------------data 
 cat0 :: CatStore ObjPoint MorphPoint
 cat0 = catStoreEmpty
@@ -260,25 +218,9 @@ pagePoint = do
     -- putIOwords ["find point from node `1", showT . xy' cat2 $ (Node 1)]
     let p1 = evalState (xyFun (Node 1)) cat2
     putIOwords ["the point for node 1", showT p1]
-    let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2
-    putIOwords ["the distance 1 t 2", showT d1]
-    -- let (Edge 'e')
+    -- let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2
+    -- putIOwords ["the distance 1 t 2", showT d1]
+    let le = evalState (lengthEdge (Edge 'e')) cat2
+    putIOwords ["the length of the edge e", showT le]
 
-{-
--- | Trivial function for subtracting co-ordinate pairs
-sub :: Num x => (x, x) -> (x, x) -> (x, x)
-sub (x1, y1) (x2, y2) = (x1 - x2, y1 - y2)
-
--- | Compute the sum of squares or dot product of a given pair of co-ordinates
-dotProduct :: Num x => (x, x) -> (x, x) -> x
-dotProduct (x1, y1) (x2, y2) = (x1 * x2) + (y1 * y2)
-
--- | Conversion of pair fromIntegral
-fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
-fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
-
--- | Compute magnitude
-mag :: Floating x => (x, x) -> x
-mag x = sqrt (dotProduct x x)
-
--}
+ 

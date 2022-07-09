@@ -79,6 +79,7 @@ getTarget1 :: [(a, b, c)] -> a
 -- just a helper
 getTarget1 cps = fst3 . head  $ cps 
 
+
 --- example code 
 data Morph = F | T  | Null  -- for storing a graph S =s,t> T 
     deriving (Show, Read, Ord, Eq, Generic)

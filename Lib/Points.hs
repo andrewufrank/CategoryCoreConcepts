@@ -126,6 +126,9 @@ dotProduct (Point2 x1 x2) (Point2 y1 y2) = (x1 * x2) + (y1 * y2)
 mag :: Point2 -> Float
 mag x = sqrt (dotProduct x x)
 
+compDist :: Point2 -> Point2 -> Length
+compDist p1 p2 = Length .   mag $ (sub p1 p2) --(unPoint2 p1) (unPoint2 p2))  
+
 -- --------------------data 
 -- cat0 :: CatStore ObjPoint MorphPoint
 -- cat0 = catStoreEmpty
