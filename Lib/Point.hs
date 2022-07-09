@@ -30,6 +30,8 @@ for computation of distance use a couple of functions locally
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE DeriveAnyClass     #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant return" #-}
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Lib.Point
@@ -167,6 +169,7 @@ makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 makePoint :: Char ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
 makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
 makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))
+makeTCost e c = (EdgeTag (Edge e), tcMorph, CostTag (Cost c))
 
 -- the functions and relatiosn to acess the store 
 
@@ -183,6 +186,10 @@ sFun :: () =>  Node -> StoreStateMonad  (Edge)
 sFun i = do 
         r1  <- find  (Just . NodeTag $ i, Just sMorph, Nothing) 
         return . unEdgeTag . getSingle3  $ r1
+sRel :: () => Node -> StoreStateMonad [Edge]
+sRel i = do 
+        r1  <- find  (Just . NodeTag $ i, Just sMorph, Nothing) 
+        return . map unEdgeTag . map trd3  $ r1
 tFun :: () =>  Node -> StoreStateMonad  (Edge)
 -- ^ start with node get edge using t
 tFun i = do 
@@ -193,6 +200,11 @@ sInvFun :: () =>  Edge -> StoreStateMonad  Node
 sInvFun i = do 
         r1  <- find  (Nothing, Just sMorph, Just . EdgeTag $ i) 
         return . unNodeTag . getSingle1  $ r1
+sInvRel :: MonadState (CatStore ObjPoint MorphPoint) m =>
+                Edge -> m [NodeType Char]
+sInvRel i = do 
+        r1  <- find  (Nothing, Just sMorph, Just . EdgeTag $ i) 
+        return . map (unNodeTag . fst3)  $ r1
 tInvFun :: () =>  Edge -> StoreStateMonad  Node
 -- ^ start with edge get node using t 
 tInvFun i = do 
@@ -204,7 +216,12 @@ tInvFun i = do
 lengthEdge :: Edge -> StoreStateMonad (Length)
 lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
         -- the first is a pure function, the other are all 4 monadic
- 
+costOutgoingEdges :: Node -> StoreStateMonad [Node]
+costOutgoingEdges n = do 
+        es :: [Edge] <- sRel n 
+        ns :: [Node] <- mapM tInvFun es 
+        return ns
+
 --------------------data 
 
 graph123 :: [Action (ObjPoint, MorphPoint, ObjPoint)]
@@ -212,9 +229,10 @@ graph123 = [Ins (makeEdgeFrom 'e' 1)
     , Ins (makeEdgeTo    'e' 2)
     , Ins (makeEdgeFrom   'f' 2)
     , Ins (makeEdgeTo     'f' 3)
-    , Ins (makePoint 'a' 0 0)
-    , Ins (makePoint 'b' 1 1)
+    , Ins (makePoint 'e' 0 0)
+    , Ins (makePoint 'f' 1 1)
     ]
+graphShortestPathEx :: [Action (ObjPoint, MorphPoint, ObjPoint)]
 graphShortestPathEx = 
     [ Ins (makeEdgeTo 'a' 1)
     , Ins (makeEdgeFrom 'b' 1)
@@ -222,7 +240,11 @@ graphShortestPathEx =
     , Ins (makeEdgeFrom 'c' 2)
     , Ins (makeEdgeTo 'a' 5)
     , Ins (makeEdgeTo 'c' 5)
-    , Ins (makeSCost 1 1)
+    , Ins (makeTCost 1 1)
+    , Ins (makeTCost 2 2)
+    , Ins (makeTCost 5 5)
+    , Ins (makeSCost 2 5)
+    , Ins (makeSCost 5 1)
     ]
 
 cat0 :: CatStore ObjPoint MorphPoint
@@ -235,11 +257,11 @@ pagePoint :: ErrIO ()
 pagePoint = do
     putIOwords ["\n pagePoint"]
     -- putIOwords ["find point from node `1", showT . xy' cat2 $ (Node 1)]
-    let p1 = evalState (xyFun (Node 'a')) cat2
-    putIOwords ["the point for node 1", showT p1]
+    let p1 = evalState (xyFun (Node 'e')) cat2
+    putIOwords ["the point for node e", showT p1]
     -- let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2
     -- putIOwords ["the distance 1 t 2", showT d1]
     let le = evalState (lengthEdge (Edge 1)) cat2
-    putIOwords ["the length of the edge e", showT le]
+    putIOwords ["the length of the edge 1", showT le]
 
  
