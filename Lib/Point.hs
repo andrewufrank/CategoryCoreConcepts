@@ -152,11 +152,11 @@ find t = do
     -- (Just $ WW (WK 2), Just . Left $ (VV 'b'), Nothing) c
     return  res 
 
-find_node_edge :: (MonadState (CatStore ObjPoint ms) StoreStateMonad, Eq ms) =>  Node -> StoreStateMonad  (CPoint ObjPoint ms)
--- ^ start with node get edge
-find_node_edge i = do 
-        r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
-        return . head $ r1
+-- find_node_edge :: (MonadState (CatStore ObjPoint ms) StoreStateMonad, Eq ms) =>  Node -> StoreStateMonad  (CPoint ObjPoint ms)
+-- -- ^ start with node get edge
+-- find_node_edge i = do 
+--         r1  <- find  (Just . NodeTag $ i, Nothing, Nothing) 
+--         return . head $ r1
 
 makeEdgeFrom :: Int -> Char -> (ObjPoint, MorphPoint, ObjPoint)
 -- | node, edge: value to store for an s (from edge to node, the from node)
@@ -170,8 +170,8 @@ makePoint :: Int ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
 makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
 -- makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
-xy' :: CatStore ObjPoint MorphPoint -> Node -> Point2
-xy' cat ow =  unPointTag . getTarget3 . catStoreFind (Just . NodeTag $ ow, Just xyMorph, Nothing) $ cat
+-- xy' :: CatStore ObjPoint MorphPoint -> Node -> Point2
+-- xy' cat ow =  unPointTag . getTarget3 . catStoreFind (Just . NodeTag $ ow, Just xyMorph, Nothing) $ cat
 
 xyFun :: () =>  Node -> StoreStateMonad  (Point2)
 -- ^ start with node get point (x y coordinates)
@@ -256,7 +256,7 @@ cat2 = catStoreBatch (
 pagePoint :: ErrIO ()
 pagePoint = do
     putIOwords ["\n pagePoint"]
-    putIOwords ["find point from node `1", showT . xy' cat2 $ (Node 1)]
+    -- putIOwords ["find point from node `1", showT . xy' cat2 $ (Node 1)]
     let p1 = evalState (xyFun (Node 1)) cat2
     putIOwords ["the point for node 1", showT p1]
     let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2

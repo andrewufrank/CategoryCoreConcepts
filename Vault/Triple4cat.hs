@@ -48,7 +48,7 @@ module Vault.Triple4cat
 
 -- import Control.Monad.State
 -- import Data.List (sort)
-import GHC.Generics ( Generic )
+-- import GHC.Generics ( Generic )
 import UniformBase
     ( Generic, fst3, trd3, errorT, putIOwords, showT, Zeros(zero) )
 import Vault.NaiveTripleStore
