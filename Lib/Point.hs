@@ -78,10 +78,18 @@ data Distance = Distance
     deriving (Show, Read, Ord, Eq, Generic)
 
 data S = S  deriving (Show, Read, Ord, Eq, Generic)
+-- | the start node of an edge
+data SC = SC  deriving (Show, Read, Ord, Eq, Generic)
+-- | the cost of the edge in direction towards s (reverse)
 data T = T  deriving (Show, Read, Ord, Eq, Generic)
+-- | the end node of an edge 
+data TC = TC  deriving (Show, Read, Ord, Eq, Generic)
+-- | the cost of the edge in direction towards t (forward)
 
 -- | the morphism in the category, required for store
-data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Distance | ZZm 
+data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Distance 
+        | SCosttag SC | TCcosttag TC
+        | ZZm 
     deriving (Show, Read, Ord, Eq, Generic )
 -- instance MorphPoint Zeros where zero = ZZm
 
@@ -94,6 +102,8 @@ sMorph :: MorphPoint
 sMorph = Stag S 
 tMorph :: MorphPoint
 tMorph = Ttag T
+scMorph = SCosttag SC
+tcMorph = TCcosttag TC
 
 ------------------ the objects 
 ---- the xxTypes serve to allow further specifications
@@ -102,21 +112,27 @@ data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial actions (moves) A or B
 
-type Node = NodeType Int 
-type Edge = EdgeType Char
+type Node = NodeType Char 
+type Edge = EdgeType Int
+
+-- | the cost to measure the use of a resource 
+data Cost = Cost Int 
+        deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
 
 ------ the object sum type  with tags 
 
 -- | the objects in the category - required for store
-data ObjPoint = NodeTag (NodeType Int) | EdgeTag (EdgeType Char) | PointTag (Point2) | ValueTag (ValueType Length)  | ZZpoint
+-- reference to types with no parameter
+data ObjPoint = NodeTag Node | EdgeTag Edge | PointTag (Point2) | ValueTag (ValueType Length)  | CostTag Cost | ZZpoint
     deriving (Show, Read, Ord, Eq, Generic)
 instance Zeros ObjPoint where zero = ZZpoint
 
-unEdgeTag :: ObjPoint -> EdgeType Char
+unEdgeTag :: ObjPoint -> Edge 
 unEdgeTag (EdgeTag t) = t 
 unEdgeTag x = errorT ["unEdgeTag - not an Edge", showT x]
 
-unNodeTag :: ObjPoint -> NodeType Int
+unNodeTag :: ObjPoint -> Node 
 unNodeTag (NodeTag t) = t 
 unNodeTag x = errorT ["unNodeTag - not a Node", showT x]
 unPointTag :: ObjPoint -> Point2
@@ -140,17 +156,17 @@ find t = do
     return  res 
 
 -- the makes for all ...
-makeEdgeFrom :: Int -> Char -> (ObjPoint, MorphPoint, ObjPoint)
+makeEdgeFrom :: Char -> Int -> (ObjPoint, MorphPoint, ObjPoint)
 -- | node, edge: value to store for an s (from edge to node, the from node)
 makeEdgeFrom o1 o2 = (NodeTag (Node o1), sMorph, EdgeTag (Edge o2))
 
-makeEdgeTo :: Int -> Char ->   (ObjPoint, MorphPoint, ObjPoint)
+makeEdgeTo :: Char -> Int ->   (ObjPoint, MorphPoint, ObjPoint)
 makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
 
-makePoint :: Int ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
+makePoint :: Char ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
 makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
--- makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
+makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))
 
 -- the functions and relatiosn to acess the store 
 
@@ -190,27 +206,40 @@ lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e)
         -- the first is a pure function, the other are all 4 monadic
  
 --------------------data 
+
+graph123 :: [Action (ObjPoint, MorphPoint, ObjPoint)]
+graph123 = [Ins (makeEdgeFrom 'e' 1)
+    , Ins (makeEdgeTo    'e' 2)
+    , Ins (makeEdgeFrom   'f' 2)
+    , Ins (makeEdgeTo     'f' 3)
+    , Ins (makePoint 'a' 0 0)
+    , Ins (makePoint 'b' 1 1)
+    ]
+graphShortestPathEx = 
+    [ Ins (makeEdgeTo 'a' 1)
+    , Ins (makeEdgeFrom 'b' 1)
+    , Ins (makeEdgeTo 'b' 2)
+    , Ins (makeEdgeFrom 'c' 2)
+    , Ins (makeEdgeTo 'a' 5)
+    , Ins (makeEdgeTo 'c' 5)
+    , Ins (makeSCost 1 1)
+    ]
+
 cat0 :: CatStore ObjPoint MorphPoint
 cat0 = catStoreEmpty
 cat2 :: CatStore ObjPoint MorphPoint
-cat2 = catStoreBatch (
-    [Ins (makeEdgeFrom 1 'e')
-    , Ins (makeEdgeTo   2 'e')
-    , Ins (makeEdgeFrom 2 'f')
-    , Ins (makeEdgeTo   3 'f')
-    , Ins (makePoint 1 0 0)
-    , Ins (makePoint 2 1 1)
-    ]) cat0
+cat2 = catStoreBatch  graph123
+     cat0
 --------------- ---------------------example
 pagePoint :: ErrIO ()
 pagePoint = do
     putIOwords ["\n pagePoint"]
     -- putIOwords ["find point from node `1", showT . xy' cat2 $ (Node 1)]
-    let p1 = evalState (xyFun (Node 1)) cat2
+    let p1 = evalState (xyFun (Node 'a')) cat2
     putIOwords ["the point for node 1", showT p1]
     -- let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2
     -- putIOwords ["the distance 1 t 2", showT d1]
-    let le = evalState (lengthEdge (Edge 'e')) cat2
+    let le = evalState (lengthEdge (Edge 1)) cat2
     putIOwords ["the length of the edge e", showT le]
 
  
