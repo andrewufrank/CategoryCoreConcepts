@@ -25,6 +25,9 @@ module Vault.Triple4cat
       CPoint 
     , CatStore (..), CatStores (..)
     , Action (..)  -- from NaiveTripleStore
+    , isSingleton, getSingle1, getSingle3
+    , getTarget3, getTarget1
+
     ---- for tests
     , pageTriple4cat
     
@@ -45,11 +48,38 @@ module Vault.Triple4cat
 
 -- import Control.Monad.State
 -- import Data.List (sort)
-import GHC.Generics
+import GHC.Generics ( Generic )
 import UniformBase
+    ( Generic, fst3, trd3, errorT, putIOwords, showT, Zeros(zero) )
 import Vault.NaiveTripleStore
+    ( Action(..), TripleStore(tsfind, tsinsert, tsdel) )
 -- import Vault.Value
 
+---- helper for queries
+isSingleton :: Foldable t => t a -> Bool
+isSingleton a = 1 == length a
+openSingleton :: Show p => [p] -> p
+openSingleton [a] = a
+openSingleton x = errorT ["openSingleton - not", showT x ]
+
+getSingle1 :: (Show a, Show b, Show c) => [(a,b,c)] -> a
+getSingle1 = fst3 . openSingleton
+-- ^ unwrap the first if singleton 
+getSingle3 :: (Show a, Show b, Show c) => [(a,b,c)] -> c
+getSingle3 = trd3 . openSingleton
+
+
+getTarget3 :: [(a, b, c)] -> c
+-- | get target (pos3) from a singleton result 
+-- just a helper
+getTarget3 cps = trd3 . head  $ cps 
+
+getTarget1 :: [(a, b, c)] -> a
+-- | get target (pos 1 ) from a singleton result 
+-- just a helper
+getTarget1 cps = fst3 . head  $ cps 
+
+--- example code 
 data Morph = F | T  | Null  -- for storing a graph S =s,t> T 
     deriving (Show, Read, Ord, Eq, Generic)
 instance Zeros Morph where zero = Null

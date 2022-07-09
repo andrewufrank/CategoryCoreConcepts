@@ -10,7 +10,12 @@ Coord and Distance are Float (simplistic)
 
 for computation of distance use a couple of functions locally 
 
- 
+ copied all the code from the preparation modules
+ because I changed the name of the Obj and Morph to ..Point 
+
+ goal is to see how this can be systematically done to avoid 
+ combinatorial explosion when the number of types increases
+(How to arrange for sub-x?)
 
 -}
 --------------------------------------------------------------------------- 
@@ -60,34 +65,16 @@ import Vault.Triple4cat
       CPoint,
       CatStore,
       CatStores(catStoreBatch, catStoreEmpty, catStoreInsert,
-                catStoreFind) )
+                catStoreFind), 
+        getSingle1, getSingle3,
+        getTarget1, getTarget3)
 
 -- helpers
 type Store = CatStore ObjPoint MorphPoint
 type StoreStateMonad = State Store  
 
 
-isSingleton :: Hask.Foldable t => t a -> Bool
-isSingleton a = 1 == length a
-openSingleton :: Show p => [p] -> p
-openSingleton [a] = a
-openSingleton x = errorT ["openSingleton - not", showT x ]
 
-getSingle1 :: (Show a, Show b, Show c) => [(a,b,c)] -> a
-getSingle1 = fst3 . openSingleton
--- ^ unwrap the first if singleton 
-getSingle3 = trd3 . openSingleton
-
-
-getTarget3 :: [(a, b, c)] -> c
--- | get target (pos3) from a singleton result 
--- just a helper
-getTarget3 cps = trd3 . head  $ cps 
-
-getTarget1 :: [(a, b, c)] -> a
--- | get target (pos 1 ) from a singleton result 
--- just a helper
-getTarget1 cps = fst3 . head  $ cps 
 ----------- the category
 
 data XY = XY 
