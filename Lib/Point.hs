@@ -184,20 +184,10 @@ tInvFun i = do
         return . unNodeTag . getSingle1  $ r1    
 
 
--- distanceFun2   :: () =>  Node -> Node -> StoreStateMonad  (Length)     
--- distanceFun2 n1 n2 = do 
---     p1 <- xyFun n1 
---     p2 <- xyFun n2 
---     -- let d = Gloss.magV ((Gloss.(-)) (unPoint2 p1) (unPoint2 p2)) 
---     let d = mag (sub ( p1) ( p2)) 
---     return . Length $ d 
 
 lengthEdge :: Edge -> StoreStateMonad (Length)
 lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
-    -- n1 <- sInvFun e 
-    -- n2 <- tInvFun e 
-    -- l <- distanceFun2 n1 n2 
-
+        -- the first is a pure function, the other are all 4 monadic
  
 --------------------data 
 cat0 :: CatStore ObjPoint MorphPoint
