@@ -27,12 +27,14 @@ module Vault.Triple4cat
     , Action (..)  -- from NaiveTripleStore
     , isSingleton, getSingle1, getSingle3
     , getTarget3, getTarget1
-
+    , openSingleton
+    , find2fun, find2rel
+    , MorphSelFun (..), MorphSelRel (..)
     ---- for tests
-    , pageTriple4cat
+    -- , pageTriple4cat
     
-    , Morph (..), Obj (..), Sobj(..), Tobj(..)
-    , v0, v1, v2, v3, a1x, a2x
+    -- , Morph (..), Obj (..), Sobj(..), Tobj(..)
+    -- , v0, v1, v2, v3, a1x, a2x
 --     Vaults (..), Vault (..), VaultState
 --     -- , ObjID, makeObjID
 -- --    , module Vault.NaiveTriplestore
@@ -49,8 +51,10 @@ module Vault.Triple4cat
 -- import Control.Monad.State
 -- import Data.List (sort)
 -- import GHC.Generics ( Generic )
-import UniformBase
-    ( Generic, fst3, trd3, errorT, putIOwords, showT, Zeros(zero) )
+import Control.Monad.State  
+
+import UniformBase ( Generic, errorT, showT, fst3, trd3 )
+    -- ( Generic, fst3, trd3, errorT, putIOwords, showT, Zeros(zero) )
 import Vault.NaiveTripleStore
     ( Action(..), TripleStore(tsfind, tsinsert, tsdel) )
 -- import Vault.Value
@@ -79,33 +83,84 @@ getTarget1 :: [(a, b, c)] -> a
 -- just a helper
 getTarget1 cps = fst3 . head  $ cps 
 
+-- ^ a monadic wrapper for catStoreFind applied to state
+-- find :: (MonadState (CatStore o m2) m1, Eq o, Eq m2) =>
+--         (Maybe o, Maybe m2, Maybe o) -> m1 [CPoint o m2]
+-- find t = do 
+--     c <- get
+--     let res = catStoreFind t c 
+--     return  res 
 
---- example code 
-data Morph = F | T  | Null  -- for storing a graph S =s,t> T 
+-- | the different views of a triple - returns for Fun and Inv are different!
+data MorphSelFun = Fun | Inv   
     deriving (Show, Read, Ord, Eq, Generic)
-instance Zeros Morph where zero = Null
-
-data Obj = SS (Sobj Int) | TT (Tobj Int) | ZZ 
+    
+data MorphSelRel =  Rel | InvRel 
     deriving (Show, Read, Ord, Eq, Generic)
-instance Zeros Obj where zero = ZZ
+    
 
-data Sobj a = SK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
-data Tobj a = TK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
+-- ^ a monadic wrapper for catStoreFind applied to state
+-- applies an unwrapper
+-- a relation dom -> codom 
+find2rel :: (MonadState (CatStore o m) m1, Eq o, Eq m) => 
+    MorphSelRel ->
+    o -> 
+    m ->
+    (o -> codom)-> m1 [codom]
+find2rel Rel s p untag = do 
+    c <- get
+    let res = catStoreFind (Just s, Just p, Nothing) c 
+    return . map  (untag . trd3) $ res 
+find2rel InvRel o p untag = do 
+    c <- get
+    let res = catStoreFind (Nothing, Just p, Just o) c 
+    return . map  (untag . fst3) $ res 
+-- find2rel _ _ _ _= errorT ["find2 can only be used for Rel and InvRel, for functions use find2fun"]
+
+-- ^ a monadic wrapper for catStoreFind applied to state
+-- applies an unwrapper and checks for single result 
+-- a function dom -> codom 
+-- find2fun :: (MonadState (CatStore o m2) m1, Eq o, Eq m2, Show codom) => MorphSel ->
+--         ObjPoint -> 
+--         MorphPoint ->
+--          (CPoint o m2 -> codom)-> m1 codom
+find2fun :: (MonadState (CatStore o m) m1, Show codom, Eq o, Eq m, Eq codom) =>
+    MorphSelFun
+    -> o
+    -> m
+    -> (o -> codom)
+    -> m1 codom
+find2fun Fun s p untag =  
+    fmap openSingleton $ find2rel Rel s p untag
+find2fun Inv s o untag =  fmap openSingleton $ find2rel Rel s o untag
+-- find2fun_ _ _ _= errorT ["find2fun can only be used for Fun and InvFun, for relations use find2rel"]
+
+-- --- example code 
+-- data Morph = F | T  | Null  -- for storing a graph S =s,t> T 
+--     deriving (Show, Read, Ord, Eq, Generic)
+-- instance Zeros Morph where zero = Null
+
+-- data Obj = SS (Sobj Int) | TT (Tobj Int) | ZZ 
+--     deriving (Show, Read, Ord, Eq, Generic)
+-- instance Zeros Obj where zero = ZZ
+
+-- data Sobj a = SK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
+-- data Tobj a = TK a deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 type CPoint o m =  (o,m,o)  -- a function for a point
-            -- deriving (Show, Read, Ord, Eq, Generic, Zeros)
--- type CPointGraph = CPoint Obj Morph
+--             -- deriving (Show, Read, Ord, Eq, Generic, Zeros)
+-- -- type CPointGraph = CPoint Obj Morph
 
 
--- for test
-os1 :: Obj
-os1 = SS (SK 0)
-os2 :: Obj
-os2 = SS (SK 1)
-cp1 :: (Obj, Morph, Obj)
-cp1 = (os1, F, os2)
-cp2 :: (Obj, Morph, Obj)
-cp2 = (os2, F, SS (SK 2))
+-- -- for test
+-- os1 :: Obj
+-- os1 = SS (SK 0)
+-- os2 :: Obj
+-- os2 = SS (SK 1)
+-- cp1 :: (Obj, Morph, Obj)
+-- cp1 = (os1, F, os2)
+-- cp2 :: (Obj, Morph, Obj)
+-- cp2 = (os2, F, SS (SK 2))
 
 newtype CatStore o m = CatStoreK [CPoint o m] 
                      deriving (Show, Read, Eq)
@@ -115,7 +170,7 @@ unCatStore (CatStoreK as) = as
 wrapCatStore :: ([CPoint o m] -> [CPoint o m]) -> CatStore o m-> CatStore o m
 wrapCatStore f = CatStoreK . f . unCatStore  -- not a functor!
 
--- -- type CatStoreState rel = State (CatStore rel)
+-- -- -- type CatStoreState rel = State (CatStore rel)
 
 class CatStores o m where
     catStoreEmpty :: CatStore o m
@@ -137,36 +192,36 @@ instance (Eq o, Eq m, TripleStore o m o) => CatStores o m where
     catStoreFind t = tsfind t . unCatStore
 
 
--- -------------for test 
+-- -- -------------for test 
 
-v0 :: CatStore Obj Morph  
-v0 = catStoreEmpty
-v1 :: CatStore   Obj Morph
-v1 = catStoreInsert cp1 v0
-v2 :: CatStore  Obj Morph
-v2 = catStoreInsert cp2 v1
-v3 :: CatStore  Obj Morph
-v3 = catStoreDel cp2 v2
+-- v0 :: CatStore Obj Morph  
+-- v0 = catStoreEmpty
+-- v1 :: CatStore   Obj Morph
+-- v1 = catStoreInsert cp1 v0
+-- v2 :: CatStore  Obj Morph
+-- v2 = catStoreInsert cp2 v1
+-- v3 :: CatStore  Obj Morph
+-- v3 = catStoreDel cp2 v2
 
-a1 :: [Action (Obj, Morph, Obj)]
-a1 = [Ins cp1, Ins cp2]
-a1x :: CatStore Obj Morph
-a1x = catStoreBatch a1 v0
-a2x :: CatStore Obj Morph
-a2x = catStoreBatch [Del cp2] a1x
+-- a1 :: [Action (Obj, Morph, Obj)]
+-- a1 = [Ins cp1, Ins cp2]
+-- a1x :: CatStore Obj Morph
+-- a1x = catStoreBatch a1 v0
+-- a2x :: CatStore Obj Morph
+-- a2x = catStoreBatch [Del cp2] a1x
 
 
 
-pageTriple4cat :: IO ()
-pageTriple4cat = do
-    putIOwords ["\n [pageTriple4cat"]
-    putIOwords ["cp1", showT cp1]
---     putIOwords ["ts one", showT x1]
+-- pageTriple4cat :: IO ()
+-- pageTriple4cat = do
+--     putIOwords ["\n [pageTriple4cat"]
+--     putIOwords ["cp1", showT cp1]
+-- --     putIOwords ["ts one", showT x1]
 
-    putIOwords ["CatStore empty", showT v0]
-    putIOwords ["CatStore with cp1", showT v1]
-    putIOwords ["CatStore added cp2, deleted cp1", showT v2]
-    putIOwords ["CatStore added batch cp1 cp2", showT a1x]
-    putIOwords ["CatStore  cp2", showT a2x]
+--     putIOwords ["CatStore empty", showT v0]
+--     putIOwords ["CatStore with cp1", showT v1]
+--     putIOwords ["CatStore added cp2, deleted cp1", showT v2]
+--     putIOwords ["CatStore added batch cp1 cp2", showT a1x]
+--     putIOwords ["CatStore  cp2", showT a2x]
 
 
