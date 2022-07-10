@@ -199,9 +199,9 @@ tFun i = find2fun Fun (NodeTag i) tMorph unEdgeTag
 -- tFun i = do 
 --         r1  <- find  (Just . NodeTag $ i, Just tMorph, Nothing) 
 --         return . unEdgeTag . getSingle3  $ r1
--- sInvFun :: () =>  Edge -> StoreStateMonad  Node
--- -- ^ start with edge get node using s
--- sInvFun i = find2fun Inv (NodeTag i) sMorph unEdgeTag 
+sInvFun :: () =>  Edge -> StoreStateMonad  Node
+-- ^ start with edge get node using s
+sInvFun i = find2fun Inv (EdgeTag i) sMorph unNodeTag 
 
 -- sInvFun i = do 
 --         r1  <- find  (Nothing, Just sMorph, Just . EdgeTag $ i) 
@@ -242,8 +242,8 @@ sCostFun i = find2fun Fun (EdgeTag i) scMorph unCostTag
 
 
 
--- lengthEdge :: Edge -> StoreStateMonad (Length)
--- lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
+lengthEdge :: Edge -> StoreStateMonad (Length)
+lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
 --         -- the first is a pure function, the other are all 4 monadic
 costOutgoingEdges :: Node -> StoreStateMonad [(Node, Cost)]
 costOutgoingEdges n = do 
@@ -301,8 +301,8 @@ pagePoint = do
     -- let le = evalState (lengthEdge (Edge 1)) cat2
     -- putIOwords ["the length of the edge 1", showT le]
 
-    let nc = evalState (costOutgoingEdges (Node 'a')) cat2
-    putIOwords ["the node-cost pairs at Node a", showT nc]
+    -- let nc = evalState (costOutgoingEdges (Node 'a')) cat2
+    -- putIOwords ["the node-cost pairs at Node a", showT nc]
 
     -- let answer = 27 :: Int
     -- guesses <- execStateT (guessSession answer) 0
@@ -315,9 +315,12 @@ f op = evalState op cat11
 
 runWithState :: StoreErrIO Store
 runWithState = do 
+    putIOwords ["runWithState"]
+    -- let le = evalState (lengthEdge (Edge 1)) cat11
+    -- putIOwords ["the length of the edge 1", showT le]
 
-    let nc = evalState (costOutgoingEdges (Node 'a')) cat2
-    putIOwords ["the node-cost pairs at Node a", showT nc]
+    -- let nc = evalState (costOutgoingEdges (Node 'a')) cat11
+    -- putIOwords ["the node-cost pairs at Node a", showT nc]
 
 
     s <- get 
