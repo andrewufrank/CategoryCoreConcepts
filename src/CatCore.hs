@@ -62,8 +62,8 @@ mainErrIO = do
     -- pageTris
     -- pageDataInState
     -- pageEdgeNodeGraph
-    part2
-    pageEdgeNodeDistance
+    -- part2
+    -- pageEdgeNodeDistance
     pagePoint
 
 

@@ -160,12 +160,12 @@ find t = do
     return  res 
 
 -- the makes for all ...
-makeEdgeFrom :: Char -> Int -> (ObjPoint, MorphPoint, ObjPoint)
+makeNodeStartingEdge :: Char -> Int -> (ObjPoint, MorphPoint, ObjPoint)
 -- | node, edge: value to store for an s (from edge to node, the from node)
-makeEdgeFrom o1 o2 = (NodeTag (Node o1), sMorph, EdgeTag (Edge o2))
+makeNodeStartingEdge o1 o2 = (NodeTag (Node o1), sMorph, EdgeTag (Edge o2))
 
-makeEdgeTo :: Char -> Int ->   (ObjPoint, MorphPoint, ObjPoint)
-makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
+makeNodeEndingEdge :: Char -> Int ->   (ObjPoint, MorphPoint, ObjPoint)
+makeNodeEndingEdge o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
 
 makePoint :: Char ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
@@ -212,9 +212,18 @@ tInvFun :: () =>  Edge -> StoreStateMonad  Node
 tInvFun i = do 
         r1  <- find  (Nothing, Just tMorph, Just . EdgeTag $ i) 
         return . unNodeTag . getSingle1  $ r1    
+sCostFun i = do 
+        r1  <- find  ( Just . EdgeTag $ i, Just scMorph, Nothing) 
+        return . unCostTag. getSingle3  $ r1    
 tCostFun i = do 
-        r1  <- find  (Nothing, Just tcMorph, Just . EdgeTag $ i) 
-        return . unCostTag. getSingle1  $ r1    
+        r1  <- find  ( Just . EdgeTag $ i, Just tcMorph,Nothing) 
+        return . unCostTag. getSingle3  $ r1    
+sCostRel i = do 
+        r1  <- find  ( Just . EdgeTag $ i, Just scMorph, Nothing) 
+        return . map (unCostTag . trd3)  $ r1    
+tCostRel i = do 
+        r1  <- find  ( Just . EdgeTag $ i, Just tcMorph,Nothing ) 
+        return . map (unCostTag . trd3)  $ r1    
 
 
 
@@ -225,32 +234,36 @@ costOutgoingEdges :: Node -> StoreStateMonad [(Node, Cost)]
 costOutgoingEdges n = do 
         es :: [Edge] <- sRel n 
         ns :: [Node] <- mapM tInvFun es 
-        cs :: [Cost] <- mapM tCostFun es
+        cs :: [Cost] <- mapM sCostFun es
         return . zip ns $ cs
 
 --------------------data 
 
 graph123 :: [Action (ObjPoint, MorphPoint, ObjPoint)]
-graph123 = [Ins (makeEdgeFrom 'e' 1)
-    , Ins (makeEdgeTo    'f' 1)
-    , Ins (makeEdgeFrom   'f' 2)
-    , Ins (makeEdgeTo     'g' 2)
+graph123 = [Ins (makeNodeStartingEdge 'e' 1)
+    , Ins (makeNodeEndingEdge    'f' 1)
+    , Ins (makeNodeStartingEdge   'f' 2)
+    , Ins (makeNodeEndingEdge     'g' 2)
     , Ins (makePoint 'e' 0 0)
     , Ins (makePoint 'f' 1 1)
     ]
 graphShortestPathEx :: [Action (ObjPoint, MorphPoint, ObjPoint)]
 graphShortestPathEx = 
-    [ Ins (makeEdgeTo 'a' 1)
-    , Ins (makeEdgeFrom 'b' 1)
-    , Ins (makeEdgeTo 'b' 2)
-    , Ins (makeEdgeFrom 'c' 2)
-    , Ins (makeEdgeTo 'a' 5)
-    , Ins (makeEdgeTo 'c' 5)
-    , Ins (makeTCost 1 1)
-    , Ins (makeTCost 2 2)
-    , Ins (makeTCost 5 5)
-    , Ins (makeSCost 2 5)
-    , Ins (makeSCost 5 1)
+    [ Ins (makeNodeStartingEdge 'a' 1)
+    , Ins (makeNodeEndingEdge 'b' 1)
+    , Ins (makeNodeStartingEdge 'b' 2)
+    , Ins (makeNodeEndingEdge 'c' 2)
+    , Ins (makeNodeStartingEdge 'b' 3)
+    , Ins (makeNodeEndingEdge 'c' 3)
+    , Ins (makeNodeStartingEdge 'c' 4)
+    , Ins (makeNodeEndingEdge 'a' 4)
+    , Ins (makeNodeStartingEdge 'a' 5)
+    , Ins (makeNodeEndingEdge 'c' 5)
+    , Ins (makeSCost 1 1)
+    , Ins (makeSCost 2 2)
+    , Ins (makeSCost 3 5)
+    , Ins (makeSCost 4 1)
+    , Ins (makeSCost 5 5)
     ]
 
 cat0 :: CatStore ObjPoint MorphPoint
@@ -258,6 +271,7 @@ cat0 = catStoreEmpty
 cat2 :: CatStore ObjPoint MorphPoint
 cat2 = catStoreBatch  graph123
      cat0
+cat11 = catStoreBatch graphShortestPathEx cat0
 --------------- ---------------------example
 pagePoint :: ErrIO ()
 pagePoint = do
@@ -273,19 +287,34 @@ pagePoint = do
     let nc = evalState (costOutgoingEdges (Node 'a')) cat2
     putIOwords ["the node-cost pairs at Node a", showT nc]
 
-    let answer = 27 :: Int
-    guesses <- execStateT (guessSession answer) 0
-    putIOwords ["guess", showT guesses]
+    -- let answer = 27 :: Int
+    -- guesses <- execStateT (guessSession answer) 0
+    -- putIOwords ["guess", showT guesses]
 
-guessSession :: Int -> StateT Int ErrIO ()
-guessSession answer =
-    do gs <- lift.lift $ getLine    -- get guess from user
-       let g = read gs       -- convert to number
-       modify (+1)           -- increment number of guesses
-       case compare g answer of
-              LT -> do lift.lift $ putStrLn "Too low"
-                       guessSession answer
-              GT -> do lift.lift $ putStrLn "Too high"
-                       guessSession answer
-              EQ -> lift.lift $ putStrLn "Got it!"
+    newcat2 <- execStateT (runWithState) cat2 
+    putIOwords ["newcat2", showT newcat2]
+
+f op = evalState op cat11
+
+runWithState :: StoreErrIO Store
+runWithState = do 
+
+    let nc = evalState (costOutgoingEdges (Node 'a')) cat2
+    putIOwords ["the node-cost pairs at Node a", showT nc]
+
+
+    s <- get 
+    return s
+
+-- guessSession :: Int -> StateT Int ErrIO ()
+-- guessSession answer =
+--     do gs <- lift.lift $ getLine    -- get guess from user
+--        let g = read gs       -- convert to number
+--        modify (+1)           -- increment number of guesses
+--        case compare g answer of
+--               LT -> do lift.lift $ putStrLn "Too low"
+--                        guessSession answer
+--               GT -> do lift.lift $ putStrLn "Too high"
+--                        guessSession answer
+--               EQ -> lift.lift $ putStrLn "Got it!"
  
