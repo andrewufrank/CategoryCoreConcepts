@@ -52,15 +52,15 @@ module Lib.Point
      where
 
 -- change prelude for constrainded-categories
-import Prelude ()
-import Control.Category.Constrained.Prelude
-import qualified Control.Category.Hask as Hask
--- import Control.Monad.Constrained  
--- end 
+-- import Prelude ()
+-- import Control.Category.Constrained.Prelude
+-- import qualified Control.Category.Hask as Hask
+-- -- import Control.Monad.Constrained  
+-- -- end 
 
 import UniformBase 
-import Control.Monad.State
-    ( MonadState(get), evalState, runState, State )
+import Control.Monad.State  
+    -- ( MonadState(get), evalState, runState, State, StateT, execStateT )
 
 import Vault.Triple4cat
     ( Action(..),
@@ -70,7 +70,7 @@ import Vault.Triple4cat
                 catStoreFind), 
         getSingle1, getSingle3,
         getTarget1, getTarget3)
-import Lib.Points 
+import Lib.Points ( compDist, Length, Point2(..), ValueType ) 
 
 ----------- the category
 
@@ -149,6 +149,7 @@ unCostTag x = errorT ["unCostTag -  not a Cost", showT x]
 -- code depending on MonadState
 type Store = CatStore ObjPoint MorphPoint
 type StoreStateMonad = State Store  
+type StoreErrIO = StateT Store ErrIO
 
 -- ^ a monadic wrapper for catStoreFind applied to state
 find :: (MonadState (CatStore o m2) m1, Eq o, Eq m2) =>
@@ -272,4 +273,19 @@ pagePoint = do
     let nc = evalState (costOutgoingEdges (Node 'a')) cat2
     putIOwords ["the node-cost pairs at Node a", showT nc]
 
+    let answer = 27 :: Int
+    guesses <- execStateT (guessSession answer) 0
+    putIOwords ["guess", showT guesses]
+
+guessSession :: Int -> StateT Int ErrIO ()
+guessSession answer =
+    do gs <- lift.lift $ getLine    -- get guess from user
+       let g = read gs       -- convert to number
+       modify (+1)           -- increment number of guesses
+       case compare g answer of
+              LT -> do lift.lift $ putStrLn "Too low"
+                       guessSession answer
+              GT -> do lift.lift $ putStrLn "Too high"
+                       guessSession answer
+              EQ -> lift.lift $ putStrLn "Got it!"
  
