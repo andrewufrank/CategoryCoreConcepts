@@ -27,7 +27,9 @@ the storage (with the sum types) are separate
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module GIS.Category
-
+    ( module GIS.Category
+    , module Lib.Points
+    )
      where
 
 -- change prelude for constrainded-categories
@@ -39,6 +41,9 @@ import qualified Control.Category.Hask as Hask
 -- -- end 
 
 import UniformBase
+import Lib.Points 
+-- the type (top level?)
+
 -- import Control.Monad.State
     -- ( MonadState(get), evalState, runState, State, StateT, execStateT )
 

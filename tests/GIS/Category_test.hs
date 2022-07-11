@@ -20,7 +20,7 @@
 {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 {-# OPTIONS_GHC -w #-}
 
-module Lib.Lawvere_test
+module GIS.Category_test
     where
 
 -- import Lib.Page13 

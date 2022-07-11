@@ -77,7 +77,7 @@ a2x = catStoreBatch [Del cp2] a1x
 
 
 
-pageTriple4cat :: IO ()
+pageTriple4cat :: ErrIO ()
 pageTriple4cat = do
     putIOwords ["\n [pageTriple4cat"]
     putIOwords ["cp1", showT cp1]
@@ -88,6 +88,12 @@ pageTriple4cat = do
     putIOwords ["CatStore added cp2, deleted cp1", showT v2]
     putIOwords ["CatStore added batch cp1 cp2", showT a1x]
     putIOwords ["CatStore  cp2", showT a2x]
+
+test_time1 = do
+        res <- runErr $  pageTriple4cat 
+                -- return True
+        assertEqual (Right ()) res  -- does not produce output
+
 
 test_empty = assertEqual ("CatStoreK []") (showT (v0))
 

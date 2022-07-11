@@ -13,12 +13,12 @@
 
 import           Test.Framework
 -- import  {-@ HTF_TESTS @-}         Lib.Lawvere_test
-import  {-@ HTF_TESTS @-}         Vault.NaiveTripleStore_test
+-- import  {-@ HTF_TESTS @-}         Vault.NaiveTripleStore_test
 import  {-@ HTF_TESTS @-}         Vault.Triple4cat_test
+-- import System.Exit 
 
 main :: IO ()
 main =  do
-    pageTriple4cat
     putStrLn "Lib.Testing.hs for Lawvere_test:\n"
     r <- htfMain htf_importedTests
     putStrLn ("other tests t:\n" ++ show r)
