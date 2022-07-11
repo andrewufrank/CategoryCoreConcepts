@@ -17,6 +17,7 @@ library
   exposed-modules:
       GIS.Category
       GIS.Store
+      GIS.Store_data
       Lib.DataInState
       Lib.EdgeNodeDistance
       Lib.EdgeNodeGraph

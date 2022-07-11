@@ -44,6 +44,7 @@ import Lib.Point
 import UniformBase
 import GIS.Category
 import GIS.Store
+import GIS.Store_data
 
 main :: IO ()
 main =  do  -- with tests in other modules
