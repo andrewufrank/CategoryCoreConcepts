@@ -29,7 +29,7 @@ module Vault.Triple4cat
     , getTarget3, getTarget1
     , openSingleton
     , find2fun, find2rel
-    , MorphSelFun (..), MorphSelRel (..)
+    , MorphSel (..) 
     ---- for tests
     -- , pageTriple4cat
     
@@ -92,26 +92,27 @@ getTarget1 cps = fst3 . head  $ cps
 --     return  res 
 
 -- | the different views of a triple - returns for Fun and Inv are different!
-data MorphSelFun = Fun | Inv   
+data MorphSel = Forward | Inv   
     deriving (Show, Read, Ord, Eq, Generic)
     
-data MorphSelRel =  Rel | InvRel 
-    deriving (Show, Read, Ord, Eq, Generic)
+-- data MorphSel =  Rel | InvRel 
+--     deriving (Show, Read, Ord, Eq, Generic)
     
 
 -- ^ a monadic wrapper for catStoreFind applied to state
 -- applies an unwrapper
 -- a relation dom -> codom 
 find2rel :: (MonadState (CatStore o m) m1, Eq o, Eq m) => 
-    MorphSelRel ->
+    MorphSel ->
     o -> 
     m ->
     (o -> codom)-> m1 [codom]
-find2rel Rel s p untag = do 
+find2rel Forward
+    s p untag = do 
     c <- get
     let res = catStoreFind (Just s, Just p, Nothing) c 
     return . map  (untag . trd3) $ res 
-find2rel InvRel o p untag = do 
+find2rel Inv o p untag = do 
     c <- get
     let res = catStoreFind (Nothing, Just p, Just o) c 
     return . map  (untag . fst3) $ res 
@@ -125,14 +126,14 @@ find2rel InvRel o p untag = do
 --         MorphPoint ->
 --          (CPoint o m2 -> codom)-> m1 codom
 find2fun :: (MonadState (CatStore o m) m1, Show codom, Eq o, Eq m, Eq codom) =>
-    MorphSelFun
+    MorphSel
     -> o
     -> m
     -> (o -> codom)
     -> m1 codom
-find2fun Fun s p untag =  
-    fmap openSingleton $ find2rel Rel s p untag
-find2fun Inv s o untag =  fmap openSingleton $ find2rel Rel s o untag
+find2fun Forward s p untag =  
+    fmap openSingleton $ find2rel Forward s p untag
+find2fun Inv s o untag =  fmap openSingleton $ find2rel Forward s o untag
 -- find2fun_ _ _ _= errorT ["find2fun can only be used for Fun and InvFun, for relations use find2rel"]
 
 -- --- example code 

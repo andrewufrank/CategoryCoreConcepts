@@ -39,6 +39,12 @@ pageCategory :: ErrIO ()
 pageCategory = do 
     putIOwords ["the ouputput from GIS.Category"]
 
+test_4_output = do
+        res <- runErr $  pageCategory 
+                -- return True
+        assertEqual (Left "") res  -- does  produce output
+        -- assertEqual (Right ()) res  -- does not produce output
+
 
 -- instance Arbitrary Set13 where
 --     arbitrary = arbitraryBoundedEnum

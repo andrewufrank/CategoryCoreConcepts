@@ -42,7 +42,8 @@ import Lib.EdgeNodeGraphOps
 import Lib.EdgeNodeDistance 
 import Lib.Point
 import UniformBase
-import GIS.category
+import GIS.Category
+import GIS.Store
 
 main :: IO ()
 main =  do  -- with tests in other modules
@@ -65,6 +66,7 @@ mainErrIO = do
     -- pageEdgeNodeGraph
     -- part2
     -- pageEdgeNodeDistance
-    pagePoint
+    -- pagePoint
+    pageStore
 
 

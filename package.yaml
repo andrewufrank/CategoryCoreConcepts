@@ -22,7 +22,7 @@ library:
   source-dirs: .
 
 executables:
-  lav:
+  core:
     main: CatCore.hs
     source-dirs: src
     dependencies: 

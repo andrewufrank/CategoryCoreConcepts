@@ -28,30 +28,37 @@ module GIS.Store
      where
 
 -- change prelude for constrainded-categories
-import Prelude ()
-import Control.Category.Constrained.Prelude
+-- import Prelude ()
+-- import Control.Category.Constrained.Prelude
  
-import qualified Control.Category.Hask as Hask
+-- import qualified Control.Category.Hask as Hask
 -- import Control.Monad.Constrained  
 -- -- end 
 
 import UniformBase
     ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
 import Control.Monad.State
-    ( StateT, MonadState(get), evalState, execStateT, State )  
+    -- ( StateT, MonadState(get), evalState, execStateT, State )  
     -- ( MonadState(get), evalState, runState, State, StateT, execStateT )
 
 -- ( MonadState(get), evalState, runState, State, StateT, execStateT )
 import Vault.Triple4cat
-    ( Action(Ins),
-      CatStores(catStoreBatch, catStoreEmpty),
-      CatStore,
-      find2rel,
-      find2fun,
-      MorphSelFun(Fun, Inv),
-      MorphSelRel(InvRel, Rel) )
 
 import GIS.Category
+    ( ValueType,
+      Length,
+      Point2(..),
+      compDist,
+      Cost(..),
+      Edge,
+      Node,
+      NodeType(..),
+      EdgeType(Edge),
+      T(..),
+      SC(..),
+      S(..),
+      Distance(..),
+      XY(..) )
 
 ----------- the category
 
@@ -123,46 +130,53 @@ makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))
 
 -- the functions and relatiosn to acess the store 
 
-xyFun :: () =>  Node -> StoreStateMonad  (Point2)
+xyFun :: (MonadState (Store) m) =>  Node -> m  (Point2)
 -- ^ start with node get point (x y coordinates)
 -- get the s related edge, fails on relation
-xyFun i = find2fun Fun (NodeTag i) xyMorph unPointTag
+xyFun i = find2fun Forward (NodeTag i) xyMorph unPointTag
 
-sFun :: () =>  Node -> StoreStateMonad  (Edge)
+sFun :: (MonadState (Store) m) =>  Node -> m  (Edge)
 -- ^ start with node get edge
 -- get the s related edge, fails on relation
-sFun i = find2fun Fun (NodeTag i) sMorph unEdgeTag 
+sFun i = find2fun Forward (NodeTag i) sMorph unEdgeTag 
 
-sRel :: () => Node -> StoreStateMonad [Edge]
-sRel i = find2rel Rel (NodeTag i) sMorph unEdgeTag 
+sRel :: (MonadState (Store) m) => Node -> m [Edge]
+sRel i = find2rel Forward (NodeTag i) sMorph unEdgeTag 
 
-tFun :: () =>  Node -> StoreStateMonad  (Edge)
+tFun :: (MonadState (Store) m) =>  Node -> m  (Edge)
 -- ^ start with node get edge using t
-tFun i = find2fun Fun (NodeTag i) tMorph unEdgeTag 
+tFun i = find2fun Forward (NodeTag i) tMorph unEdgeTag 
+tRel :: (MonadState (Store) m) =>  Node -> m  [Edge]
+-- ^ start with node get edge using t
+tRel i = find2rel Forward (NodeTag i) tMorph unEdgeTag 
 
-sInvFun :: () =>  Edge -> StoreStateMonad  Node
+sInv :: (MonadState (Store) m) =>  Edge -> m  Node
 -- ^ start with edge get node using s
-sInvFun i = find2fun Inv (EdgeTag i) sMorph unNodeTag 
+sInv i = find2fun Inv (EdgeTag i) sMorph unNodeTag 
 
-sInvRel :: MonadState (CatStore ObjPoint MorphPoint) m =>
+sInvRel :: MonadState (Store) m =>
                 Edge -> m [NodeType Char]
-sInvRel i = find2rel InvRel (EdgeTag i) sMorph unNodeTag
+sInvRel i = find2rel Inv (EdgeTag i) sMorph unNodeTag
 
-tInvFun :: () =>  Edge -> StoreStateMonad  Node
+tInv :: (MonadState (Store) m) =>  Edge -> m  Node
 -- ^ start with edge get node using t 
-tInvFun i = find2fun Inv (EdgeTag i) sMorph unNodeTag
+tInv i = find2fun Inv (EdgeTag i) tMorph unNodeTag
 
-sCostFun :: MonadState (CatStore ObjPoint MorphPoint) m => Edge -> m Cost
-sCostFun i = find2fun Fun (EdgeTag i) scMorph unCostTag
+tInvRel :: (MonadState (Store) m) =>  Edge -> m  [Node]
+-- ^ start with edge get node using t 
+tInvRel i = find2rel Inv (EdgeTag i) tMorph unNodeTag
+
+sCostFun :: MonadState (Store) m => Edge -> m Cost
+sCostFun i = find2fun Forward (EdgeTag i) scMorph unCostTag
 
 
-lengthEdge :: Edge -> StoreStateMonad (Length)
-lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
+lengthEdge :: (MonadState (Store) m) => Edge -> m (Length)
+lengthEdge  e =    compDist <$> ( xyFun =<< sInv e) <*> (xyFun =<< tInv e) 
 --         -- the first is a pure function, the other are all 4 monadic
-costOutgoingEdges :: Node -> StoreStateMonad [(Node, Cost)]
+costOutgoingEdges :: MonadState (Store) m => Node -> m [(Node, Cost)]
 costOutgoingEdges n = do 
         es :: [Edge] <- sRel n 
-        ns :: [Node] <- mapM tInvFun es 
+        ns :: [Node] <- mapM tInv es 
         cs :: [Cost] <- mapM sCostFun es
         return . zip ns $ cs
 
@@ -182,8 +196,8 @@ graphShortestPathEx =
     , Ins (makeNodeEndingEdge 'b' 1)
     , Ins (makeNodeStartingEdge 'b' 2)
     , Ins (makeNodeEndingEdge 'c' 2)
-    , Ins (makeNodeStartingEdge 'b' 3)
-    , Ins (makeNodeEndingEdge 'c' 3)
+    , Ins (makeNodeStartingEdge 'c' 3)
+    , Ins (makeNodeEndingEdge 'b' 3)
     , Ins (makeNodeStartingEdge 'c' 4)
     , Ins (makeNodeEndingEdge 'a' 4)
     , Ins (makeNodeStartingEdge 'a' 5)
@@ -202,9 +216,9 @@ cat2 = catStoreBatch  graph123
      cat0
 cat11 = catStoreBatch graphShortestPathEx cat0
 --------------- ---------------------example
-pagePoint :: ErrIO ()
-pagePoint = do
-    putIOwords ["\n pagePoint"]
+pageStore :: ErrIO ()
+pageStore = do
+    putIOwords ["\n ------------------- pageStore"]
     -- putIOwords ["find point from node `1", showT . xy' cat2 $ (Node 1)]
     let p1 = evalState (xyFun (Node 'e')) cat2
     putIOwords ["the point for node e", showT p1]
@@ -215,26 +229,37 @@ pagePoint = do
     -- let le = evalState (lengthEdge (Edge 1)) cat2
     -- putIOwords ["the length of the edge 1", showT le]
 
+
+    let n1 = evalState (sRel (Node 'a')) cat11 -- > [Edge 1,Edge 5]
+    putIOwords ["sRel von Node a", showT n1]
+
     putIOwords ["cat11", showT cat11]
-    newcat11 <- execStateT (runWithState) cat11
-    putIOwords ["newcat11", showT newcat11]
+    newcat11 <- runStateT (runWithState) cat11
+    -- putIOwords ["newcat11", showT newcat11]
 
     -- let nc = evalState (costOutgoingEdges (Node 'a')) cat2
     -- putIOwords ["the node-cost pairs at Node a", showT nc]
+    return ()
 
 
 f op = evalState op cat11
 
-runWithState :: StoreErrIO Store
+runWithState :: StoreErrIO ()
 runWithState = do 
     putIOwords ["runWithState"]
-    let le = evalState (lengthEdge (Edge 1)) cat11
+    -- catxx <- get 
+    -- putIOwords ["cat", showT catxx]
+    -- let n1 = evalState (sRel (Node 'a')) cat11 -- > [Edge 1,Edge 5]
+    -- putIOwords ["sRel von Node a", showT n1]
+    n1 <- sRel (Node 'a') -- > [Edge 1,Edge 5]
+    putIOwords ["sRel von Node a", showT n1]
+    le <- lengthEdge (Edge 1) 
     putIOwords ["the length of the edge 1", showT le]
 
-    let nc = evalState (costOutgoingEdges (Node 'a')) cat11
-    putIOwords ["the node-cost pairs at Node a", showT nc]
+    -- let nc = evalState (costOutgoingEdges (Node 'a')) cat11
+    -- putIOwords ["the node-cost pairs at Node a", showT nc]
 
 
-    s <- get 
-    return s
+    -- s <- get 
+    return ()
 

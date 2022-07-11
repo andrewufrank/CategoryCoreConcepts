@@ -86,8 +86,8 @@ import Vault.Triple4cat
       CatStore,
       find2rel,
       find2fun,
-      MorphSelFun(Fun, Inv),
-      MorphSelRel(InvRel, Rel) )
+      MorphSel (..)
+    )
 
 import Lib.Points ( compDist, Length, Point2(..), ValueType ) 
 
@@ -142,164 +142,164 @@ data Cost = Cost Int
         deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 
------- the object sum type  with tags 
+-- ------ the object sum type  with tags 
 
--- | the objects in the category - required for store
--- reference to types with no parameter
-data ObjPoint = NodeTag Node | EdgeTag Edge | PointTag (Point2) | ValueTag (ValueType Length)  | CostTag Cost | ZZpoint
-    deriving (Show, Read, Ord, Eq, Generic)
-instance Zeros ObjPoint where zero = ZZpoint
+-- -- | the objects in the category - required for store
+-- -- reference to types with no parameter
+-- data ObjPoint = NodeTag Node | EdgeTag Edge | PointTag (Point2) | ValueTag (ValueType Length)  | CostTag Cost | ZZpoint
+--     deriving (Show, Read, Ord, Eq, Generic)
+-- instance Zeros ObjPoint where zero = ZZpoint
 
-unEdgeTag :: ObjPoint -> Edge 
-unEdgeTag (EdgeTag t) = t 
-unEdgeTag x = errorT ["unEdgeTag - not an Edge", showT x]
+-- unEdgeTag :: ObjPoint -> Edge 
+-- unEdgeTag (EdgeTag t) = t 
+-- unEdgeTag x = errorT ["unEdgeTag - not an Edge", showT x]
 
-unNodeTag :: ObjPoint -> Node 
-unNodeTag (NodeTag t) = t 
-unNodeTag x = errorT ["unNodeTag - not a Node", showT x]
-unPointTag :: ObjPoint -> Point2
-unPointTag (PointTag t) = t 
-unPointTag x = errorT ["unNodeTag - not a Node", showT x]
-unValueTag :: ObjPoint -> ValueType Length
-unValueTag (ValueTag t) = t 
-unValueTag x = errorT ["unNodeTag - not a Node", showT x]
-unCostTag (CostTag t) = t 
-unCostTag x = errorT ["unCostTag -  not a Cost", showT x]
+-- unNodeTag :: ObjPoint -> Node 
+-- unNodeTag (NodeTag t) = t 
+-- unNodeTag x = errorT ["unNodeTag - not a Node", showT x]
+-- unPointTag :: ObjPoint -> Point2
+-- unPointTag (PointTag t) = t 
+-- unPointTag x = errorT ["unNodeTag - not a Node", showT x]
+-- unValueTag :: ObjPoint -> ValueType Length
+-- unValueTag (ValueTag t) = t 
+-- unValueTag x = errorT ["unNodeTag - not a Node", showT x]
+-- unCostTag (CostTag t) = t 
+-- unCostTag x = errorT ["unCostTag -  not a Cost", showT x]
 
--- code depending on MonadState
-type Store = CatStore ObjPoint MorphPoint
-type StoreStateMonad = State Store  
-type StoreErrIO = StateT Store ErrIO
-
-
--- the makes for all ...
-makeNodeStartingEdge :: Char -> Int -> (ObjPoint, MorphPoint, ObjPoint)
--- | node, edge: value to store for an s (from edge to node, the from node)
-makeNodeStartingEdge o1 o2 = (NodeTag (Node o1), sMorph, EdgeTag (Edge o2))
-
-makeNodeEndingEdge :: Char -> Int ->   (ObjPoint, MorphPoint, ObjPoint)
-makeNodeEndingEdge o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
+-- -- code depending on MonadState
+-- type Store = CatStore ObjPoint MorphPoint
+-- type StoreStateMonad = State Store  
+-- type StoreErrIO = StateT Store ErrIO
 
 
-makePoint :: Char ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
-makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
-makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))
--- makeTCost e c = (EdgeTag (Edge e), tcMorph, CostTag (Cost c))
+-- -- the makes for all ...
+-- makeNodeStartingEdge :: Char -> Int -> (ObjPoint, MorphPoint, ObjPoint)
+-- -- | node, edge: value to store for an s (from edge to node, the from node)
+-- makeNodeStartingEdge o1 o2 = (NodeTag (Node o1), sMorph, EdgeTag (Edge o2))
 
--- the functions and relatiosn to acess the store 
-
-xyFun :: () =>  Node -> StoreStateMonad  (Point2)
--- ^ start with node get point (x y coordinates)
--- get the s related edge, fails on relation
-xyFun i = find2fun Fun (NodeTag i) xyMorph unPointTag
-
-sFun :: () =>  Node -> StoreStateMonad  (Edge)
--- ^ start with node get edge
--- get the s related edge, fails on relation
-sFun i = find2fun Fun (NodeTag i) sMorph unEdgeTag 
-
-sRel :: () => Node -> StoreStateMonad [Edge]
-sRel i = find2rel Rel (NodeTag i) sMorph unEdgeTag 
-
-tFun :: () =>  Node -> StoreStateMonad  (Edge)
--- ^ start with node get edge using t
-tFun i = find2fun Fun (NodeTag i) tMorph unEdgeTag 
-
-sInvFun :: () =>  Edge -> StoreStateMonad  Node
--- ^ start with edge get node using s
-sInvFun i = find2fun Inv (EdgeTag i) sMorph unNodeTag 
-
-sInvRel :: MonadState (CatStore ObjPoint MorphPoint) m =>
-                Edge -> m [NodeType Char]
-sInvRel i = find2rel InvRel (EdgeTag i) sMorph unNodeTag
-
-tInvFun :: () =>  Edge -> StoreStateMonad  Node
--- ^ start with edge get node using t 
-tInvFun i = find2fun Inv (EdgeTag i) sMorph unNodeTag
-
-sCostFun :: MonadState (CatStore ObjPoint MorphPoint) m => Edge -> m Cost
-sCostFun i = find2fun Fun (EdgeTag i) scMorph unCostTag
+-- makeNodeEndingEdge :: Char -> Int ->   (ObjPoint, MorphPoint, ObjPoint)
+-- makeNodeEndingEdge o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
 
-lengthEdge :: Edge -> StoreStateMonad (Length)
-lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
---         -- the first is a pure function, the other are all 4 monadic
-costOutgoingEdges :: Node -> StoreStateMonad [(Node, Cost)]
-costOutgoingEdges n = do 
-        es :: [Edge] <- sRel n 
-        ns :: [Node] <- mapM tInvFun es 
-        cs :: [Cost] <- mapM sCostFun es
-        return . zip ns $ cs
+-- makePoint :: Char ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
+-- makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
+-- makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))
+-- -- makeTCost e c = (EdgeTag (Edge e), tcMorph, CostTag (Cost c))
 
---------------------data 
+-- -- the functions and relatiosn to acess the store 
 
-graph123 :: [Action (ObjPoint, MorphPoint, ObjPoint)]
-graph123 = [Ins (makeNodeStartingEdge 'e' 1)
-    , Ins (makeNodeEndingEdge    'f' 1)
-    , Ins (makeNodeStartingEdge   'f' 2)
-    , Ins (makeNodeEndingEdge     'g' 2)
-    , Ins (makePoint 'e' 0 0)
-    , Ins (makePoint 'f' 1 1)
-    ]
-graphShortestPathEx :: [Action (ObjPoint, MorphPoint, ObjPoint)]
-graphShortestPathEx = 
-    [ Ins (makeNodeStartingEdge 'a' 1)
-    , Ins (makeNodeEndingEdge 'b' 1)
-    , Ins (makeNodeStartingEdge 'b' 2)
-    , Ins (makeNodeEndingEdge 'c' 2)
-    , Ins (makeNodeStartingEdge 'b' 3)
-    , Ins (makeNodeEndingEdge 'c' 3)
-    , Ins (makeNodeStartingEdge 'c' 4)
-    , Ins (makeNodeEndingEdge 'a' 4)
-    , Ins (makeNodeStartingEdge 'a' 5)
-    , Ins (makeNodeEndingEdge 'c' 5)
-    , Ins (makeSCost 1 1)
-    , Ins (makeSCost 2 2)
-    , Ins (makeSCost 3 5)
-    , Ins (makeSCost 4 1)
-    , Ins (makeSCost 5 5)
-    ]
+-- xyFun :: () =>  Node -> StoreStateMonad  (Point2)
+-- -- ^ start with node get point (x y coordinates)
+-- -- get the s related edge, fails on relation
+-- xyFun i = find2fun Fun (NodeTag i) xyMorph unPointTag
 
-cat0 :: CatStore ObjPoint MorphPoint
-cat0 = catStoreEmpty
-cat2 :: CatStore ObjPoint MorphPoint
-cat2 = catStoreBatch  graph123
-     cat0
-cat11 = catStoreBatch graphShortestPathEx cat0
---------------- ---------------------example
-pagePoint :: ErrIO ()
-pagePoint = do
-    putIOwords ["\n pagePoint"]
-    -- putIOwords ["find point from node `1", showT . xy' cat2 $ (Node 1)]
-    let p1 = evalState (xyFun (Node 'e')) cat2
-    putIOwords ["the point for node e", showT p1]
-    let p1f = evalState (xyFun (Node 'f')) cat2
-    putIOwords ["the point for node f", showT p1f]
-    -- let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2
-    -- putIOwords ["the distance 1 t 2", showT d1]
-    -- let le = evalState (lengthEdge (Edge 1)) cat2
-    -- putIOwords ["the length of the edge 1", showT le]
+-- sFun :: () =>  Node -> StoreStateMonad  (Edge)
+-- -- ^ start with node get edge
+-- -- get the s related edge, fails on relation
+-- sFun i = find2fun Fun (NodeTag i) sMorph unEdgeTag 
 
-    putIOwords ["cat11", showT cat11]
-    newcat11 <- execStateT (runWithState) cat11
-    putIOwords ["newcat11", showT newcat11]
+-- sRel :: () => Node -> StoreStateMonad [Edge]
+-- sRel i = find2rel Rel (NodeTag i) sMorph unEdgeTag 
 
-    -- let nc = evalState (costOutgoingEdges (Node 'a')) cat2
-    -- putIOwords ["the node-cost pairs at Node a", showT nc]
+-- tFun :: () =>  Node -> StoreStateMonad  (Edge)
+-- -- ^ start with node get edge using t
+-- tFun i = find2fun Fun (NodeTag i) tMorph unEdgeTag 
+
+-- sInvFun :: () =>  Edge -> StoreStateMonad  Node
+-- -- ^ start with edge get node using s
+-- sInvFun i = find2fun Inv (EdgeTag i) sMorph unNodeTag 
+
+-- sInvRel :: MonadState (CatStore ObjPoint MorphPoint) m =>
+--                 Edge -> m [NodeType Char]
+-- sInvRel i = find2rel InvRel (EdgeTag i) sMorph unNodeTag
+
+-- tInvFun :: () =>  Edge -> StoreStateMonad  Node
+-- -- ^ start with edge get node using t 
+-- tInvFun i = find2fun Inv (EdgeTag i) sMorph unNodeTag
+
+-- sCostFun :: MonadState (CatStore ObjPoint MorphPoint) m => Edge -> m Cost
+-- sCostFun i = find2fun Fun (EdgeTag i) scMorph unCostTag
 
 
-f op = evalState op cat11
+-- lengthEdge :: Edge -> StoreStateMonad (Length)
+-- lengthEdge  e =   compDist <$> ( xyFun =<< sInvFun e) <*> (xyFun =<< tInvFun e) 
+-- --         -- the first is a pure function, the other are all 4 monadic
+-- costOutgoingEdges :: Node -> StoreStateMonad [(Node, Cost)]
+-- costOutgoingEdges n = do 
+--         es :: [Edge] <- sRel n 
+--         ns :: [Node] <- mapM tInvFun es 
+--         cs :: [Cost] <- mapM sCostFun es
+--         return . zip ns $ cs
 
-runWithState :: StoreErrIO Store
-runWithState = do 
-    putIOwords ["runWithState"]
-    let le = evalState (lengthEdge (Edge 1)) cat11
-    putIOwords ["the length of the edge 1", showT le]
+-- --------------------data 
 
-    let nc = evalState (costOutgoingEdges (Node 'a')) cat11
-    putIOwords ["the node-cost pairs at Node a", showT nc]
+-- graph123 :: [Action (ObjPoint, MorphPoint, ObjPoint)]
+-- graph123 = [Ins (makeNodeStartingEdge 'e' 1)
+--     , Ins (makeNodeEndingEdge    'f' 1)
+--     , Ins (makeNodeStartingEdge   'f' 2)
+--     , Ins (makeNodeEndingEdge     'g' 2)
+--     , Ins (makePoint 'e' 0 0)
+--     , Ins (makePoint 'f' 1 1)
+--     ]
+-- graphShortestPathEx :: [Action (ObjPoint, MorphPoint, ObjPoint)]
+-- graphShortestPathEx = 
+--     [ Ins (makeNodeStartingEdge 'a' 1)
+--     , Ins (makeNodeEndingEdge 'b' 1)
+--     , Ins (makeNodeStartingEdge 'b' 2)
+--     , Ins (makeNodeEndingEdge 'c' 2)
+--     , Ins (makeNodeStartingEdge 'b' 3)
+--     , Ins (makeNodeEndingEdge 'c' 3)
+--     , Ins (makeNodeStartingEdge 'c' 4)
+--     , Ins (makeNodeEndingEdge 'a' 4)
+--     , Ins (makeNodeStartingEdge 'a' 5)
+--     , Ins (makeNodeEndingEdge 'c' 5)
+--     , Ins (makeSCost 1 1)
+--     , Ins (makeSCost 2 2)
+--     , Ins (makeSCost 3 5)
+--     , Ins (makeSCost 4 1)
+--     , Ins (makeSCost 5 5)
+--     ]
+
+-- cat0 :: CatStore ObjPoint MorphPoint
+-- cat0 = catStoreEmpty
+-- cat2 :: CatStore ObjPoint MorphPoint
+-- cat2 = catStoreBatch  graph123
+--      cat0
+-- cat11 = catStoreBatch graphShortestPathEx cat0
+-- --------------- ---------------------example
+-- pagePoint :: ErrIO ()
+-- pagePoint = do
+--     putIOwords ["\n pagePoint"]
+--     -- putIOwords ["find point from node `1", showT . xy' cat2 $ (Node 1)]
+--     let p1 = evalState (xyFun (Node 'e')) cat2
+--     putIOwords ["the point for node e", showT p1]
+--     let p1f = evalState (xyFun (Node 'f')) cat2
+--     putIOwords ["the point for node f", showT p1f]
+--     -- let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2
+--     -- putIOwords ["the distance 1 t 2", showT d1]
+--     -- let le = evalState (lengthEdge (Edge 1)) cat2
+--     -- putIOwords ["the length of the edge 1", showT le]
+
+--     putIOwords ["cat11", showT cat11]
+--     newcat11 <- execStateT (runWithState) cat11
+--     putIOwords ["newcat11", showT newcat11]
+
+--     -- let nc = evalState (costOutgoingEdges (Node 'a')) cat2
+--     -- putIOwords ["the node-cost pairs at Node a", showT nc]
 
 
-    s <- get 
-    return s
+-- f op = evalState op cat11
+
+-- runWithState :: StoreErrIO Store
+-- runWithState = do 
+--     putIOwords ["runWithState"]
+--     let le = evalState (lengthEdge (Edge 1)) cat11
+--     putIOwords ["the length of the edge 1", showT le]
+
+--     let nc = evalState (costOutgoingEdges (Node 'a')) cat11
+--     putIOwords ["the node-cost pairs at Node a", showT nc]
+
+
+--     s <- get 
+--     return s
 

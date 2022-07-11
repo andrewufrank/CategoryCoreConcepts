@@ -14,8 +14,8 @@
 import           Test.Framework
 -- import  {-@ HTF_TESTS @-}         Lib.Lawvere_test
 -- import  {-@ HTF_TESTS @-}         Vault.NaiveTripleStore_test
-import  {-@ HTF_TESTS @-}         Vault.Triple4cat_test
--- import System.Exit 
+-- import  {-@ HTF_TESTS @-}         Vault.Triple4cat_test
+import  {-@ HTF_TESTS @-}         GIS.Category_test
 
 main :: IO ()
 main =  do

@@ -44,7 +44,7 @@ library
     , uniformBase
   default-language: Haskell2010
 
-executable lav
+executable core
   main-is: CatCore.hs
   other-modules:
       Paths_CatCoreConcepts
