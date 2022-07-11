@@ -70,6 +70,8 @@ graphShortestPathEx =
     , Ins (makeSCost 3 5)
     , Ins (makeSCost 4 1)
     , Ins (makeSCost 5 5)
+    , Ins (makePoint 'a' 0 0)
+    , Ins (makePoint 'b' 1 1)
     ]
 
 cat0 :: CatStore ObjPoint MorphPoint
@@ -118,8 +120,12 @@ runWithState = do
     -- putIOwords ["sRel von Node a", showT n1]
     n1 <- sRel (Node 'a') -- > [Edge 1,Edge 5]
     putIOwords ["sRel von Node a", showT n1]
-    le <- lengthEdge (Edge 1) 
-    putIOwords ["the length of the edge 1", showT le]
+    e1 <- sInv (Edge 1)  -- > (Node a)
+    putIOwords ["sInv from Edge 1", showT e1]
+    -- p1 <- xyFun (Node 'a')
+    -- putIOwords ["the xy of Edge 1", showT p1]
+    -- le <- lengthEdge (Edge 1) 
+    -- putIOwords ["the length of the edge 1", showT le]
 
     -- let nc = evalState (costOutgoingEdges (Node 'a')) cat11
     -- putIOwords ["the node-cost pairs at Node a", showT nc]

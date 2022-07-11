@@ -94,6 +94,14 @@ test_time1 = do
                 -- return True
         assertEqual (Right ()) res  -- does not produce output
 
+-- need more data , check that fun and invFun are inverse
+-- test_eval_Node_e = do 
+--     res <- evalStateT ( sRel (Node 'a')) cat11
+--     assertEqual [Edge 1, Edge 5] res 
+
+-- test_eval_edge_1s = do 
+--     res <- evalStateT ( sInv (Edge 1)) cat11 -- expect Node a
+--     assertEqual ("") (showT res) 
 
 test_empty = assertEqual ("CatStoreK []") (showT (v0))
 

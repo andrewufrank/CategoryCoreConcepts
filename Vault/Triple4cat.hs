@@ -133,7 +133,7 @@ find2fun :: (MonadState (CatStore o m) m1, Show codom, Eq o, Eq m, Eq codom) =>
     -> m1 codom
 find2fun Forward s p untag =  
     fmap openSingleton $ find2rel Forward s p untag
-find2fun Inv s o untag =  fmap openSingleton $ find2rel Forward s o untag
+find2fun Inv s o untag =  fmap openSingleton $ find2rel Inv s o untag
 -- find2fun_ _ _ _= errorT ["find2fun can only be used for Fun and InvFun, for relations use find2rel"]
 
 -- --- example code 

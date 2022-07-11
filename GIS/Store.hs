@@ -185,4 +185,5 @@ costOutgoingEdges n = do
 
 
 
+-- f1 op = evalState op cat11
 

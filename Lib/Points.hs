@@ -110,7 +110,7 @@ data ValueType c = Value c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- | Trivial function for subtracting co-ordinate pairs
 -- sub :: Num x => Point2 -> (x, x) -> (x, x)
 sub :: Point2 -> Point2 -> Point2
-sub (Point2 x1 x2) (Point2 y1 y2) = Point2 (x1 - x2) (y1 - y2)
+sub (Point2 x1 y1) (Point2 x2 y2) = Point2 (x1 - x2) (y1 - y2)
 
 -- | Compute the sum of squares or dot product of a given pair of co-ordinates
 -- dotProduct :: Num x => (x, x) -> (x, x) -> x

@@ -67,6 +67,7 @@ test-suite test1
   main-is: Testing.hs
   other-modules:
       GIS.Category_test
+      GIS.Store_test
       Lib.Lawvere_test
       Vault.NaiveTripleStore_test
       Vault.Triple4cat_test
