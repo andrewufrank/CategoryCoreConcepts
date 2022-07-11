@@ -152,15 +152,7 @@ type CPoint o m =  (o,m,o)  -- a function for a point
 -- -- type CPointGraph = CPoint Obj Morph
 
 
--- -- for test
--- os1 :: Obj
--- os1 = SS (SK 0)
--- os2 :: Obj
--- os2 = SS (SK 1)
--- cp1 :: (Obj, Morph, Obj)
--- cp1 = (os1, F, os2)
--- cp2 :: (Obj, Morph, Obj)
--- cp2 = (os2, F, SS (SK 2))
+
 
 newtype CatStore o m = CatStoreK [CPoint o m] 
                      deriving (Show, Read, Eq)
@@ -192,36 +184,6 @@ instance (Eq o, Eq m, TripleStore o m o) => CatStores o m where
     catStoreFind t = tsfind t . unCatStore
 
 
--- -- -------------for test 
 
--- v0 :: CatStore Obj Morph  
--- v0 = catStoreEmpty
--- v1 :: CatStore   Obj Morph
--- v1 = catStoreInsert cp1 v0
--- v2 :: CatStore  Obj Morph
--- v2 = catStoreInsert cp2 v1
--- v3 :: CatStore  Obj Morph
--- v3 = catStoreDel cp2 v2
-
--- a1 :: [Action (Obj, Morph, Obj)]
--- a1 = [Ins cp1, Ins cp2]
--- a1x :: CatStore Obj Morph
--- a1x = catStoreBatch a1 v0
--- a2x :: CatStore Obj Morph
--- a2x = catStoreBatch [Del cp2] a1x
-
-
-
--- pageTriple4cat :: IO ()
--- pageTriple4cat = do
---     putIOwords ["\n [pageTriple4cat"]
---     putIOwords ["cp1", showT cp1]
--- --     putIOwords ["ts one", showT x1]
-
---     putIOwords ["CatStore empty", showT v0]
---     putIOwords ["CatStore with cp1", showT v1]
---     putIOwords ["CatStore added cp2, deleted cp1", showT v2]
---     putIOwords ["CatStore added batch cp1 cp2", showT a1x]
---     putIOwords ["CatStore  cp2", showT a2x]
 
 

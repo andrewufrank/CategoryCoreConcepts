@@ -1,22 +1,11 @@
 -----------------------------------------------------------------------------
 --
--- Module      :  building points with 2 coordinate values
+-- Module      :  the store for the category in GIS.Category
 {-  
 
-two objects: Point, Coord  (Point = Coord x Coord)
-two morphism: distance :: Point -> Point -> Distance 
-
-Coord and Distance are Float (simplistic)
-
-for computation of distance use a couple of functions locally 
-
- copied all the code from the preparation modules
- because I changed the name of the Obj and Morph to ..Point 
-
- goal is to see how this can be systematically done to avoid 
- combinatorial explosion when the number of types increases
-(How to arrange for sub-x?)
-
+ construct the two sum types and the storage
+ 
+ the morphis here?
 -}
 --------------------------------------------------------------------------- 
 {-# LANGUAGE FlexibleContexts      #-}
@@ -34,41 +23,14 @@ for computation of distance use a couple of functions locally
 {-# HLINT ignore "Redundant return" #-}
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
-module Lib.Point
-    -- (ObjPoint (..)
-    -- , MorphPoint
-    -- -- , MorphPoint'(Left, Right)
-    -- -- , Left, Right
-    -- , Wobj(..), Bobj(..)
-    -- -- , either, distribute
-    -- , b', w', h, k
-    -- , T(..), S(..)
-    -- , makeEdgeSpace, makeEdgeBusiness
-    -- -- for test 
-    -- , pageST_withTriples
-    -- , pageST_withTriplesBusiness
-    -- , pageSTproductCombines
-    -- )    
+module GIS.Store
+ 
      where
 
 -- change prelude for constrainded-categories
 import Prelude ()
 import Control.Category.Constrained.Prelude
-    ( zip,
-      Eq,
-      Ord,
-      Read,
-      Show,
-      Char,
-      Float,
-      Int,
-      Category((.)),
-      ($),
-      (<$>),
-      (=<<),
-      return,
-      Applicative((<*>)),
-      mapM )
+ 
 import qualified Control.Category.Hask as Hask
 -- import Control.Monad.Constrained  
 -- -- end 
@@ -89,23 +51,10 @@ import Vault.Triple4cat
       MorphSelFun(Fun, Inv),
       MorphSelRel(InvRel, Rel) )
 
-import Lib.Points ( compDist, Length, Point2(..), ValueType ) 
+import GIS.Category
 
 ----------- the category
 
-data XY = XY 
-    deriving (Show, Read, Ord, Eq, Generic)
-data Distance = Distance 
-    deriving (Show, Read, Ord, Eq, Generic)
-
-data S = S  deriving (Show, Read, Ord, Eq, Generic)
--- | the start node of an edge
-data SC = SC  deriving (Show, Read, Ord, Eq, Generic)
--- | the cost of the edge in direction towards s (reverse)
-data T = T  deriving (Show, Read, Ord, Eq, Generic)
--- | the end node of an edge 
-data TC = TC  deriving (Show, Read, Ord, Eq, Generic)
--- | the cost of the edge in direction towards t (forward)
 
 -- | the morphism in the category, required for store
 data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Distance 
@@ -128,20 +77,6 @@ scMorph = SCosttag SC
 -- tcMorph = TCcosttag TC
 
 ------------------ the objects 
----- the xxTypes serve to allow further specifications
-data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
--- ^ the spatial states W1, W2, W3
-data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
--- ^ the spatial actions (moves) A or B
-
-type Node = NodeType Char 
-type Edge = EdgeType Int
-
--- | the cost to measure the use of a resource 
-data Cost = Cost Int 
-        deriving (Show, Read, Ord, Eq, Generic, Zeros)
-
-
 ------ the object sum type  with tags 
 
 -- | the objects in the category - required for store

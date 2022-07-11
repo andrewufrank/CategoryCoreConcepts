@@ -1,8 +1,8 @@
 name:           CatCoreConcepts
-version:        0.1
+version:        0.2
 
 ghc-options: -Wall
-synopsis: Kuhn' spatial core concept data models with categories 
+synopsis: GIS as a category 
 
 description: |
     experiment to build the core concept data models with categories 

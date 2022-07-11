@@ -18,6 +18,7 @@ import  {-@ HTF_TESTS @-}         Vault.Triple4cat_test
 
 main :: IO ()
 main =  do
+    pageTriple4cat
     putStrLn "Lib.Testing.hs for Lawvere_test:\n"
     r <- htfMain htf_importedTests
     putStrLn ("other tests t:\n" ++ show r)
