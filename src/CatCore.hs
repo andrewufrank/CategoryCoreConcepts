@@ -30,17 +30,17 @@ module Main     where      -- must have Main (main) or Main where
 -- import Lib.UsingSets
 -- import           Lib.OpenClass
 -- import Vault.Tris
-import Lib.STproduct ()
-import Vault.NaiveTripleStore
-import Vault.Triple4cat
-import Lib.STproductTriple
--- import Lib.STproductCombine
-import Lib.DataInState
-import Vault.TrisFiles 
-import Lib.EdgeNodeGraph
-import Lib.EdgeNodeGraphOps
-import Lib.EdgeNodeDistance 
-import Lib.Point
+-- import Lib.STproduct ()
+-- import Vault.NaiveTripleStore
+-- import Vault.Triple4cat
+-- import Lib.STproductTriple
+-- -- import Lib.STproductCombine
+-- import Lib.DataInState
+-- import Vault.TrisFiles 
+-- import Lib.EdgeNodeGraph
+-- import Lib.EdgeNodeGraphOps
+-- import Lib.EdgeNodeDistance 
+-- import Lib.Point
 import UniformBase
 import GIS.Category
 import GIS.Store

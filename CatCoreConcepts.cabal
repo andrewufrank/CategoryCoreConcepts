@@ -18,13 +18,7 @@ library
       GIS.Category
       GIS.Store
       GIS.Store_data
-      Lib.DataInState
-      Lib.EdgeNodeDistance
-      Lib.EdgeNodeGraph
-      Lib.EdgeNodeGraphOps
-      Lib.Point
       Lib.Rules
-      Lib.STproduct
       Lib.STproductTriple
       Vault.NaiveTripleStore
       Vault.Triple4cat
