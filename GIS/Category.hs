@@ -28,7 +28,7 @@ the storage (with the sum types) are separate
 
 module GIS.Category
     ( module GIS.Category
-    , module Lib.Points
+    -- , module Lib.Points
     )
      where
 
@@ -41,7 +41,9 @@ import qualified Control.Category.Hask as Hask
 -- -- end 
 
 import UniformBase
-import Lib.Points 
+import Vault.Triple4cat () -- for instance Zeros Float
+
+-- import Lib.Points 
 -- the type (top level?)
 
 -- import Control.Monad.State
@@ -78,6 +80,18 @@ type Edge = EdgeType Int
 -- | the cost to measure the use of a resource 
 data Cost = Cost Int 
         deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+data Point2 = Point2 Float Float  -- the data type from gloss 
+-- a point in 2d (simplistic from gloss)
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+    
+data Length = Length Float  
+-- a distance value, should be a subobj of Value 
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+-- data PointType c = PointType Point2 deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+data ValueType c = Value c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 
 -- --------------------data 

@@ -89,7 +89,7 @@ import Vault.Triple4cat
       MorphSel (..)
     )
 
-import Lib.Points ( compDist, Length, Point2(..), ValueType ) 
+-- import Lib.Points ( compDist, Length, Point2(..), ValueType ) 
 
 ----------- the category
 

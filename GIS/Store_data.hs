@@ -122,13 +122,13 @@ runWithState = do
     putIOwords ["sRel von Node a", showT n1]
     e1 <- sInv (Edge 1)  -- > (Node a)
     putIOwords ["sInv from Edge 1", showT e1]
-    -- p1 <- xyFun (Node 'a')
-    -- putIOwords ["the xy of Edge 1", showT p1]
-    -- le <- lengthEdge (Edge 1) 
-    -- putIOwords ["the length of the edge 1", showT le]
+    p1 <- xyFun (Node 'a')
+    putIOwords ["the xy of Edge 1", showT p1]
+    le <- lengthEdge (Edge 1) 
+    putIOwords ["the length of the edge 1", showT le]
 
-    -- let nc = evalState (costOutgoingEdges (Node 'a')) cat11
-    -- putIOwords ["the node-cost pairs at Node a", showT nc]
+    let nc = evalState (costOutgoingEdges (Node 'a')) cat11
+    putIOwords ["the node-cost pairs at Node a", showT nc]
 
 
     -- s <- get 

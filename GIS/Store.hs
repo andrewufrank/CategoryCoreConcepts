@@ -48,20 +48,7 @@ import Vault.Triple4cat
       MorphSel(Forward, Inv) )
 
 import GIS.Category
-    ( ValueType,
-      Length,
-      Point2(..),
-      compDist,
-      Cost(..),
-      Edge,
-      Node,
-      NodeType(..),
-      EdgeType(Edge),
-      T(..),
-      SC(..),
-      S(..),
-      Distance(..),
-      XY(..) )
+
 
 ----------- the category
 
@@ -135,12 +122,10 @@ makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))
 
 xyFun :: (MonadState (Store) m) =>  Node -> m  (Point2)
 -- ^ start with node get point (x y coordinates)
--- get the s related edge, fails on relation
 xyFun i = find2fun Forward (NodeTag i) xyMorph unPointTag
 
 sFun :: (MonadState (Store) m) =>  Node -> m  (Edge)
 -- ^ start with node get edge
--- get the s related edge, fails on relation
 sFun i = find2fun Forward (NodeTag i) sMorph unEdgeTag 
 
 sRel :: (MonadState (Store) m) => Node -> m [Edge]
@@ -183,7 +168,27 @@ costOutgoingEdges n = do
         cs :: [Cost] <- mapM sCostFun es
         return . zip ns $ cs
 
+-- | Trivial function for subtracting co-ordinate pairs
+-- sub :: Num x => Point2 -> (x, x) -> (x, x)
+sub :: Point2 -> Point2 -> Point2
+sub (Point2 x1 y1) (Point2 x2 y2) = Point2 (x1 - x2) (y1 - y2)
 
+-- | Compute the sum of squares or dot product of a given pair of co-ordinates
+-- dotProduct :: Num x => (x, x) -> (x, x) -> x
+dotProduct :: Point2 -> Point2 -> Float
+dotProduct (Point2 x1 y1) (Point2 x2 y2) = (x1 * x2) + (y1 * y2)
+
+-- -- | Conversion of pair fromIntegral
+-- fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
+-- fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
+
+-- | Compute magnitude
+-- mag :: Floating x => (x, x) -> x
+mag :: Point2 -> Float
+mag x = sqrt (dotProduct x x)
+
+compDist :: Point2 -> Point2 -> Length
+compDist p1 p2 = Length .   mag $ (sub p1 p2) --(unPoint2 p1) (unPoint2 p2))  
 
 -- f1 op = evalState op cat11
 

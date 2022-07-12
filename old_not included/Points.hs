@@ -115,7 +115,7 @@ sub (Point2 x1 y1) (Point2 x2 y2) = Point2 (x1 - x2) (y1 - y2)
 -- | Compute the sum of squares or dot product of a given pair of co-ordinates
 -- dotProduct :: Num x => (x, x) -> (x, x) -> x
 dotProduct :: Point2 -> Point2 -> Float
-dotProduct (Point2 x1 x2) (Point2 y1 y2) = (x1 * x2) + (y1 * y2)
+dotProduct (Point2 x1 y1) (Point2 x2 y2) = (x1 * x2) + (y1 * y2)
 
 -- -- | Conversion of pair fromIntegral
 -- fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
