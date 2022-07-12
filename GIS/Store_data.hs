@@ -42,6 +42,7 @@ import Vault.Triple4cat
 
 import GIS.Category
 import GIS.Store  
+import GIS.Functions
 
 --------------------data 
 

@@ -18,6 +18,8 @@ import UniformBase
 import GIS.Category
 import GIS.Store
 import GIS.Store_data
+import GIS.Functions
+
 
 main :: IO ()
 main =  do  -- with tests in other modules
