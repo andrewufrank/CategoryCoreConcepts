@@ -39,11 +39,12 @@ import Control.Monad.State
 
 import GIS.Category
 import GIS.Store
+-- import GIS.Store_data
 
-import GIS.Functions
+-- import GIS.Functions
 
 -- import qualified Data.Map.Strict as Map
-import qualified Dat-a.Set as Set
+import qualified Data.Set as Set
 import Data.Maybe ( fromMaybe )
 
 
@@ -100,13 +101,13 @@ dijkstra next target start = search mempty (Set.singleton start)
                     visitedWithNode = Set.insert vertex visited
                     withNext = foldr Set.insert withoutVertex $ next (cost , vertex)
 
-graph =
-    Map.fromList
-        [ ('a' , [(1 , 'b') , (5 , 'c')])
-        , ('b' , [(2 , 'c')])
-        , ('c' , [(1 , 'a') , (5 , 'b')])
-        ]
-
+-- graph =
+--     Map.fromList
+--         [ ('a' , [(1 , 'b') , (5 , 'c')])
+--         , ('b' , [(2 , 'c')])
+--         , ('c' , [(1 , 'a') , (5 , 'b')])
+--         ]
+-- data for this graph are in cat11
 -- Output:
 -- Just (3,'c')
 
@@ -129,23 +130,8 @@ tryItOutWithPath = dijkstra step 'c' (Path 0 ['a'] , 'a')
         step :: (Path Char , Char) -> [(Path Char , Char)]
         step (Path cost traj , node) =
             [ (Path (cost + edgeCost) (child : traj) , child)
-            | (edgeCost , child) <- fromMaybe [] $ Map.lookup node graph
+            | (Node child, Cost edgeCost) <- evalState (costOutgoingEdges (Node node)) cat11
             ]
 
 
-main1 = print $ dijkstra step 'c' (0 , 'a')
-    where
-        step :: (Int , Char) -> [(Int , Char)]
-        step (cost , node) =
-            [ (cost + edgeCost , child)
-            | (edgeCost , child) <- fromMaybe [] $ Map.lookup node graph
-            ]
--- replace Map.lookup node with costOutgoingEdges
 
-main2 :: IO ()
-main2 =  do  -- with tests in other modules
-    main1
-    print $ tryItOutWithPath
-    -- dirMain
-    -- openMain
-    return ()

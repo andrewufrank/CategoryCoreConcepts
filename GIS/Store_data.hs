@@ -43,6 +43,7 @@ import Vault.Triple4cat
 import GIS.Category
 import GIS.Store  
 import GIS.Functions
+import GIS.FunGeometry
 
 --------------------data 
 
@@ -135,3 +136,24 @@ runWithState = do
     -- s <- get 
     return ()
 
+-- to test shortest path function 
+
+main1 = print $ dijkstra step 'c' (0 , 'a')
+    where
+        step :: (Int , Char) -> [(Int , Char)]
+        step (cost , node) =
+            [ (cost + edgeCost , child)
+            | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node))cat11
+                    ]
+-- replace Map.lookup node with costOutgoingEdges
+-- evalState (costOutgoingEdges node) cat11
+-- removed fromMaybe []  (because find returns [])
+-- and flip result
+
+main2 :: IO ()
+main2 =  do  -- with tests in other modules
+    main1
+    print $ tryItOutWithPath
+    -- dirMain
+    -- openMain
+    return ()
