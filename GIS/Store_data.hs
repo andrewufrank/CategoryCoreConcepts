@@ -47,25 +47,25 @@ import GIS.Functions
 --------------------data 
 
 graph123 :: [Action (ObjPoint, MorphPoint, ObjPoint)]
-graph123 = [Ins (makeNodeStartingEdge 'e' 1)
-    , Ins (makeNodeEndingEdge    'f' 1)
-    , Ins (makeNodeStartingEdge   'f' 2)
-    , Ins (makeNodeEndingEdge     'g' 2)
+graph123 = [Ins (makeEdgeStartNode 1 'e' )
+    , Ins (makeEdgeEndNode   1 'f' )
+    , Ins (makeEdgeStartNode  2 'f' )
+    , Ins (makeEdgeEndNode   2  'g' )
     , Ins (makePoint 'e' 0 0)
     , Ins (makePoint 'f' 1 1)
     ]
 graphShortestPathEx :: [Action (ObjPoint, MorphPoint, ObjPoint)]
 graphShortestPathEx = 
-    [ Ins (makeNodeStartingEdge 'a' 1)
-    , Ins (makeNodeEndingEdge 'b' 1)
-    , Ins (makeNodeStartingEdge 'b' 2)
-    , Ins (makeNodeEndingEdge 'c' 2)
-    , Ins (makeNodeStartingEdge 'c' 3)
-    , Ins (makeNodeEndingEdge 'b' 3)
-    , Ins (makeNodeStartingEdge 'c' 4)
-    , Ins (makeNodeEndingEdge 'a' 4)
-    , Ins (makeNodeStartingEdge 'a' 5)
-    , Ins (makeNodeEndingEdge 'c' 5)
+    [ Ins (makeEdgeStartNode 1 'a' )
+    , Ins (makeEdgeEndNode 1 'b' )
+    , Ins (makeEdgeStartNode 2 'b' )
+    , Ins (makeEdgeEndNode 2 'c' )
+    , Ins (makeEdgeStartNode 3 'c' )
+    , Ins (makeEdgeEndNode 3 'b' )
+    , Ins (makeEdgeStartNode  4 'c' )
+    , Ins (makeEdgeEndNode 4 'a' )
+    , Ins (makeEdgeStartNode 5 'a' )
+    , Ins (makeEdgeEndNode 5 'c' )
     , Ins (makeSCost 1 1)
     , Ins (makeSCost 2 2)
     , Ins (makeSCost 3 5)
@@ -99,7 +99,7 @@ pageStore = do
     -- putIOwords ["the length of the edge 1", showT le]
 
 
-    let n1 = evalState (sRel (Node 'a')) cat11 -- > [Edge 1,Edge 5]
+    let n1 = evalState (sInvRel (Node 'a')) cat11 -- > [Edge 1,Edge 5]
     putIOwords ["sRel von Node a", showT n1]
 
     putIOwords ["cat11", showT cat11]
@@ -119,9 +119,9 @@ runWithState = do
     -- putIOwords ["cat", showT catxx]
     -- let n1 = evalState (sRel (Node 'a')) cat11 -- > [Edge 1,Edge 5]
     -- putIOwords ["sRel von Node a", showT n1]
-    n1 <- sRel (Node 'a') -- > [Edge 1,Edge 5]
+    n1 <- sInvRel (Node 'a') -- > [Edge 1,Edge 5]
     putIOwords ["sRel von Node a", showT n1]
-    e1 <- sInv (Edge 1)  -- > (Node a)
+    e1 <- sFun (Edge 1)  -- > (Node a)
     putIOwords ["sInv from Edge 1", showT e1]
     p1 <- xyFun (Node 'a')
     putIOwords ["the xy of Edge 1", showT p1]

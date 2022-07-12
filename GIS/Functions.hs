@@ -43,12 +43,12 @@ import GIS.Store
 
 
 lengthEdge :: (MonadState (Store) m) => Edge -> m (Length)
-lengthEdge  e =    compDist <$> ( xyFun =<< sInv e) <*> (xyFun =<< tInv e) 
+lengthEdge  e =    compDist <$> ( xyFun =<< sFun e) <*> (xyFun =<< tFun e) 
 --         -- the first is a pure function, the other are all 4 monadic
 costOutgoingEdges :: MonadState (Store) m => Node -> m [(Node, Cost)]
 costOutgoingEdges n = do 
-        es :: [Edge] <- sRel n 
-        ns :: [Node] <- mapM tInv es 
+        es :: [Edge] <- sInvRel n 
+        ns :: [Node] <- mapM tFun es 
         cs :: [Cost] <- mapM sCostFun es
         return . zip ns $ cs
 

@@ -33,6 +33,7 @@ import Control.Monad.State
 
 import GIS.Category
 import GIS.Store 
+import GIS.Functions
 import GIS.Store_data
 
 -- pageCategory :: ErrIO ()
@@ -47,14 +48,14 @@ test_4_output = do
         -- assertEqual (Right ()) res  -- does not produce output
 
 test_eval_Node_e = do 
-    res <- evalStateT ( sRel (Node 'a')) cat11
+    res <- evalStateT ( sInvRel (Node 'a')) cat11
     assertEqual [Edge 1, Edge 5] res 
 
 test_eval_edge_1s = do 
-    res <- evalStateT ( sInv (Edge 1)) cat11 -- expect Node a
+    res <- evalStateT ( sFun (Edge 1)) cat11 -- expect Node a
     assertEqual ("Node 'a'") (showT res) 
 test_eval_edge_1t = do 
-    res <- evalStateT ( tInv (Edge 1)) cat11 -- expect Node b
+    res <- evalStateT ( tFun (Edge 1)) cat11 -- expect Node b
     assertEqual ("Node 'b'") (showT res) 
 
 

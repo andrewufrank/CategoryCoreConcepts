@@ -105,12 +105,12 @@ type StoreErrIO = StateT Store ErrIO
 
 
 -- the makes for all ...
-makeNodeStartingEdge :: Char -> Int -> (ObjPoint, MorphPoint, ObjPoint)
+makeEdgeStartNode :: Int -> Char -> (ObjPoint, MorphPoint, ObjPoint)
 -- | node, edge: value to store for an s (from edge to node, the from node)
-makeNodeStartingEdge o1 o2 = (NodeTag (Node o1), sMorph, EdgeTag (Edge o2))
+makeEdgeStartNode o1 o2 = (EdgeTag (Edge o1), sMorph, NodeTag (Node o2))
 
-makeNodeEndingEdge :: Char -> Int ->   (ObjPoint, MorphPoint, ObjPoint)
-makeNodeEndingEdge o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
+makeEdgeEndNode :: Int -> Char ->   (ObjPoint, MorphPoint, ObjPoint)
+makeEdgeEndNode o1 o2 = (EdgeTag (Edge o1), tMorph, NodeTag (Node o2))
 
 
 makePoint :: Char ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
@@ -124,35 +124,35 @@ xyFun :: (MonadState (Store) m) =>  Node -> m  (Point2)
 -- ^ start with node get point (x y coordinates)
 xyFun i = find2fun Forward (NodeTag i) xyMorph unPointTag
 
-sFun :: (MonadState (Store) m) =>  Node -> m  (Edge)
+sFun :: (MonadState (Store) m) =>  Edge -> m  Node
 -- ^ start with node get edge
-sFun i = find2fun Forward (NodeTag i) sMorph unEdgeTag 
+sFun i = find2fun Forward (EdgeTag i) sMorph unNodeTag 
 
-sRel :: (MonadState (Store) m) => Node -> m [Edge]
-sRel i = find2rel Forward (NodeTag i) sMorph unEdgeTag 
+-- sRel :: (MonadState (Store) m) => Edge -> m [Edge]
+-- sRel i = find2rel Forward (EdgeTag i) sMorph unEdgeTag 
 
-tFun :: (MonadState (Store) m) =>  Node -> m  (Edge)
+tFun :: (MonadState (Store) m) =>  Edge -> m  Node
 -- ^ start with node get edge using t
-tFun i = find2fun Forward (NodeTag i) tMorph unEdgeTag 
+tFun i = find2fun Forward (EdgeTag i) tMorph unNodeTag 
 
-tRel :: (MonadState (Store) m) =>  Node -> m  [Edge]
--- ^ start with node get edge using t
-tRel i = find2rel Forward (NodeTag i) tMorph unEdgeTag 
+-- tRel :: (MonadState (Store) m) =>  Edge -> m  [Edge]
+-- -- ^ start with node get edge using t
+-- tRel i = find2rel Forward (NodeTag i) tMorph unEdgeTag 
 
-sInv :: (MonadState (Store) m) =>  Edge -> m  Node
--- ^ start with edge get node using s
-sInv i = find2fun Inv (EdgeTag i) sMorph unNodeTag 
+-- sInv :: (MonadState (Store) m) =>  Edge -> m  Edge
+-- -- ^ start with edge get node using s
+-- sInv i = find2fun Inv (EdgeTag i) sMorph unNodeTag 
 
-sInvRel :: MonadState (Store) m =>  Edge -> m [Node]
-sInvRel i = find2rel Inv (EdgeTag i) sMorph unNodeTag
+sInvRel :: MonadState (Store) m =>  Node -> m [Edge]
+sInvRel i = find2rel Inv (NodeTag i) sMorph unEdgeTag
 
-tInv :: (MonadState (Store) m) =>  Edge -> m  Node
+-- tInv :: (MonadState (Store) m) =>  Edge -> m  Edge
+-- -- ^ start with edge get node using t 
+-- tInv i = find2fun Inv (EdgeTag i) tMorph unNodeTag
+
+tInvRel :: (MonadState (Store) m) =>  Node -> m  [Edge]
 -- ^ start with edge get node using t 
-tInv i = find2fun Inv (EdgeTag i) tMorph unNodeTag
-
-tInvRel :: (MonadState (Store) m) =>  Edge -> m  [Node]
--- ^ start with edge get node using t 
-tInvRel i = find2rel Inv (EdgeTag i) tMorph unNodeTag
+tInvRel i = find2rel Inv (NodeTag i) tMorph unEdgeTag
 
 sCostFun :: MonadState (Store) m => Edge -> m Cost
 sCostFun i = find2fun Forward (EdgeTag i) scMorph unCostTag
