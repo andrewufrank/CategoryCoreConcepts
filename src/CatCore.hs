@@ -19,7 +19,7 @@ import GIS.Category
 import GIS.Store
 import GIS.Store_data
 import GIS.Functions
-
+import GIS.FunGeometry
 
 main :: IO ()
 main =  do  -- with tests in other modules
@@ -30,5 +30,6 @@ mainErrIO :: ErrIO ()
 mainErrIO = do 
 
     pageStore
+    main2
 
 
