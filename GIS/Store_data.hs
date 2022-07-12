@@ -153,7 +153,7 @@ main1 = print $ dijkstra step 'c' (0 , 'a')
 main2 :: IO ()
 main2 =  do  -- with tests in other modules
     main1
-    print $ tryItOutWithPath
+    print $  (tryItOutWithPath cat11 (Path 0 ['a'] , 'a')) 
     -- dirMain
     -- openMain
     return ()

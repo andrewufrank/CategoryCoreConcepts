@@ -123,14 +123,16 @@ instance Ord (Path a) where
 
 -- Output:
 --     Just (Path {cost = 3, trajectory = "cba"},'c')
+-- try to run in state monad
 
-tryItOutWithPath :: Maybe (Path Char, Char)
-tryItOutWithPath = dijkstra step 'c' (Path 0 ['a'] , 'a')
+-- tryItOutWithPath :: MonadState (Store) m => Path Char -> m (Maybe (Path Char, Char)) 
+tryItOutWithPath cat11 startPath =  dijkstra step 'c' startPath 
     where
         step :: (Path Char , Char) -> [(Path Char , Char)]
         step (Path cost traj , node) =
             [ (Path (cost + edgeCost) (child : traj) , child)
-            | (Node child, Cost edgeCost) <- evalState (costOutgoingEdges (Node node)) cat11
+            | (Node child, Cost edgeCost) 
+                <- evalState (costOutgoingEdges (Node node)) cat11  
             ]
 
 
