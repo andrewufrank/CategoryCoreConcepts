@@ -84,7 +84,7 @@ compDist p1 p2 = Length .   mag $ (sub p1 p2) --(unPoint2 p1) (unPoint2 p2))
 
 
 dijkstra
-    :: (Ord cost , Ord node)
+    :: (Ord cost , Ord node )
     => ((cost , node) -> [(cost , node)]) -- ^ Where we can go from a node and the cost of that
     -> node                               -- ^ Where we want to get to
     -> (cost , node)                      -- ^ The start position
@@ -123,17 +123,66 @@ instance Ord (Path a) where
 
 -- Output:
 --     Just (Path {cost = 3, trajectory = "cba"},'c')
+
+
+
 -- try to run in state monad
 
--- tryItOutWithPath :: MonadState (Store) m => Path Char -> m (Maybe (Path Char, Char)) 
-tryItOutWithPath cat11 startPath =  dijkstra step 'c' startPath 
+shortestPathCostOnly :: Store -> (Int, Char) -> Char -> Maybe (Int, Char)
+shortestPathCostOnly store startPath targetNode = 
+        dijkstra step targetNode startPath 
+
     where
-        step :: (Path Char , Char) -> [(Path Char , Char)]
+        step :: (Int , Char) -> [(Int , Char)]
+        step (cost , node) =
+            [ (cost + edgeCost , child)
+            | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node)) store
+            ]
+
+
+-- shortestPathWithPathB :: MonadState (Store) m => Path Char -> m (Maybe (Path Char, Char)) 
+-- shortestPathWithPathB cat11 startPath targetNode =  
+--     dijkstra stepB  targetNode startPath  
+    
+--     where
+        
+-- stepB :: MonadState (Store) m => (Path Char , Char) -> m [(Path Char, Char)]
+-- stepB (Path cost traj , node) =
+--             [ (Path (cost + edgeCost) (child : traj) , child)
+--             | (Node child, Cost edgeCost) 
+--                 <- evalState (costOutgoingEdges (Node node)) cat11  
+--             ]
+
+shortestPathWithPath :: Store -> (Path Char, Char) -> Char -> Maybe (Path Char, Char)
+shortestPathWithPath cat11 startPath targetNode =  
+    dijkstra step  targetNode startPath  
+    
+    where
+        step :: (Path Char , Char) -> [(Path Char, Char)]
         step (Path cost traj , node) =
             [ (Path (cost + edgeCost) (child : traj) , child)
             | (Node child, Cost edgeCost) 
                 <- evalState (costOutgoingEdges (Node node)) cat11  
             ]
 
+
+-- put in StateMonad 
+-- not worth the troubles, but could just pass the store...
+-- shortB ::  Store -> (Path Char, Char) -> Char -> Maybe (Path Char, Char)
+-- shortB store   startPath targetNode = evalState (opsB startPath targetNode) store 
+
+-- opsB startPath targetNode = do 
+--     st <- get 
+--     res <- shortestPathWithPathB st startPath targetNode 
+--     return res
+
+
+shortA ::  Store -> (Path Char, Char) -> Char -> Maybe (Path Char, Char)
+shortA store   startPath targetNode = evalState (opsa startPath targetNode) store 
+
+opsa startPath targetNode = do 
+    st <- get 
+    let res = shortestPathWithPath st startPath targetNode 
+    return res
 
 

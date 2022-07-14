@@ -153,7 +153,11 @@ main1 = print $ dijkstra step 'c' (0 , 'a')
 main2 :: IO ()
 main2 =  do  -- with tests in other modules
     main1
-    print $  (tryItOutWithPath cat11 (Path 0 ['a'] , 'a')) 
+    print $  (shortestPathCostOnly cat11 (0, 'a') 'c') 
+
+    print $  (shortestPathWithPath cat11 (Path 0 ['a'], 'a') 'c') 
     -- dirMain
     -- openMain
+    let resA = shortA cat11 (Path 0 ['a'], 'a') 'c'
+    putIOwords ["the resA", showT resA]
     return ()
