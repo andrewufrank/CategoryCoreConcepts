@@ -14,4 +14,4 @@
 :set -fno-warn-missing-methods
 :set -isrc
 @REM :load test/Testing.hs
- 
+ :module GIS.Subdivisions

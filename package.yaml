@@ -18,9 +18,9 @@ dependencies:
   - hgeometry 
   - linear
   - hgeometry-combinatorial
-  # - data-clist
+  - data-clist
   # - aeson-pretty
-  # - vector 
+  - vector 
   # -- not used
   # - array                    >= 0.5
   # - hgeometry

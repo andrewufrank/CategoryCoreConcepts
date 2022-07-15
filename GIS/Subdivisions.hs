@@ -49,9 +49,9 @@ import Data.Ext ( type (:+)(..) )
 import Data.Geometry.Point
 -- import Linear.V2 -- ( V2(..) )
 -- import GHC.Generics
--- import qualified Data.List.NonEmpty as NE
--- import Algorithms.Geometry.DelaunayTriangulation.Naive
--- import Algorithms.Geometry.DelaunayTriangulation.Types
+import qualified Data.List.NonEmpty as NE
+import Algorithms.Geometry.DelaunayTriangulation.Naive
+import Algorithms.Geometry.DelaunayTriangulation.Types
 --     -- ( Triangulation (_neighbours), toPlanarSubdivision, toPlaneGraph, vertexIds )
 -- -- import Data.PlaneGraph ( PlaneGraph )
 -- -- import Data.PlaneGraph ( PlaneGraph )
@@ -59,9 +59,9 @@ import Data.Geometry.Point
 -- import Data.PlaneGraph (boundary)
 --     -- ( PlanarSubdivision, PlaneGraph, vertices )
 --     -- ( PlanarSubdivision, PlaneGraph, edgeSegment )
--- -- import qualified Data.CircularList as CL
+import qualified Data.CircularList as CL
 -- import qualified Data.Vector.Circular as Vector
--- -- import qualified Data.Vector as V
+import qualified Data.Vector as V
 -- -- import Data.Aeson.Encode.Pretty (encodePretty)
 
 -- import qualified Data.Map.Strict as Map
@@ -82,3 +82,38 @@ twoT = [(0,0,11), (1.5, 1.5, 12), (0,2,13), (2,0,14)]
 
 -- tests points used initially
 qs = [(Point2  0 0) :+ 'a' , Point2  1.5 1.5 :+ 'b' , Point2  0 2  :+ 'c', Point2  2 0  :+ 'd']
+
+t1 :: Triangulation Char Float
+t1 = delaunayTriangulation . NE.fromList $ qs 
+-- verts1 :: Vector (CList VertexID)
+verts1 = _neighbours t1
+-- pos1 = edgesAsPoints t1 -- gives all possible pairs
+-- po11 :: [(Point 2 Float :+ Char)]
+-- pos1 ::  Vector (Point 2 Float :+ Char)
+pos1 =  _positions t1
+-- pos1l :: [a]
+-- pos1l =  fromJust . Vector.fromList .  CL.fromList $ pos1
+pos1l =  V.toList pos1
+unPoint2 (Point2 x y :+ c) = (x, y, c)
+-- unLoc (p1,p2) = (unPoint2 p1, unPoint2 p2)
+pos1m :: [(Float, Float, Char)]
+pos1m = map unPoint2  pos1l
+pos1mx = zip [1..] pos1m  
+-- ready to convert to node triples with the local index first arg
+-- then x,y, and the name given in the input for the triangulation 
+
+verts1l :: [CL.CList VertexID]
+verts1l = V.toList verts1 
+verts1ll :: [[Int]]
+-- verts1ll :: [[VertexID]]
+verts1ll = map CL.toList  verts1l   -- VertexID is Int
+ver1mx :: [(Int, [Int])]
+ver1mx = zip [1..] verts1ll
+edgesPerNode :: (a, [b]) -> [(a, b)]
+edgesPerNode (s,[]) = []
+edgesPerNode (s,t:ts) = (s,t): edgesPerNode (s,ts)
+-- this gives all the half-quad-edges, i.e. 
+-- one for (hq id, start, s), (hq id+, end, t), etc. 
+-- the faces must be reconstructed from following the halfquads 
+-- around a face 
+edgePairs = map edgesPerNode ver1mx
