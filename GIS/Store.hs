@@ -57,6 +57,7 @@ import GIS.Category
 data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Distance 
         | SCosttag SC 
         -- | TCcosttag TC -- probably never used, cost of incoming edge?
+        | Nametag
         | ZZm 
     deriving (Show, Read, Ord, Eq, Generic )
 -- instance MorphPoint Zeros where zero = ZZm
@@ -72,13 +73,16 @@ tMorph :: MorphPoint
 tMorph = Ttag T
 scMorph = SCosttag SC
 -- tcMorph = TCcosttag TC
+nameMorph = Nametag 
 
 ------------------ the objects 
 ------ the object sum type  with tags 
 
 -- | the objects in the category - required for store
 -- reference to types with no parameter
-data ObjPoint = NodeTag Node | EdgeTag Edge | PointTag (Point2) | ValueTag (ValueType Length)  | CostTag Cost | ZZpoint
+data ObjPoint = NodeTag Node | EdgeTag Edge | PointTag (Point2) | ValueTag (ValueType Length)  | CostTag Cost 
+    | HQTag HQType
+    | ZZpoint
     deriving (Show, Read, Ord, Eq, Generic)
 instance Zeros ObjPoint where zero = ZZpoint
 
@@ -105,16 +109,17 @@ type StoreErrIO = StateT Store ErrIO
 
 
 -- the makes for all ...
-makeEdgeStartNode :: Int -> Char -> (ObjPoint, MorphPoint, ObjPoint)
+makeEdgeStartNode :: Int -> NodeID -> (ObjPoint, MorphPoint, ObjPoint)
 -- | node, edge: value to store for an s (from edge to node, the from node)
 makeEdgeStartNode o1 o2 = (EdgeTag (Edge o1), sMorph, NodeTag (Node o2))
 
-makeEdgeEndNode :: Int -> Char ->   (ObjPoint, MorphPoint, ObjPoint)
+makeEdgeEndNode :: Int -> NodeID ->   (ObjPoint, MorphPoint, ObjPoint)
 makeEdgeEndNode o1 o2 = (EdgeTag (Edge o1), tMorph, NodeTag (Node o2))
 
 
-makePoint :: Char ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
-makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
+makePoint :: NodeID ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
+-- add a function name if necessary
+makePoint i x y = (NodeTag (Node i), xyMorph, PointTag (Point2 x y))
 makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))
 -- makeTCost e c = (EdgeTag (Edge e), tcMorph, CostTag (Cost c))
 

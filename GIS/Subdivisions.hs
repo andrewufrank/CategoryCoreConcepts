@@ -1,6 +1,9 @@
 -----------------------------------------------------------------------------
 --
 -- Module      :  functions to produce a triangulation and deal with faces 
+-- this is only the stuff which requires/uses hgeometry
+-- pass the resulting data to FunGeometry (to avoid clashes with symbols)
+
 -- storing in triple store, using a half-quad-edge structure (HQ)
 -- approach: use hgeometry to construct the triangulation
 --              then use the output to create the triples 
@@ -50,7 +53,7 @@ import Control.Monad.State
 
 
 -- import GIS.Category
-import GIS.Store
+-- import GIS.Store
 -- import GIS.Store_data
 -- import GIS.Functions
 -- import qualified Data.Map.Strict as Map
@@ -92,8 +95,26 @@ toPos= zip [0..] . map unPoint2 . V.toList . _positions
 -- zip with id for the hqs
 toEdge = map edgesPerNode . zip [0..]. map CL.toList . V.toList . _neighbours 
 
+unPoint2 (Point2 x y :+ c) = (x, y, c)
+
+edgesPerNode (s,[]) = []
+edgesPerNode (s,t:ts) = (s,t): edgesPerNode (s,ts)
+-- this gives all the half-quad-edges, i.e. 
+-- one for (hq id, start, s), (hq id+, end, t), etc. 
+-- the faces must be reconstructed from following the halfquads 
+-- around a face 
 -- construct the hq for the face later
 
+-- makeNode :: Int -> (Int -> (PtTuple)) ->  (ObjPoint, MorphPoint, ObjPoint)
+-- -- | the first is a offset for the node id
+-- -- | same for both nodes and edges 
+-- -- | id for edge (s t)
+-- makeNode offset (n, (x,y,i)) = 
+--     [ (NodeTag (Node (offset + n)), xyMorph, PointTag (Point2 x y))
+--     , (NodeTag (Node (offset + n))), nameMorph, NameTag (NameInt i)]
+
+-- makeEdge (offset, s, t) = [(EdgeTag (Edge (s,t)), sMorph, NodeTag (Node (offset + s)))
+--     , (EdgeTag (Edge (s,t)), sMorph, NodeTag (Node (offset + t)))]
 
 
 outputSubdivisions :: ErrIO () 
@@ -101,9 +122,9 @@ outputSubdivisions = do
     putIOwords ["the tests for subdivisions, primarily triangulation"]
 
 --------- data for test 
-type PtTuple = (Double, Double, Int)
--- toPoint2 :: [PtTuple] -> [Point 2 Double :+ Int]
-toPoint2   = map (\(x,y,i) -> (Point2 x y :+ i)) 
+type PtTuple a = (Double, Double, a)
+-- toPoint2 :: [PtTuple] -> [Point 2 Double :+ Text]
+toPoint2   = map (\(x,y,i) -> (Point2 x y :+ showT i)) 
 
 qs = [(Point2  0 0) :+ 'a' , Point2  1.5 1.5 :+ 'b' , Point2  0 2  :+ 'c', Point2  2 0  :+ 'd']
 
@@ -115,7 +136,7 @@ edge_qs = toEdge tri_qs
 -- pos_qs --[(0,(0.0,0.0,'a')),(1,(1.5,1.5,'b')),(2,(0.0,2.0,'c')),(3,(2.0,0.0,'d'))]
 -- edge_qs -- [[(0,2),(0,1),(0,3)],[(1,3),(1,0),(1,2)],[(2,1),(2,0)],[(3,0),(3,1)]]
 
-twoT :: [PtTuple]
+twoT :: [PtTuple Int]
 twoT = [(0,0,11), (1.5, 1.5, 12), (0,2,13), (2,0,14)]
 -- test points - x, y, id 
 -- pos_two -> [(1,(0.0,0.0,11)),(2,(1.5,1.5,12)),(3,(0.0,2.0,13)),(4,(2.0,0.0,14))]
@@ -143,44 +164,44 @@ edge_three = toEdge tri_three
 -- pos_three -- [(0,(0.0,0.0,21)),(1,(3.0,0.0,22)),(2,(4.0,2.0,23)),(3,(3.0,5.0,24)),(4,(0.0,3.0,25))]
 -- edge_three -- [[(0,4),(0,1)],[(1,0),(1,4),(1,2)],[(2,1),(2,4),(2,3)],[(3,2),(3,4)],[(4,2),(4,1),(4,0),(4,3)]]
 
--- rest preparation
-t1 :: Triangulation Char Float
-t1 = delaunayTriangulation . NE.fromList $ qs 
--- verts1 :: Vector (CList VertexID)
-verts1 = _neighbours t1
--- pos1 = edgesAsPoints t1 -- gives all possible pairs
--- po11 :: [(Point 2 Float :+ Char)]
--- pos1 ::  Vector (Point 2 Float :+ Char)
-pos1 =  _positions t1
--- pos1l :: [a]
--- pos1l =  fromJust . Vector.fromList .  CL.fromList $ pos1
-pos1l =  V.toList pos1
-unPoint2 (Point2 x y :+ c) = (x, y, c)
--- unLoc (p1,p2) = (unPoint2 p1, unPoint2 p2)
-pos1m :: [(Float, Float, Char)]
-pos1m = map unPoint2  pos1l
-pos1mx = zip [0..] pos1m  
--- ready to convert to node triples with the local index first arg
--- then x,y, and the name given in the input for the triangulation 
-pos_two = toPos tri_two 
-    -- zip [1..] . V.toList . _positions . delaunayTriangulation . NE.fromList . toPoint2 $ twoT
+-- -- rest preparation
+-- t1 :: Triangulation Char Float
+-- t1 = delaunayTriangulation . NE.fromList $ qs 
+-- -- verts1 :: Vector (CList VertexID)
+-- verts1 = _neighbours t1
+-- -- pos1 = edgesAsPoints t1 -- gives all possible pairs
+-- -- po11 :: [(Point 2 Float :+ Char)]
+-- -- pos1 ::  Vector (Point 2 Float :+ Char)
+-- pos1 =  _positions t1
+-- -- pos1l :: [a]
+-- -- pos1l =  fromJust . Vector.fromList .  CL.fromList $ pos1
+-- pos1l =  V.toList pos1
+-- unPoint2 (Point2 x y :+ c) = (x, y, c)
+-- -- unLoc (p1,p2) = (unPoint2 p1, unPoint2 p2)
+-- pos1m :: [(Float, Float, Char)]
+-- pos1m = map unPoint2  pos1l
+-- pos1mx = zip [0..] pos1m  
+-- -- ready to convert to node triples with the local index first arg
+-- -- then x,y, and the name given in the input for the triangulation 
+-- pos_two = toPos tri_two 
+--     -- zip [1..] . V.toList . _positions . delaunayTriangulation . NE.fromList . toPoint2 $ twoT
 
 
-verts1l :: [CL.CList VertexID]
-verts1l = V.toList verts1 
-verts1ll :: [[Int]]
--- verts1ll :: [[VertexID]]
-verts1ll = map CL.toList  verts1l   -- VertexID is Int
-ver1mx :: [(Int, [Int])]
-ver1mx = zip [0..] verts1ll
-edgesPerNode :: (a, [b]) -> [(a, b)]
-edgesPerNode (s,[]) = []
-edgesPerNode (s,t:ts) = (s,t): edgesPerNode (s,ts)
--- this gives all the half-quad-edges, i.e. 
--- one for (hq id, start, s), (hq id+, end, t), etc. 
--- the faces must be reconstructed from following the halfquads 
--- around a face 
-edgePairs = map edgesPerNode ver1mx
+-- verts1l :: [CL.CList VertexID]
+-- verts1l = V.toList verts1 
+-- verts1ll :: [[Int]]
+-- -- verts1ll :: [[VertexID]]
+-- verts1ll = map CL.toList  verts1l   -- VertexID is Int
+-- ver1mx :: [(Int, [Int])]
+-- ver1mx = zip [0..] verts1ll
+-- edgesPerNode :: (a, [b]) -> [(a, b)]
+-- edgesPerNode (s,[]) = []
+-- edgesPerNode (s,t:ts) = (s,t): edgesPerNode (s,ts)
+-- -- this gives all the half-quad-edges, i.e. 
+-- -- one for (hq id, start, s), (hq id+, end, t), etc. 
+-- -- the faces must be reconstructed from following the halfquads 
+-- -- around a face 
+-- edgePairs = map edgesPerNode ver1mx
 
 
-edge_two = toEdge tri_two 
+-- edge_two = toEdge tri_two 

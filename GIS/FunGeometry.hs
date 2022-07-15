@@ -32,7 +32,7 @@ module GIS.FunGeometry
 -- -- end 
 
 import UniformBase
-    ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
+    -- ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
 import Control.Monad.State
 
 
@@ -46,6 +46,7 @@ import GIS.Store
 -- import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import Data.Maybe ( fromMaybe )
+import GIS.Subdivisions
 
 
 lengthEdge :: (MonadState (Store) m) => Edge -> m (Length)
@@ -111,56 +112,56 @@ dijkstra next target start = search mempty (Set.singleton start)
 -- Output:
 -- Just (3,'c')
 
-data Path a = Path {cost :: Int , trajectory :: [a]}
+data PathChar a = PathChar {cost :: Int , trajectory :: [a]}
     deriving (Show)
 
-instance Eq (Path a) where
+instance Eq (PathChar a) where
     a == b = cost a == cost b
 
-instance Ord (Path a) where
+instance Ord (PathChar a) where
     compare a b = compare (cost a) (cost b)
 
 
 -- Output:
---     Just (Path {cost = 3, trajectory = "cba"},'c')
+--     Just (PathChar {cost = 3, trajectory = "cba"},'c')
 
 
 
 -- try to run in state monad
 
-shortestPathCostOnly :: Store -> (Int, Char) -> Char -> Maybe (Int, Char)
+shortestPathCostOnly :: Store -> (Int, NodeID) -> NodeID -> Maybe (Int, NodeID)
 shortestPathCostOnly store startPath targetNode = 
         dijkstra step targetNode startPath 
 
     where
-        step :: (Int , Char) -> [(Int , Char)]
+        step :: (Int , NodeID) -> [(Int , NodeID)]
         step (cost , node) =
             [ (cost + edgeCost , child)
             | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node)) store
             ]
 
 
--- shortestPathWithPathB :: MonadState (Store) m => Path Char -> m (Maybe (Path Char, Char)) 
+-- shortestPathWithPathB :: MonadState (Store) m => PathChar NodeID -> m (Maybe (PathChar NodeID, NodeID)) 
 -- shortestPathWithPathB cat11 startPath targetNode =  
 --     dijkstra stepB  targetNode startPath  
     
 --     where
         
--- stepB :: MonadState (Store) m => (Path Char , Char) -> m [(Path Char, Char)]
--- stepB (Path cost traj , node) =
---             [ (Path (cost + edgeCost) (child : traj) , child)
+-- stepB :: MonadState (Store) m => (PathChar NodeID , NodeID) -> m [(PathChar NodeID, NodeID)]
+-- stepB (PathChar cost traj , node) =
+--             [ (PathChar (cost + edgeCost) (child : traj) , child)
 --             | (Node child, Cost edgeCost) 
 --                 <- evalState (costOutgoingEdges (Node node)) cat11  
 --             ]
 
-shortestPathWithPath :: Store -> (Path Char, Char) -> Char -> Maybe (Path Char, Char)
+shortestPathWithPath :: Store -> (PathChar NodeID, NodeID) -> NodeID -> Maybe (PathChar NodeID, NodeID)
 shortestPathWithPath cat11 startPath targetNode =  
     dijkstra step  targetNode startPath  
     
     where
-        step :: (Path Char , Char) -> [(Path Char, Char)]
-        step (Path cost traj , node) =
-            [ (Path (cost + edgeCost) (child : traj) , child)
+        step :: (PathChar NodeID , NodeID) -> [(PathChar NodeID, NodeID)]
+        step (PathChar cost traj , node) =
+            [ (PathChar (cost + edgeCost) (child : traj) , child)
             | (Node child, Cost edgeCost) 
                 <- evalState (costOutgoingEdges (Node node)) cat11  
             ]
@@ -168,7 +169,7 @@ shortestPathWithPath cat11 startPath targetNode =
 
 -- put in StateMonad 
 -- not worth the troubles, but could just pass the store...
--- shortB ::  Store -> (Path Char, Char) -> Char -> Maybe (Path Char, Char)
+-- shortB ::  Store -> (PathChar NodeID, NodeID) -> NodeID -> Maybe (PathChar NodeID, NodeID)
 -- shortB store   startPath targetNode = evalState (opsB startPath targetNode) store 
 
 -- opsB startPath targetNode = do 
@@ -177,7 +178,7 @@ shortestPathWithPath cat11 startPath targetNode =
 --     return res
 
 
-shortA ::  Store -> (Path Char, Char) -> Char -> Maybe (Path Char, Char)
+shortA ::  Store -> (PathChar NodeID, NodeID) -> NodeID -> Maybe (PathChar NodeID, NodeID)
 shortA store   startPath targetNode = evalState (opsa startPath targetNode) store 
 
 opsa startPath targetNode = do 
@@ -185,4 +186,20 @@ opsa startPath targetNode = do
     let res = shortestPathWithPath st startPath targetNode 
     return res
 
+-- -- may move again
+-- makeNode :: (Show a) => Int -> (Int -> (PtTuple a)) ->  (ObjPoint, MorphPoint, ObjPoint)
+-- -- | the first is a offset for the node id
+-- -- | same for both nodes and edges 
+-- -- | id for edge (s t)
+-- makeNode offset (n, (x,y,i)) = 
+--     [ (NodeTag (Node (offset + n)), xyMorph, PointTag (Point2 x y))
+--     , (NodeTag (Node (offset + n))), nameMorph, 
+--             Nametag (Name . showT $ i)]
 
+-- makeHQ (offset, s, t) = [(HQTag hqid, sMorph, NodeTag (Node (offset + s)))
+--     , (HQTag hqid, sMorph, NodeTag (Node (offset + t)))]
+--     where 
+--         hqid = HQ (offset + s)  (offset + t)
+
+-- -- showT :: NodeID -> NodeID 
+-- -- showT x = ShowT x

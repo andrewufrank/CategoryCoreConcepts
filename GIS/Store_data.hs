@@ -48,32 +48,32 @@ import GIS.FunGeometry
 --------------------data 
 
 graph123 :: [Action (ObjPoint, MorphPoint, ObjPoint)]
-graph123 = [Ins (makeEdgeStartNode 1 'e' )
-    , Ins (makeEdgeEndNode   1 'f' )
-    , Ins (makeEdgeStartNode  2 'f' )
-    , Ins (makeEdgeEndNode   2  'g' )
-    , Ins (makePoint 'e' 0 0)
-    , Ins (makePoint 'f' 1 1)
+graph123 = [Ins (makeEdgeStartNode 1 "e" )
+    , Ins (makeEdgeEndNode   1 "f" )
+    , Ins (makeEdgeStartNode  2 "f" )
+    , Ins (makeEdgeEndNode   2  "g" )
+    , Ins (makePoint "e" 0 0)
+    , Ins (makePoint "f" 1 1)
     ]
 graphShortestPathEx :: [Action (ObjPoint, MorphPoint, ObjPoint)]
 graphShortestPathEx = 
-    [ Ins (makeEdgeStartNode 1 'a' )
-    , Ins (makeEdgeEndNode 1 'b' )
-    , Ins (makeEdgeStartNode 2 'b' )
-    , Ins (makeEdgeEndNode 2 'c' )
-    , Ins (makeEdgeStartNode 3 'c' )
-    , Ins (makeEdgeEndNode 3 'b' )
-    , Ins (makeEdgeStartNode  4 'c' )
-    , Ins (makeEdgeEndNode 4 'a' )
-    , Ins (makeEdgeStartNode 5 'a' )
-    , Ins (makeEdgeEndNode 5 'c' )
+    [ Ins (makeEdgeStartNode 1 "a" )
+    , Ins (makeEdgeEndNode 1 "b" )
+    , Ins (makeEdgeStartNode 2 "b" )
+    , Ins (makeEdgeEndNode 2 "c" )
+    , Ins (makeEdgeStartNode 3 "c" )
+    , Ins (makeEdgeEndNode 3 "b" )
+    , Ins (makeEdgeStartNode  4 "c" )
+    , Ins (makeEdgeEndNode 4 "a" )
+    , Ins (makeEdgeStartNode 5 "a" )
+    , Ins (makeEdgeEndNode 5 "c" )
     , Ins (makeSCost 1 1)
     , Ins (makeSCost 2 2)
     , Ins (makeSCost 3 5)
     , Ins (makeSCost 4 1)
     , Ins (makeSCost 5 5)
-    , Ins (makePoint 'a' 0 0)
-    , Ins (makePoint 'b' 1 1)
+    , Ins (makePoint "a" 0 0)
+    , Ins (makePoint "b" 1 1)
     ]
 
 cat0 :: CatStore ObjPoint MorphPoint
@@ -90,9 +90,9 @@ pageStore :: ErrIO ()
 pageStore = do
     putIOwords ["\n ------------------- pageStore"]
     -- putIOwords ["find point from node `1", showT . xy' cat2 $ (Node 1)]
-    let p1 = evalState (xyFun (Node 'e')) cat2
+    let p1 = evalState (xyFun (Node "e")) cat2
     putIOwords ["the point for node e", showT p1]
-    let p1f = evalState (xyFun (Node 'f')) cat2
+    let p1f = evalState (xyFun (Node "f")) cat2
     putIOwords ["the point for node f", showT p1f]
     -- let d1 = evalState ( distanceFun2 (Node 1) (Node 2)) cat2
     -- putIOwords ["the distance 1 t 2", showT d1]
@@ -100,14 +100,14 @@ pageStore = do
     -- putIOwords ["the length of the edge 1", showT le]
 
 
-    let n1 = evalState (sInvRel (Node 'a')) cat11 -- > [Edge 1,Edge 5]
+    let n1 = evalState (sInvRel (Node "a")) cat11 -- > [Edge 1,Edge 5]
     putIOwords ["sRel von Node a", showT n1]
 
     putIOwords ["cat11", showT cat11]
     newcat11 <- runStateT (runWithState) cat11
     -- putIOwords ["newcat11", showT newcat11]
 
-    -- let nc = evalState (costOutgoingEdges (Node 'a')) cat2
+    -- let nc = evalState (costOutgoingEdges (Node "a")) cat2
     -- putIOwords ["the node-cost pairs at Node a", showT nc]
     return ()
 
@@ -118,18 +118,18 @@ runWithState = do
     putIOwords ["runWithState"]
     -- catxx <- get 
     -- putIOwords ["cat", showT catxx]
-    -- let n1 = evalState (sRel (Node 'a')) cat11 -- > [Edge 1,Edge 5]
+    -- let n1 = evalState (sRel (Node "a")) cat11 -- > [Edge 1,Edge 5]
     -- putIOwords ["sRel von Node a", showT n1]
-    n1 <- sInvRel (Node 'a') -- > [Edge 1,Edge 5]
+    n1 <- sInvRel (Node "a") -- > [Edge 1,Edge 5]
     putIOwords ["sRel von Node a", showT n1]
     e1 <- sFun (Edge 1)  -- > (Node a)
     putIOwords ["sInv from Edge 1", showT e1]
-    p1 <- xyFun (Node 'a')
+    p1 <- xyFun (Node "a")
     putIOwords ["the xy of Edge 1", showT p1]
     le <- lengthEdge (Edge 1) 
     putIOwords ["the length of the edge 1", showT le]
 
-    let nc = evalState (costOutgoingEdges (Node 'a')) cat11
+    let nc = evalState (costOutgoingEdges (Node "a")) cat11
     putIOwords ["the node-cost pairs at Node a", showT nc]
 
 
@@ -138,9 +138,9 @@ runWithState = do
 
 -- to test shortest path function 
 
-main1 = print $ dijkstra step 'c' (0 , 'a')
+main1 = print $ dijkstra step "c" (0 , "a")
     where
-        step :: (Int , Char) -> [(Int , Char)]
+        step :: (Int , NodeID) -> [(Int , NodeID)]
         step (cost , node) =
             [ (cost + edgeCost , child)
             | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node))cat11
@@ -153,11 +153,11 @@ main1 = print $ dijkstra step 'c' (0 , 'a')
 main2 :: IO ()
 main2 =  do  -- with tests in other modules
     main1
-    print $  (shortestPathCostOnly cat11 (0, 'a') 'c') 
+    print $  (shortestPathCostOnly cat11 (0, "a") "c") 
 
-    print $  (shortestPathWithPath cat11 (Path 0 ['a'], 'a') 'c') 
+    print $  (shortestPathWithPath cat11 (PathChar 0 ["a"], "a") "c") 
     -- dirMain
     -- openMain
-    let resA = shortA cat11 (Path 0 ['a'], 'a') 'c'
+    let resA = shortA cat11 (PathChar 0 ["a"], "a") "c"
     putIOwords ["the resA", showT resA]
     return ()

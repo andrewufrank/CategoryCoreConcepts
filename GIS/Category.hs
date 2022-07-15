@@ -67,15 +67,25 @@ data T = T  deriving (Show, Read, Ord, Eq, Generic)
 data TC = TC  deriving (Show, Read, Ord, Eq, Generic)
 -- | the cost of the edge in direction towards t (forward)
 
+data Name  = Name Text 
+-- names for the points in geometry
+-- perhaps better all text?
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
 ------------------ the objects 
 ---- the xxTypes serve to allow further specifications
 data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial states W1, W2, W3
 data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial actions (moves) A or B
+data HQType = HQ Int Int
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
-type Node = NodeType Char 
+type NodeID = Text
+
+type Node = NodeType NodeID 
 type Edge = EdgeType Int
+-- type HQ =   HQType (Int, Int)
 
 -- | the cost to measure the use of a resource 
 data Cost = Cost Int 
