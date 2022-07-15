@@ -14,7 +14,20 @@ dependencies:
   - constrained-categories
   - containers
   - mtl   # for vault
- 
+#  for hgeometry
+  - hgeometry 
+  - linear
+  - hgeometry-combinatorial
+  # - data-clist
+  # - aeson-pretty
+  # - vector 
+  # -- not used
+  # - array                    >= 0.5
+  # - hgeometry
+  # # - hgeometry-ipe            >= 0.14
+  # - lens
+  # - semigroups
+  - vector-circular
 
 library:
   source-dirs: .

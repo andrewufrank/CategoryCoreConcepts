@@ -20,6 +20,7 @@ library
       GIS.FunGeometry
       GIS.Store
       GIS.Store_data
+      GIS.Subdivisions
       Lib.Rules
       Lib.STproductTriple
       Vault.NaiveTripleStore
@@ -36,8 +37,12 @@ library
     , constrained-categories
     , containers
     , extra
+    , hgeometry
+    , hgeometry-combinatorial
+    , linear
     , mtl
     , uniformBase
+    , vector-circular
   default-language: Haskell2010
 
 executable core
@@ -53,8 +58,12 @@ executable core
     , constrained-categories
     , containers
     , extra
+    , hgeometry
+    , hgeometry-combinatorial
+    , linear
     , mtl
     , uniformBase
+    , vector-circular
   default-language: Haskell2010
 
 test-suite test1
@@ -78,7 +87,11 @@ test-suite test1
     , constrained-categories
     , containers
     , extra
+    , hgeometry
+    , hgeometry-combinatorial
+    , linear
     , mtl
     , test-invariant
     , uniformBase
+    , vector-circular
   default-language: Haskell2010

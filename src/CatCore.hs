@@ -19,13 +19,16 @@ import GIS.Category
 import GIS.Store
 import GIS.Store_data
 import GIS.Functions
--- import GIS.FunGeometry
+import GIS.FunGeometry
+import GIS.Subdivisions
+
 
 main :: IO ()
 main =  do  -- with tests in other modules
 
     -- startProg "CatCore" mainErrIO 
-    main2
+    -- main2
+    return ()
 
 mainErrIO :: ErrIO ()
 mainErrIO = do 
