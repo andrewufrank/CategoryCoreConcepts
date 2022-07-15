@@ -63,8 +63,8 @@ pageCCdata= do
 
 data Point1d a = Point1d {x1 :: a}
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
-type Point  = Point1d Float 
-mkpt :: Float -> Point 
+type Point  = Point1d Double 
+mkpt :: Double -> Point 
 mkpt = Point1d  -- x1 . mkpt = id 
 
 instance Functor Point1d  where
@@ -84,11 +84,11 @@ instance (Num f) => Num (Point1d f) where
 
 --------------------- field
 
-data Field = Field {base :: Float, tang :: Float}
+data Field = Field {base :: Double, tang :: Double}
         deriving (Eq, Ord, Read, Show, Generic, Zeros)
 -- ^ Field with trival interpolation f x = base + x * tang
 
-fieldval :: Field -> Point1d Float -> ValueSum
+fieldval :: Field -> Point1d Double -> ValueSum
 fieldval (Field b t) p = mkfloat $ b + x1 p * t 
 
 field1 = Field 0 0.1
@@ -102,7 +102,7 @@ class Objects o v where
     getval :: o -> v
 class Objects0 o where 
     getid :: o -> Int 
-instance Objects Obj Float where 
+instance Objects Obj Double where 
     mkobj i v =  Obj (ID i) (mkfloat v)
 instance Objects Obj Text where 
     mkobj i v =  Obj (ID i) (mktext v)
@@ -110,13 +110,13 @@ data Obj = Obj {oid::IDint, oval :: ValueSum}
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 o1, o2 :: Obj
-o1 = mkobj 1 (3.2 :: Float)  
+o1 = mkobj 1 (3.2 :: Double)  
 o2 = mkobj 2 ("object 2" :: Text) -- how to assure unique id?
 
 
 -------------------------old
 
--- data WorldPoint = WP {space::Point1dFloat, val:: Float}
+-- data WorldPoint = WP {space::Point1dDouble, val:: Double}
 --     deriving (Eq, Ord, Read, Show)
 -- mkwp x11 v11 = WP (mkp x11) v11
 -- wp1 = WP p1 t0 th0
@@ -132,10 +132,10 @@ o2 = mkobj 2 ("object 2" :: Text) -- how to assure unique id?
 -- type Objects = Map.Map ObjProperty Value
 
 
--- data Field = Field Float Float
+-- data Field = Field Double Double
 -- field1 = Field 1.0 0.1 
 
--- field :: Field -> Point -> Float
+-- field :: Field -> Point -> Double
 -- field (Field a b) p = a + x p * b 
 
 -- -- necessary because set has context Ord 
@@ -147,7 +147,7 @@ o2 = mkobj 2 ("object 2" :: Text) -- how to assure unique id?
 -- instance Functor Set Ranking Ranking where
 --   fmap = constrainedFmap Set.map
 
--- pointData :: Map.Map Text Float
+-- pointData :: Map.Map Text Double
 -- pointData = Map.fromList $ zip ["a1", "a2"] [1.0, 2.0]
 -- -- is automatically surjective (if no other def of domain)
 
@@ -162,16 +162,16 @@ o2 = mkobj 2 ("object 2" :: Text) -- how to assure unique id?
 -- ps :: [Text]
 -- ps = Set.toList points
 
--- coords :: Set Float
+-- coords :: Set Double
 -- coords = Set.fromList $ Map.elems pointData
 
--- cs :: [Float]
+-- cs :: [Double]
 -- cs = Set.toList coords
 
--- p2c :: Map.Map Text Float -> Text -> Float
+-- p2c :: Map.Map Text Double -> Text -> Double
 -- p2c pdb p = pdb Map.! p
 
--- c2p :: Map.Map Text Float -> Float -> Text
+-- c2p :: Map.Map Text Double -> Double -> Text
 -- c2p pdb c = (Map.fromList . map swap . Map.toList $ pdb) Map.! c
 
 

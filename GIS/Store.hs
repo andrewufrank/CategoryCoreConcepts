@@ -81,6 +81,7 @@ nameMorph = Nametag
 -- | the objects in the category - required for store
 -- reference to types with no parameter
 data ObjPoint = NodeTag Node | EdgeTag Edge | PointTag (Point2) | ValueTag (ValueType Length)  | CostTag Cost 
+    | NameTag Name
     | HQTag HQType
     | ZZpoint
     deriving (Show, Read, Ord, Eq, Generic)
@@ -117,7 +118,7 @@ makeEdgeEndNode :: Int -> NodeID ->   (ObjPoint, MorphPoint, ObjPoint)
 makeEdgeEndNode o1 o2 = (EdgeTag (Edge o1), tMorph, NodeTag (Node o2))
 
 
-makePoint :: NodeID ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
+makePoint :: NodeID ->  Double -> Double ->   (ObjPoint, MorphPoint, ObjPoint)
 -- add a function name if necessary
 makePoint i x y = (NodeTag (Node i), xyMorph, PointTag (Point2 x y))
 makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))

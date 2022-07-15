@@ -27,7 +27,7 @@ module Vault.Vault
 --     -- , ObjID, makeObjID
 -- --    , module Vault.NaiveTriplestore
 -- --    ,  Rel4Test  (..)
---     -- , B4val (..), proxyB4val, proxyFloat
+--     -- , B4val (..), proxyB4val, proxyDouble
 --     , Val
 --     , Vals (..)
 --     -- ,  unVal4, isVal4

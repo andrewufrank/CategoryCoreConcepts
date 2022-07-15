@@ -6,7 +6,7 @@
 two objects: Point, Coord  (Point = Coord x Coord)
 two morphism: distance :: Point -> Point -> Distance 
 
-Coord and Distance are Float (simplistic)
+Coord and Distance are Double (simplistic)
 
 for computation of distance use a couple of functions locally 
 
@@ -60,7 +60,7 @@ import Control.Category.Constrained.Prelude
       Read,
       Show,
       Char,
-      Float,
+      Double,
       Int,
       Category((.)),
       ($),
@@ -181,7 +181,7 @@ data Cost = Cost Int
 -- makeNodeEndingEdge o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
 
--- makePoint :: Char ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
+-- makePoint :: Char ->  Double -> Double ->   (ObjPoint, MorphPoint, ObjPoint)
 -- makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
 -- makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))
 -- -- makeTCost e c = (EdgeTag (Edge e), tcMorph, CostTag (Cost c))

@@ -53,7 +53,7 @@ instance Vals Int where
     
 -- instance Vals Bool where val = ValB;     unval _ (ValB t) = t
 -- instance Vals B4val where val = Val4;     unval _ (Val4 t) = t
--- instance Vals Float where val = ValF;     unval _ (ValF t) = t
+-- instance Vals Double where val = ValF;     unval _ (ValF t) = t
 
 -- KEY - is used in Naive Triple Store !!! 
 
@@ -70,8 +70,8 @@ newtype Value a = Value  a
 unvalue :: Value a -> a
 unvalue (Value a) = a 
 
-type ValueF = Value Float
-mkfloat :: Float -> ValueSum
+type ValueF = Value Double
+mkfloat :: Double -> ValueSum
 mkfloat = VF . Value 
 type ValueT = Value Text
 mktext :: Text -> ValueSum
@@ -94,7 +94,7 @@ data ValueSum = VF ValueF |  VT ValueT | VI ValueI | VO ValueO | VZ
     deriving (Show, Read, Ord, Eq, Generic)
 instance Zeros ValueSum where zero = VZ
 
-instance Zeros Float where zero = zero
+instance Zeros Double where zero = zero
 -- add to uniformBase
 
 newtype ID a = ID a

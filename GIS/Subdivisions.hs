@@ -47,7 +47,7 @@ module GIS.Subdivisions
 -- -- end 
 
 import UniformBase
-    ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
+    -- ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
 import Control.Monad.State
 
 
@@ -93,7 +93,8 @@ toPos= zip [0..] . map unPoint2 . V.toList . _positions
 -- the minimal triples for the half quad edges hq
 -- gives pairs of start - end node, which produce two hq 
 -- zip with id for the hqs
-toEdge = map edgesPerNode . zip [0..]. map CL.toList . V.toList . _neighbours 
+toEdge :: Triangulation p r -> [(Int, Int)]
+toEdge = concat . map edgesPerNode . zip [0..]. map CL.toList . V.toList . _neighbours 
 
 unPoint2 (Point2 x y :+ c) = (x, y, c)
 
@@ -142,8 +143,10 @@ twoT = [(0,0,11), (1.5, 1.5, 12), (0,2,13), (2,0,14)]
 -- pos_two -> [(1,(0.0,0.0,11)),(2,(1.5,1.5,12)),(3,(0.0,2.0,13)),(4,(2.0,0.0,14))]
 -- edge_two -> [[(1,2),(1,1),(1,3)],[(2,3),(2,0),(2,2)],[(3,1),(3,0)],[(4,0),(4,1)]]
 tri_two = toTri twoT --  delaunayTriangulation . NE.fromList . toPoint2 $ twoT
-pos_tri = toPos tri_two
-edge_tri = toEdge tri_two
+pos_two :: [(Int, (Double, Double, Text))]
+pos_two = toPos tri_two
+edge_two :: [(Int, Int)]
+edge_two = toEdge tri_two
 
 -- tri_two
 -- Triangulation {_vertexIds = fromList [(Point2 0.0 0.0,0),(Point2 0.0 2.0,2),(Point2 1.5 1.5,1),(Point2 2.0 0.0,3)], 
@@ -165,20 +168,20 @@ edge_three = toEdge tri_three
 -- edge_three -- [[(0,4),(0,1)],[(1,0),(1,4),(1,2)],[(2,1),(2,4),(2,3)],[(3,2),(3,4)],[(4,2),(4,1),(4,0),(4,3)]]
 
 -- -- rest preparation
--- t1 :: Triangulation Char Float
+-- t1 :: Triangulation Char Double
 -- t1 = delaunayTriangulation . NE.fromList $ qs 
 -- -- verts1 :: Vector (CList VertexID)
 -- verts1 = _neighbours t1
 -- -- pos1 = edgesAsPoints t1 -- gives all possible pairs
--- -- po11 :: [(Point 2 Float :+ Char)]
--- -- pos1 ::  Vector (Point 2 Float :+ Char)
+-- -- po11 :: [(Point 2 Double :+ Char)]
+-- -- pos1 ::  Vector (Point 2 Double :+ Char)
 -- pos1 =  _positions t1
 -- -- pos1l :: [a]
 -- -- pos1l =  fromJust . Vector.fromList .  CL.fromList $ pos1
 -- pos1l =  V.toList pos1
 -- unPoint2 (Point2 x y :+ c) = (x, y, c)
 -- -- unLoc (p1,p2) = (unPoint2 p1, unPoint2 p2)
--- pos1m :: [(Float, Float, Char)]
+-- pos1m :: [(Double, Double, Char)]
 -- pos1m = map unPoint2  pos1l
 -- pos1mx = zip [0..] pos1m  
 -- -- ready to convert to node triples with the local index first arg

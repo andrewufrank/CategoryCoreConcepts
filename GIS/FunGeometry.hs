@@ -66,7 +66,7 @@ sub (Point2 x1 y1) (Point2 x2 y2) = Point2 (x1 - x2) (y1 - y2)
 
 -- | Compute the sum of squares or dot product of a given pair of co-ordinates
 -- dotProduct :: Num x => (x, x) -> (x, x) -> x
-dotProduct :: Point2 -> Point2 -> Float
+dotProduct :: Point2 -> Point2 -> Double
 dotProduct (Point2 x1 y1) (Point2 x2 y2) = (x1 * x2) + (y1 * y2)
 
 -- -- | Conversion of pair fromIntegral
@@ -74,8 +74,8 @@ dotProduct (Point2 x1 y1) (Point2 x2 y2) = (x1 * x2) + (y1 * y2)
 -- fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
 
 -- | Compute magnitude
--- mag :: Floating x => (x, x) -> x
-mag :: Point2 -> Float
+-- mag :: Doubleing x => (x, x) -> x
+mag :: Point2 -> Double
 mag x = sqrt (dotProduct x x)
 
 compDist :: Point2 -> Point2 -> Length
@@ -186,20 +186,21 @@ opsa startPath targetNode = do
     let res = shortestPathWithPath st startPath targetNode 
     return res
 
--- -- may move again
--- makeNode :: (Show a) => Int -> (Int -> (PtTuple a)) ->  (ObjPoint, MorphPoint, ObjPoint)
--- -- | the first is a offset for the node id
--- -- | same for both nodes and edges 
--- -- | id for edge (s t)
--- makeNode offset (n, (x,y,i)) = 
---     [ (NodeTag (Node (offset + n)), xyMorph, PointTag (Point2 x y))
---     , (NodeTag (Node (offset + n))), nameMorph, 
---             Nametag (Name . showT $ i)]
+-- may move again
+makeNode :: (Show a) => Int -> (Int, (PtTuple a)) ->  [(ObjPoint, MorphPoint, ObjPoint)]
+-- | the first is a offset for the node id
+-- | same for both nodes and edges 
+-- | id for edge (s t)
+makeNode offset (n, (x,y,i)) = 
+    [ (NodeTag node, xyMorph, PointTag (Point2 x y))
+    , (NodeTag node, nameMorph, NameTag (Name . showT $ i))]
+    where node = Node (showT (offset + n))
 
--- makeHQ (offset, s, t) = [(HQTag hqid, sMorph, NodeTag (Node (offset + s)))
---     , (HQTag hqid, sMorph, NodeTag (Node (offset + t)))]
---     where 
---         hqid = HQ (offset + s)  (offset + t)
+makeHQ :: Int -> (Int, Int) -> [(ObjPoint, MorphPoint, ObjPoint)]
+makeHQ offset (s, t) = [(HQTag hqid, sMorph, NodeTag (Node (showT $ offset + s)))
+    , (HQTag hqid, sMorph, NodeTag (Node (showT $ offset + t)))]
+    where 
+        hqid = HQ (offset + s)  (offset + t)
 
--- -- showT :: NodeID -> NodeID 
--- -- showT x = ShowT x
+-- showT :: NodeID -> NodeID 
+-- showT x = ShowT x

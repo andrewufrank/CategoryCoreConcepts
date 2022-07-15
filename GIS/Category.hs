@@ -41,7 +41,7 @@ import qualified Control.Category.Hask as Hask
 -- -- end 
 
 import UniformBase
-import Vault.Triple4cat () -- for instance Zeros Float
+import Vault.Triple4cat () -- for instance Zeros Double
 
 -- import Lib.Points 
 -- the type (top level?)
@@ -91,11 +91,11 @@ type Edge = EdgeType Int
 data Cost = Cost Int 
         deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
-data Point2 = Point2 Float Float  -- the data type from gloss 
+data Point2 = Point2 Double Double  -- the data type from gloss 
 -- a point in 2d (simplistic from gloss)
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
     
-data Length = Length Float  
+data Length = Length Double  
 -- a distance value, should be a subobj of Value 
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 

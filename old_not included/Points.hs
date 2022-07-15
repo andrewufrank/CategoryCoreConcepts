@@ -69,11 +69,11 @@ import Vault.Triple4cat
 
 
 
-data Point2 = Point2 Float Float  -- the data type from gloss 
+data Point2 = Point2 Double Double  -- the data type from gloss 
 -- a point in 2d (simplistic from gloss)
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
     
-data Length = Length Float  
+data Length = Length Double  
 -- a distance value, should be a subobj of Value 
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
@@ -82,7 +82,7 @@ data Length = Length Float
 data ValueType c = Value c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 
--- makePoint :: Int ->  Float -> Float ->   (ObjPoint, MorphPoint, ObjPoint)
+-- makePoint :: Int ->  Double -> Double ->   (ObjPoint, MorphPoint, ObjPoint)
 -- makePoint n x y = (NodeTag (Node n), xyMorph, PointTag (Point2 x y))
 -- makeEdgeTo o1 o2 = (NodeTag (Node o1), tMorph, EdgeTag (Edge o2))
 
@@ -114,7 +114,7 @@ sub (Point2 x1 y1) (Point2 x2 y2) = Point2 (x1 - x2) (y1 - y2)
 
 -- | Compute the sum of squares or dot product of a given pair of co-ordinates
 -- dotProduct :: Num x => (x, x) -> (x, x) -> x
-dotProduct :: Point2 -> Point2 -> Float
+dotProduct :: Point2 -> Point2 -> Double
 dotProduct (Point2 x1 y1) (Point2 x2 y2) = (x1 * x2) + (y1 * y2)
 
 -- -- | Conversion of pair fromIntegral
@@ -122,8 +122,8 @@ dotProduct (Point2 x1 y1) (Point2 x2 y2) = (x1 * x2) + (y1 * y2)
 -- fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
 
 -- | Compute magnitude
--- mag :: Floating x => (x, x) -> x
-mag :: Point2 -> Float
+-- mag :: Doubleing x => (x, x) -> x
+mag :: Point2 -> Double
 mag x = sqrt (dotProduct x x)
 
 compDist :: Point2 -> Point2 -> Length
@@ -166,7 +166,7 @@ fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
 fromIntegralP (x1, y1) = (fromIntegral x1, fromIntegral y1)
 
 -- | Compute magnitude
-mag :: Floating x => (x, x) -> x
+mag :: Doubleing x => (x, x) -> x
 mag x = sqrt (dotProduct x x)
 
 -}
