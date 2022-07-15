@@ -45,6 +45,7 @@ library
     , uniformBase
     , vector
     , vector-circular
+    , CatCoreConcepts
   default-language: Haskell2010
 
 executable core

@@ -35,6 +35,7 @@ import GIS.Category
 import GIS.Store 
 import GIS.Functions
 import GIS.Store_data
+import GIS.FunGeometry
 
 -- pageCategory :: ErrIO ()
 -- pageCategory = do 

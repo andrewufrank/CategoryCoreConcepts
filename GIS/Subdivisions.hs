@@ -16,8 +16,15 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE DeriveAnyClass     #-}
+-- for hgeometry
+-- {-# LANGUAGE DeriveDataTypeable #-}
+-- {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE DataKinds #-}
+-- {-# LANGUAGE TypeOperators #-}
+
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant return" #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module GIS.Subdivisions
@@ -42,6 +49,9 @@ import Control.Monad.State
 import GIS.Store
 -- import GIS.Store_data
 -- import GIS.Functions
+-- import qualified Data.Map.Strict as Map
+import qualified Data.Set as Set
+import Data.Maybe ( fromMaybe )
 
 -- imports for hgeometry 
 import Data.Ext ( type (:+)(..) )
@@ -64,9 +74,7 @@ import qualified Data.CircularList as CL
 import qualified Data.Vector as V
 -- -- import Data.Aeson.Encode.Pretty (encodePretty)
 
--- import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
-import Data.Maybe ( fromMaybe )
+
 
 
 
@@ -76,10 +84,20 @@ outputSubdivisions = do
     putIOwords ["the tests for subdivisions, primarily triangulation"]
 
 --------- data for test 
+type PtTuple = (Double, Double, Int)
+-- toPoint2 :: [PtTuple] -> [Point 2 Double :+ Int]
+toPoint2   = map (\(x,y,i) -> (Point2 x y :+ i)) 
 
+twoT :: [PtTuple]
 twoT = [(0,0,11), (1.5, 1.5, 12), (0,2,13), (2,0,14)]
 -- test points - x, y, id 
 
+tri_two = toTri twoT --  delaunayTriangulation . NE.fromList . toPoint2 $ twoT
+
+toTri = delaunayTriangulation . NE.fromList . toPoint2
+
+qtwo = toPoint2 twoT
+threeT = [(0,0,21), (3,0,22), (4,2,23), (3,5,24),(0,3,25)]
 -- tests points used initially
 qs = [(Point2  0 0) :+ 'a' , Point2  1.5 1.5 :+ 'b' , Point2  0 2  :+ 'c', Point2  2 0  :+ 'd']
 
@@ -101,6 +119,10 @@ pos1m = map unPoint2  pos1l
 pos1mx = zip [1..] pos1m  
 -- ready to convert to node triples with the local index first arg
 -- then x,y, and the name given in the input for the triangulation 
+pos_two = toPos tri_two 
+    -- zip [1..] . V.toList . _positions . delaunayTriangulation . NE.fromList . toPoint2 $ twoT
+
+toPos= zip [1..] . map unPoint2 . V.toList . _positions
 
 verts1l :: [CL.CList VertexID]
 verts1l = V.toList verts1 
@@ -117,3 +139,6 @@ edgesPerNode (s,t:ts) = (s,t): edgesPerNode (s,ts)
 -- the faces must be reconstructed from following the halfquads 
 -- around a face 
 edgePairs = map edgesPerNode ver1mx
+
+toEdge = map edgesPerNode . zip [1..]. map CL.toList . V.toList . _neighbours 
+edge_two = toEdge tri_two 

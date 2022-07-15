@@ -13,5 +13,5 @@
 :set -fno-warn-duplicate-exports
 :set -fno-warn-missing-methods
 :set -isrc
-@REM :load test/Testing.hs
- :module GIS.Subdivisions
+:load 
+:module GIS.Subdivisions
