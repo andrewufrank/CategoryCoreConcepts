@@ -49,30 +49,30 @@ test_4_output = do
         -- assertEqual (Right ()) res  -- does not produce output
 
 test_eval_Node_e = do 
-    res <- evalStateT ( sInvRel (Node 'a')) cat11
+    res <- evalStateT ( sInvRel (Node "a")) cat11
     assertEqual [Edge 1, Edge 5] res 
 
 test_eval_edge_1s = do 
     res <- evalStateT ( sFun (Edge 1)) cat11 -- expect Node a
-    assertEqual ("Node 'a'") (showT res) 
+    assertEqual ("Node \"a\"") (showT res) 
 test_eval_edge_1t = do 
     res <- evalStateT ( tFun (Edge 1)) cat11 -- expect Node b
-    assertEqual ("Node 'b'") (showT res) 
+    assertEqual ("Node \"b\"") (showT res) 
 
 
 test_eval_node_a_xy = do 
-    res <- evalStateT ( xyFun (Node 'a')) cat11
+    res <- evalStateT ( xyFun (Node "a")) cat11
     assertEqual  ("Point2 0.0 0.0") (showT res) 
 test_eval_node_b_xy = do 
-    res <- evalStateT ( xyFun (Node 'b')) cat11
+    res <- evalStateT ( xyFun (Node "b")) cat11
     assertEqual  ("Point2 1.0 1.0") (showT res) 
 
 test_sub = assertEqual (Point2 (- 1.0) (- 1.0)) (sub (Point2 0 0) (Point2 1 1))
-test_compDist = assertEqual (Length 1.4142135) (compDist (Point2 0 0) (Point2 1 1))
-test_dotProd = assertEqual (1.4142135) ( mag   (Point2 1 1))
+test_compDist = assertEqual (Length 1.4142135623730951) (compDist (Point2 0 0) (Point2 1 1))
+test_dotProd = assertEqual (1.4142135623730951) ( mag   (Point2 1 1))
 test_lengthEdge_1 = do 
     res <- evalStateT (lengthEdge (Edge 1)) cat11
-    assertEqual (Length 1.4142135) (res)
+    assertEqual (Length 1.4142135623730951) (res)
 
 
 -- instance Arbitrary Set13 where
