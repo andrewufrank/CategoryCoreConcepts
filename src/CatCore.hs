@@ -28,6 +28,8 @@ main =  do  -- with tests in other modules
 
     -- startProg "CatCore" mainErrIO 
     -- main2
+    res <- runErr $ mainErrIO
+    putIOwords ["\n--------------error in mainErrIO", showT res]
     return ()
 
 mainErrIO :: ErrIO ()
