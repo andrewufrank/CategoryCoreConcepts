@@ -34,7 +34,7 @@
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
-module GIS.Subdivisions
+module GIS.Triangulation
  
      where
 
@@ -118,8 +118,8 @@ edgesPerNode (s,t:ts) = (s,t): edgesPerNode (s,ts)
 --     , (EdgeTag (Edge (s,t)), sMorph, NodeTag (Node (offset + t)))]
 
 
-outputSubdivisions :: ErrIO () 
-outputSubdivisions = do 
+outputTriangulation :: ErrIO () 
+outputTriangulation = do 
     putIOwords ["the tests for subdivisions, primarily triangulation"]
 
 --------- data for test 

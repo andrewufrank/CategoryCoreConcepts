@@ -46,7 +46,7 @@ import GIS.Store
 -- import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import Data.Maybe ( fromMaybe )
-import GIS.Subdivisions
+import GIS.Triangulation
 
 
 lengthEdge :: (MonadState (Store) m) => Edge -> m (Length)

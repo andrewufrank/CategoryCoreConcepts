@@ -44,7 +44,7 @@ import GIS.Category
 import GIS.Store  
 import GIS.Functions
 import GIS.FunGeometry
-import GIS.Subdivisions
+import GIS.Triangulation
 
 --------------------data 
 

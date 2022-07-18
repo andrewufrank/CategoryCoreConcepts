@@ -22,7 +22,7 @@ library
       GIS.Functions
       GIS.FunGeometry
       GIS.Store
-      GIS.Subdivisions
+      GIS.Triangulation
       Lib.Rules
       Lib.STproductTriple
       Vault.NaiveTripleStore

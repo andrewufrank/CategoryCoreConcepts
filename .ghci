@@ -14,4 +14,4 @@
 :set -fno-warn-missing-methods
 :set -isrc
 :load 
-:module GIS.Subdivisions
+:module GIS.Triangulation
