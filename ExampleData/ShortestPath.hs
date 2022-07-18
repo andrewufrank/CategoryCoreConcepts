@@ -34,7 +34,7 @@ module ExampleData.ShortestPath
 -- -- end 
 
 import UniformBase
-    ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
+--     ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
 import Control.Monad.State
 
 import Vault.Triple4cat
@@ -42,9 +42,9 @@ import Vault.Triple4cat
 
 import GIS.Category
 import GIS.Store  
-import GIS.Functions
+-- import GIS.Functions
 import GIS.FunGeometry
-import GIS.Triangulation
+-- import GIS.Triangulation
 
 --------------------data 
 

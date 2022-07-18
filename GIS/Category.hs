@@ -74,27 +74,32 @@ data Name  = Name Text
 
 ------------------ the objects 
 ---- the xxTypes serve to allow further specifications
+
 data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial states W1, W2, W3
 data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial actions (moves) A or B
+
 data HQType = HQ Int Int
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
-
+-- the id for the half-quad edge, derived by the two node ids from hgeometry  
 type NodeID = Text
 
 type Node = NodeType NodeID 
 type Edge = EdgeType Int
--- type HQ =   HQType (Int, Int)
 
 -- | the cost to measure the use of a resource 
 data Cost = Cost Int 
         deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
 data Point2 = Point2 Double Double  -- the data type from gloss 
+-- to replace the name by Point2d 
 -- a point in 2d (simplistic from gloss)
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
-    
+data Point2d = Point2d Double Double 
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+-- | to replace Point2, the data type to represent all 2 coordinate pairs 
+
 data Length = Length Double  
 -- a distance value, should be a subobj of Value 
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
