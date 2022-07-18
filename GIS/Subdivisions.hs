@@ -94,7 +94,7 @@ toPos= zip [0..] . map unPoint2 . V.toList . _positions
 -- gives pairs of start - end node, which produce two hq 
 -- zip with id for the hqs
 toEdge :: Triangulation p r -> [(Int, Int)]
-toEdge = concat . map edgesPerNode . zip [0..]. map CL.toList . V.toList . _neighbours 
+toEdge = concatMap edgesPerNode . zip [0..]. map CL.toList . V.toList . _neighbours 
 
 unPoint2 (Point2 x y :+ c) = (x, y, c)
 

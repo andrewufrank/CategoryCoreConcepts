@@ -15,11 +15,13 @@ build-type:     Simple
 
 library
   exposed-modules:
+      ExampleData.ShortestPath
+      ExampleData.Store_data
+      ExampleData.Triangulation
       GIS.Category
       GIS.Functions
       GIS.FunGeometry
       GIS.Store
-      GIS.Store_data
       GIS.Subdivisions
       Lib.Rules
       Lib.STproductTriple

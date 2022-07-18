@@ -94,13 +94,13 @@ dijkstra next target start = search mempty (Set.singleton start)
     where
         search visited toBeVisited = case Set.minView toBeVisited of
             Nothing -> Nothing
-            Just ((cost , vertex) , withoutVertex)
-                | vertex == target            -> Just (cost , vertex)
+            Just ((cost1 , vertex) , withoutVertex)
+                | vertex == target            -> Just (cost1 , vertex)
                 | vertex `Set.member` visited -> search visited withoutVertex
                 | otherwise                   -> search visitedWithNode withNext
                 where
                     visitedWithNode = Set.insert vertex visited
-                    withNext = foldr Set.insert withoutVertex $ next (cost , vertex)
+                    withNext = foldr Set.insert withoutVertex $ next (cost1 , vertex)
 
 -- graph =
 --     Map.fromList
@@ -135,9 +135,9 @@ shortestPathCostOnly store startPath targetNode =
 
     where
         step :: (Int , NodeID) -> [(Int , NodeID)]
-        step (cost , node) =
-            [ (cost + edgeCost , child)
-            | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node)) store
+        step (cost1 , node1) =
+            [ (cost1 + edgeCost , child)
+            | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node1)) store
             ]
 
 
@@ -160,10 +160,10 @@ shortestPathWithPath cat11 startPath targetNode =
     
     where
         step :: (PathChar NodeID , NodeID) -> [(PathChar NodeID, NodeID)]
-        step (PathChar cost traj , node) =
-            [ (PathChar (cost + edgeCost) (child : traj) , child)
+        step (PathChar cost1 traj , node1) =
+            [ (PathChar (cost1 + edgeCost) (child : traj) , child)
             | (Node child, Cost edgeCost) 
-                <- evalState (costOutgoingEdges (Node node)) cat11  
+                <- evalState (costOutgoingEdges (Node node1)) cat11  
             ]
 
 

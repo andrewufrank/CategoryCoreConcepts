@@ -30,11 +30,12 @@ import           Test.Framework
 import           Test.Invariant           as Rule  
 import Test.QuickCheck --  (arbitraryBoundedEnum)
 import Control.Monad.State
+import ExampleData.ShortestPath
 
 import GIS.Category
 import GIS.Store 
 import GIS.Functions
-import GIS.Store_data
+-- import Data.Store_data
 import GIS.FunGeometry
 
 -- pageCategory :: ErrIO ()

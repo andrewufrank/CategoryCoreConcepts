@@ -21,7 +21,7 @@
 {-# HLINT ignore "Redundant return" #-}
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
-module GIS.Store_data
+module ExampleData.Store_data
  
      where
 
@@ -45,6 +45,7 @@ import GIS.Store
 import GIS.Functions
 import GIS.FunGeometry
 import GIS.Subdivisions
+
 --------------------data 
 
 graph123 :: [Action (ObjPoint, MorphPoint, ObjPoint)]
@@ -141,9 +142,9 @@ runWithState = do
 main1 = print $ dijkstra step "c" (0 , "a")
     where
         step :: (Int , NodeID) -> [(Int , NodeID)]
-        step (cost , node) =
-            [ (cost + edgeCost , child)
-            | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node))cat11
+        step (cost1 , node1) =
+            [ (cost1 + edgeCost , child)
+            | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node1))cat11
                     ]
 -- replace Map.lookup node with costOutgoingEdges
 -- evalState (costOutgoingEdges node) cat11
@@ -175,8 +176,17 @@ main3 =  do  -- with tests in other modules
     putIOwords ["the edgeTriple", showT edgeTriple_two]
     return ()
 
+wrapIns' a =   Ins  a
+
+catTwo0 = catStoreEmpty
+catTwo1 = catStoreBatch (map wrapIns' . concat $ posTriple_two) catTwo0
+catTwo2 = catStoreBatch (map wrapIns' . concat $ edgeTriple_two) catTwo1
+
+
 {- 
 loading the data from triangulation two
+code tri_two, pos_two, edge_two 
+then posTriple_two, edgeTriple_two
 the node data [(0,(0.0,0.0,"11")),(1,(1.5,1.5,"12")),(2,(0.0,2.0,"13")),(3,(2.0,0.0,"14"))]
 the edge data [(0,2),(0,1),(0,3),(1,3),(1,0),(1,2),(2,1),(2,0),(3,0),(3,1)]
 the nodeTriple [[(NodeTag (Node "200"),XYtag XY,PointTag (Point2 0.0 0.0)),(NodeTag (Node "200"),Nametag,NameTag (Name "\"11\""))],[(NodeTag (Node "201"),XYtag XY,PointTag (Point2 1.5 1.5)),(NodeTag (Node "201"),Nametag,NameTag (Name "\"12\""))],[(NodeTag (Node "202"),XYtag XY,PointTag (Point2 0.0 2.0)),(NodeTag (Node "202"),Nametag,NameTag (Name "\"13\""))],[(NodeTag (Node "203"),XYtag XY,PointTag (Point2 2.0 0.0)),(NodeTag (Node "203"),Nametag,NameTag (Name "\"14\""))]]
