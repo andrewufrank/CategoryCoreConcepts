@@ -20,7 +20,7 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Vault.Value
+module Storable.Value
      where -- normal prelude
 -- import Prelude ()
 -- import Control.Category.Constrained.Prelude

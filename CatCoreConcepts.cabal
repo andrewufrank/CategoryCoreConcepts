@@ -25,10 +25,10 @@ library
       GIS.Triangulation
       Lib.Rules
       Lib.STproductTriple
+      Storable.Value
       Vault.NaiveTripleStore
       Vault.Triple4cat
       Vault.TrisFiles
-      Vault.Value
   other-modules:
       Paths_CatCoreConcepts
   hs-source-dirs:

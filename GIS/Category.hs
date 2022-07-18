@@ -72,7 +72,7 @@ data Name  = Name Text
 -- perhaps better all text?
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
------------------- the objects 
+------------------ the storable objects 
 ---- the xxTypes serve to allow further specifications
 
 data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
@@ -80,9 +80,9 @@ data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- ^ the spatial actions (moves) A or B
 
-data HQType = HQ Int Int
+data HQType = HQ Int -- Int
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
--- the id for the half-quad edge, derived by the two node ids from hgeometry  
+-- the id for the half-quad edge, derived by the two node ids from hgeometry, but just a simple int as id
 type NodeID = Text
 
 type Node = NodeType NodeID 

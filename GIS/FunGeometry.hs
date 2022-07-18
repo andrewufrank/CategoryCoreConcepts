@@ -200,7 +200,7 @@ makeHQ :: Int -> (Int, Int) -> [(ObjPoint, MorphPoint, ObjPoint)]
 makeHQ offset (s, t) = [(HQTag hqid, sMorph, NodeTag (Node (showT $ offset + s)))
     , (HQTag hqid, sMorph, NodeTag (Node (showT $ offset + t)))]
     where 
-        hqid = HQ (offset + s)  (offset + t)
+        hqid = HQ $ 100 * (offset + s)  + (offset + t)
 
 -- showT :: NodeID -> NodeID 
 -- showT x = ShowT x

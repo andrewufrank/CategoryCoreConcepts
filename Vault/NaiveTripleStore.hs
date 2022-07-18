@@ -36,7 +36,7 @@ import UniformBase
 -- import Uniform.Error
 -- import Data.List.Extra
 
-import Vault.Value
+import Storable.Value
 -- import Test.Framework.TestManager (testSuiteAsTest)
 
 
