@@ -23,6 +23,7 @@ library
       Lib.Rules
       Lib.STproductTriple
       Storable.Sobj
+      Storable.Srel
       Storable.Store
       Storable.Value
       Vault.NaiveTripleStore
