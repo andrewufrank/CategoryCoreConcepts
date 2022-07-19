@@ -16,22 +16,22 @@ module Main     where      -- must have Main (main) or Main where
 
 import UniformBase
 import GIS.Category
-import GIS.Store
+import Storable.Store
 import GIS.Functions
 import GIS.FunGeometry
 import GIS.Triangulation
 -- import Data.Store_data
 
 
-import ExampleData.ShortestPath
-import ExampleData.Triangulation
+-- import ExampleData.ShortestPath
+-- import ExampleData.Triangulation
 
 main :: IO ()
 main =  do  -- with tests in other modules
 
     -- startProg "CatCore" mainErrIO 
     -- main2
-    main3
+    -- main3
     res <- runErr $ mainErrIO
     putIOwords ["\n--------------error in mainErrIO", showT res]
     return ()

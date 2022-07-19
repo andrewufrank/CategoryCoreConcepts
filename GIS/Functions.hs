@@ -36,8 +36,8 @@ import Control.Monad.State
 
 
 
-import GIS.Category
-import GIS.Store
+-- import GIS.Category
+-- import Storable.Store
 
 
 

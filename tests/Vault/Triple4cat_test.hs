@@ -27,7 +27,7 @@ module Vault.Triple4cat_test
 import UniformBase
 -- import Vault.NaiveTripleStore
 -- import Vault.Object 
-import Vault.Value
+import Storable.Value
 import Vault.Triple4cat
 
 -- import  qualified         Algebra.Laws             as Law

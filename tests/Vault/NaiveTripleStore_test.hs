@@ -27,7 +27,7 @@ module Vault.NaiveTripleStore_test
 import UniformBase
 import Vault.NaiveTripleStore
 -- import Vault.Object 
-import Vault.Value
+import Storable.Value
 
 -- import  qualified         Algebra.Laws             as Law
 import           Test.Framework

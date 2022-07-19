@@ -4,8 +4,11 @@
 {-  
 
  construct the two sum types and the storage
+
+ the s-obj are in the subj (o) and value (v) values in the triples 
  
- the morphis here?
+ the s-morphism are the relations in the triple store 
+ (the p = predicate) 
 -}
 --------------------------------------------------------------------------- 
 {-# LANGUAGE FlexibleContexts      #-}
@@ -23,7 +26,7 @@
 {-# HLINT ignore "Redundant return" #-}
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
-module GIS.Store
+module Storable.Store
  
      where
 
@@ -47,8 +50,8 @@ import Vault.Triple4cat
       find2fun,
       MorphSel(Forward, Inv) )
 
-import GIS.Category
-
+-- import GIS.Category
+import Storable.Sobj  -- the storable objects 
 
 ----------- the category
 

@@ -15,16 +15,15 @@ build-type:     Simple
 
 library
   exposed-modules:
-      ExampleData.ShortestPath
-      ExampleData.Store_data
       ExampleData.Triangulation
       GIS.Category
       GIS.Functions
       GIS.FunGeometry
-      GIS.Store
       GIS.Triangulation
       Lib.Rules
       Lib.STproductTriple
+      Storable.Sobj
+      Storable.Store
       Storable.Value
       Vault.NaiveTripleStore
       Vault.Triple4cat
@@ -77,7 +76,6 @@ test-suite test1
   main-is: Testing.hs
   other-modules:
       GIS.Category_test
-      GIS.Store_test
       Lib.Lawvere_test
       Vault.NaiveTripleStore_test
       Vault.Triple4cat_test

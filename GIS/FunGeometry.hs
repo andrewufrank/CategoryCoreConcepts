@@ -37,8 +37,8 @@ import Control.Monad.State
 
 
 
-import GIS.Category
-import GIS.Store
+import Storable.Sobj
+import Storable.Store
 -- import GIS.Store_data
 
 -- import GIS.Functions

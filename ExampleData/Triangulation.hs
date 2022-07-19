@@ -37,7 +37,8 @@ import Vault.Triple4cat
  
 
 -- import GIS.Category
-import GIS.Store  
+import Storable.Sobj  
+import Storable.Store
 -- import GIS.Functions
 import GIS.FunGeometry
 import GIS.Triangulation
@@ -49,7 +50,7 @@ import GIS.Triangulation
 offset_two :: Int
 offset_two = 200 :: Int
 
-posTriple_two :: [[(GIS.Store.ObjPoint, GIS.Store.MorphPoint, GIS.Store.ObjPoint)]]
+posTriple_two :: [[(ObjPoint, MorphPoint, ObjPoint)]]
 posTriple_two = map (makeNode offset_two) pos_two
 edgeTriple_two :: [[(ObjPoint, MorphPoint, ObjPoint)]]
 edgeTriple_two = map (makeHQ offset_two)    $ edge_two

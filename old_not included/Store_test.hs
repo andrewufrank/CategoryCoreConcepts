@@ -33,7 +33,7 @@ import Control.Monad.State
 import ExampleData.ShortestPath
 
 import GIS.Category
-import GIS.Store 
+import Storable.Store 
 import GIS.Functions
 -- import Data.Store_data
 import GIS.FunGeometry

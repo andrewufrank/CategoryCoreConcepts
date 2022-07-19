@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 --
--- Module      :  the data for the shortest path examples
+-- Module      :  the store for the category in GIS.Category
 {-  
 
  only the data and the output
@@ -13,15 +13,15 @@
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE DeriveAnyClass     #-}
--- {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
--- {-# HLINT ignore "Redundant return" #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant return" #-}
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
-{-# OPTIONS_GHC -Wno-missing-signatures #-}
--- {-# OPTIONS_GHC -Wno-unused-imports #-}
 
-module ExampleData.ShortestPath
+module ExampleData.Store_data
  
      where
 
@@ -34,17 +34,17 @@ module ExampleData.ShortestPath
 -- -- end 
 
 import UniformBase
---     ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
+    ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
 import Control.Monad.State
 
 import Vault.Triple4cat
  
 
 import GIS.Category
-import GIS.Store  
--- import GIS.Functions
+import Storable.Store  
+import GIS.Functions
 import GIS.FunGeometry
--- import GIS.Triangulation
+import GIS.Triangulation
 
 --------------------data 
 
@@ -87,9 +87,6 @@ cat11 = catStoreBatch graphShortestPathEx cat0
 f op = evalState op cat11
 
 --------------- ---------------------example
--- these output producing functions do not work in repl!
--- build the individual tests - they can be run in repl
-
 pageStore :: ErrIO ()
 pageStore = do
     putIOwords ["\n ------------------- pageStore"]
@@ -153,3 +150,45 @@ main1 = print $ dijkstra step "c" (0 , "a")
 -- evalState (costOutgoingEdges node) cat11
 -- removed fromMaybe []  (because find returns [])
 -- and flip result
+
+main2 :: IO ()
+main2 =  do  -- with tests in other modules
+    main1
+    print $  (shortestPathCostOnly cat11 (0, "a") "c") 
+
+    print $  (shortestPathWithPath cat11 (PathChar 0 ["a"], "a") "c") 
+    -- dirMain
+    -- openMain
+    let resA = shortA cat11 (PathChar 0 ["a"], "a") "c"
+    putIOwords ["the resA", showT resA]
+    return ()
+
+offset_two = 200 :: Int
+
+posTriple_two = map (makeNode offset_two) pos_two
+edgeTriple_two = map (makeHQ offset_two)    $ edge_two
+main3 :: IO ()
+main3 =  do  -- with tests in other modules
+    putIOwords ["loading the data from triangulation two"] 
+    putIOwords ["the node data", showT pos_two]
+    putIOwords ["the edge data", showT edge_two]
+    putIOwords ["the nodeTriple", showT posTriple_two]
+    putIOwords ["the edgeTriple", showT edgeTriple_two]
+    return ()
+
+wrapIns' a =   Ins  a
+
+catTwo0 = catStoreEmpty
+catTwo1 = catStoreBatch (map wrapIns' . concat $ posTriple_two) catTwo0
+catTwo2 = catStoreBatch (map wrapIns' . concat $ edgeTriple_two) catTwo1
+
+
+{- 
+loading the data from triangulation two
+code tri_two, pos_two, edge_two 
+then posTriple_two, edgeTriple_two
+the node data [(0,(0.0,0.0,"11")),(1,(1.5,1.5,"12")),(2,(0.0,2.0,"13")),(3,(2.0,0.0,"14"))]
+the edge data [(0,2),(0,1),(0,3),(1,3),(1,0),(1,2),(2,1),(2,0),(3,0),(3,1)]
+the nodeTriple [[(NodeTag (Node "200"),XYtag XY,PointTag (Point2 0.0 0.0)),(NodeTag (Node "200"),Nametag,NameTag (Name "\"11\""))],[(NodeTag (Node "201"),XYtag XY,PointTag (Point2 1.5 1.5)),(NodeTag (Node "201"),Nametag,NameTag (Name "\"12\""))],[(NodeTag (Node "202"),XYtag XY,PointTag (Point2 0.0 2.0)),(NodeTag (Node "202"),Nametag,NameTag (Name "\"13\""))],[(NodeTag (Node "203"),XYtag XY,PointTag (Point2 2.0 0.0)),(NodeTag (Node "203"),Nametag,NameTag (Name "\"14\""))]]
+the edgeTriple [[(HQTag (HQ 200 202),Stag S,NodeTag (Node "200")),(HQTag (HQ 200 202),Stag S,NodeTag (Node "202"))],[(HQTag (HQ 200 201),Stag S,NodeTag (Node "200")),(HQTag (HQ 200 201),Stag S,NodeTag (Node "201"))],[(HQTag (HQ 200 203),Stag S,NodeTag (Node "200")),(HQTag (HQ 200 203),Stag S,NodeTag (Node "203"))],[(HQTag (HQ 201 203),Stag S,NodeTag (Node "201")),(HQTag (HQ 201 203),Stag S,NodeTag (Node "203"))],[(HQTag (HQ 201 200),Stag S,NodeTag (Node "201")),(HQTag (HQ 201 200),Stag S,NodeTag (Node "200"))],[(HQTag (HQ 201 202),Stag S,NodeTag (Node "201")),(HQTag (HQ 201 202),Stag S,NodeTag (Node "202"))],[(HQTag (HQ 202 201),Stag S,NodeTag (Node "202")),(HQTag (HQ 202 201),Stag S,NodeTag (Node "201"))],[(HQTag (HQ 202 200),Stag S,NodeTag (Node "202")),(HQTag (HQ 202 200),Stag S,NodeTag (Node "200"))],[(HQTag (HQ 203 200),Stag S,NodeTag (Node "203")),(HQTag (HQ 203 200),Stag S,NodeTag (Node "200"))],[(HQTag (HQ 203 201),Stag S,NodeTag (Node "203")),(HQTag (HQ 203 201),Stag S,NodeTag (Node "201"))]]
+-}

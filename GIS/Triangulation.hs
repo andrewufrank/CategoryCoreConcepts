@@ -53,7 +53,7 @@ import Control.Monad.State
 
 
 -- import GIS.Category
--- import GIS.Store
+-- import Storable.Store
 -- import GIS.Store_data
 -- import GIS.Functions
 -- import qualified Data.Map.Strict as Map
