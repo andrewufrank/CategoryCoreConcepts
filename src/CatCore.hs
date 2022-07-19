@@ -39,6 +39,6 @@ main =  do  -- with tests in other modules
 mainErrIO :: ErrIO ()
 mainErrIO = do 
 
-    -- pageStore
+    pageStore
 
     return ()

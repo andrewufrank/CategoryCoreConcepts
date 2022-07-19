@@ -39,6 +39,7 @@ import Control.Monad.State
 
 import Storable.Sobj
 import Storable.Store
+import Storable.Retrieve
 -- import GIS.Store_data
 
 -- import GIS.Functions
@@ -60,14 +61,14 @@ costOutgoingEdges n = do
         return . zip ns $ cs
 
 -- | Trivial function for subtracting co-ordinate pairs
--- sub :: Num x => Point2 -> (x, x) -> (x, x)
-sub :: Point2 -> Point2 -> Point2
-sub (Point2 x1 y1) (Point2 x2 y2) = Point2 (x1 - x2) (y1 - y2)
+-- sub :: Num x => Point2d -> (x, x) -> (x, x)
+sub :: Point2d -> Point2d -> Point2d
+sub (Point2d x1 y1) (Point2d x2 y2) = Point2d (x1 - x2) (y1 - y2)
 
 -- | Compute the sum of squares or dot product of a given pair of co-ordinates
 -- dotProduct :: Num x => (x, x) -> (x, x) -> x
-dotProduct :: Point2 -> Point2 -> Double
-dotProduct (Point2 x1 y1) (Point2 x2 y2) = (x1 * x2) + (y1 * y2)
+dotProduct :: Point2d -> Point2d -> Double
+dotProduct (Point2d x1 y1) (Point2d x2 y2) = (x1 * x2) + (y1 * y2)
 
 -- -- | Conversion of pair fromIntegral
 -- fromIntegralP :: (Integral x, Num y) => (x, x) -> (y, y)
@@ -75,10 +76,10 @@ dotProduct (Point2 x1 y1) (Point2 x2 y2) = (x1 * x2) + (y1 * y2)
 
 -- | Compute magnitude
 -- mag :: Doubleing x => (x, x) -> x
-mag :: Point2 -> Double
+mag :: Point2d -> Double
 mag x = sqrt (dotProduct x x)
 
-compDist :: Point2 -> Point2 -> Length
+compDist :: Point2d -> Point2d -> Length
 compDist p1 p2 = Length .   mag $ (sub p1 p2) --(unPoint2 p1) (unPoint2 p2))  
 
 -- f1 op = evalState op cat11
@@ -129,37 +130,37 @@ instance Ord (PathChar a) where
 
 -- try to run in state monad
 
-shortestPathCostOnly :: Store -> (Int, NodeID) -> NodeID -> Maybe (Int, NodeID)
+shortestPathCostOnly :: Store -> (Int, Node) -> Node -> Maybe (Int, Node)
 shortestPathCostOnly store startPath targetNode = 
         dijkstra step targetNode startPath 
 
     where
-        step :: (Int , NodeID) -> [(Int , NodeID)]
+        step :: (Int , Node) -> [(Int , Node)]
         step (cost1 , node1) =
             [ (cost1 + edgeCost , child)
             | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node1)) store
             ]
 
 
--- shortestPathWithPathB :: MonadState (Store) m => PathChar NodeID -> m (Maybe (PathChar NodeID, NodeID)) 
+-- shortestPathWithPathB :: MonadState (Store) m => PathChar Node -> m (Maybe (PathChar Node, Node)) 
 -- shortestPathWithPathB cat11 startPath targetNode =  
 --     dijkstra stepB  targetNode startPath  
     
 --     where
         
--- stepB :: MonadState (Store) m => (PathChar NodeID , NodeID) -> m [(PathChar NodeID, NodeID)]
+-- stepB :: MonadState (Store) m => (PathChar Node , Node) -> m [(PathChar Node, Node)]
 -- stepB (PathChar cost traj , node) =
 --             [ (PathChar (cost + edgeCost) (child : traj) , child)
 --             | (Node child, Cost edgeCost) 
 --                 <- evalState (costOutgoingEdges (Node node)) cat11  
 --             ]
 
-shortestPathWithPath :: Store -> (PathChar NodeID, NodeID) -> NodeID -> Maybe (PathChar NodeID, NodeID)
+shortestPathWithPath :: Store -> (PathChar Node, Node) -> Node -> Maybe (PathChar Node, Node)
 shortestPathWithPath cat11 startPath targetNode =  
     dijkstra step  targetNode startPath  
     
     where
-        step :: (PathChar NodeID , NodeID) -> [(PathChar NodeID, NodeID)]
+        step :: (PathChar Node , Node) -> [(PathChar Node, Node)]
         step (PathChar cost1 traj , node1) =
             [ (PathChar (cost1 + edgeCost) (child : traj) , child)
             | (Node child, Cost edgeCost) 
@@ -169,7 +170,7 @@ shortestPathWithPath cat11 startPath targetNode =
 
 -- put in StateMonad 
 -- not worth the troubles, but could just pass the store...
--- shortB ::  Store -> (PathChar NodeID, NodeID) -> NodeID -> Maybe (PathChar NodeID, NodeID)
+-- shortB ::  Store -> (PathChar Node, Node) -> Node -> Maybe (PathChar Node, Node)
 -- shortB store   startPath targetNode = evalState (opsB startPath targetNode) store 
 
 -- opsB startPath targetNode = do 
@@ -178,7 +179,7 @@ shortestPathWithPath cat11 startPath targetNode =
 --     return res
 
 
-shortA ::  Store -> (PathChar NodeID, NodeID) -> NodeID -> Maybe (PathChar NodeID, NodeID)
+shortA ::  Store -> (PathChar Node, Node) -> Node -> Maybe (PathChar Node, Node)
 shortA store   startPath targetNode = evalState (opsa startPath targetNode) store 
 
 opsa startPath targetNode = do 
@@ -192,7 +193,7 @@ makeNode :: (Show a) => Int -> (Int, (PtTuple a)) ->  [(ObjPoint, MorphPoint, Ob
 -- | same for both nodes and edges 
 -- | id for edge (s t)
 makeNode offset (n, (x,y,i)) = 
-    [ (NodeTag node, xyMorph, PointTag (Point2 x y))
+    [ (NodeTag node, xyMorph, PointTag (Point2d x y))
     , (NodeTag node, nameMorph, NameTag (Name . showT $ i))]
     where node = Node (showT (offset + n))
 
@@ -202,5 +203,5 @@ makeHQ offset (s, t) = [(HQTag hqid, sMorph, NodeTag (Node (showT $ offset + s))
     where 
         hqid = HQ $ 100 * (offset + s)  + (offset + t)
 
--- showT :: NodeID -> NodeID 
+-- showT :: Node -> Node 
 -- showT x = ShowT x

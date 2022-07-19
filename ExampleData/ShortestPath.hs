@@ -40,11 +40,13 @@ import Control.Monad.State
 import Vault.Triple4cat
  
 
-import GIS.Category
+-- import GIS.Category
 import Storable.Store  
 -- import GIS.Functions
 import GIS.FunGeometry
 -- import GIS.Triangulation
+import Storable.Makes
+import Storable.Retrieve
 
 --------------------data 
 
@@ -144,7 +146,7 @@ runWithState = do
 
 main1 = print $ dijkstra step "c" (0 , "a")
     where
-        step :: (Int , NodeID) -> [(Int , NodeID)]
+        step :: (Int , Node) -> [(Int , Node)]
         step (cost1 , node1) =
             [ (cost1 + edgeCost , child)
             | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node1))cat11

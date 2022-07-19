@@ -15,13 +15,14 @@ build-type:     Simple
 
 library
   exposed-modules:
-      ExampleData.Triangulation
-      GIS.Category
+      ExampleData.ShortestPath
       GIS.Functions
       GIS.FunGeometry
       GIS.Triangulation
       Lib.Rules
       Lib.STproductTriple
+      Storable.Makes
+      Storable.Retrieve
       Storable.Sobj
       Storable.Srel
       Storable.Store
