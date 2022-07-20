@@ -21,7 +21,7 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 -- {-# OPTIONS_GHC -Wno-unused-imports #-}
 
-module ExampleData.ShortestPath
+module ExampleData.ShortestPathData
  
      where
 

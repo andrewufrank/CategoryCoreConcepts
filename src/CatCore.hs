@@ -23,8 +23,8 @@ import GIS.Triangulation
 -- import Data.Store_data
 
 
-import ExampleData.ShortestPath
--- import ExampleData.Triangulation
+import ExampleData.ShortestPathData
+import ExampleData.TriangulationData
 
 main :: IO ()
 main =  do  -- with tests in other modules
@@ -32,7 +32,7 @@ main =  do  -- with tests in other modules
     -- startProg "CatCore" mainErrIO 
     -- main1
     -- main2
-    -- main3
+    main3  -- triangulation
     res <- runErr $ mainErrIO
     putIOwords ["\n--------------error in mainErrIO", showT res]
     return ()

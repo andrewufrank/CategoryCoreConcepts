@@ -64,10 +64,9 @@ makeEdgeEndNode o1 o2 = [(EdgeTag (Edge o1), tMorph, NodeTag (Node o2))]
 
 -- point is not storable, is a value
 -- store node
--- makePoint :: Node ->  Double -> Double ->   StoreElementList
--- -- add a function name if necessary
--- makePoint i x y = (NodeTag ( i), xyMorph, PointTag (Point2d x y))
 
+
+makeSCost :: Int -> Int -> [(ObjPoint, MorphPoint, ObjPoint)]
 makeSCost e c = [(EdgeTag (Edge e), scMorph, CostTag (Cost c))]
 -- makeTCost e c = (EdgeTag (Edge e), tcMorph, CostTag (Cost c))
 -- cost is on edge, one direction only... 
@@ -76,10 +75,11 @@ makePoint :: Int -> Text -> Double -> Double -> [StoreElement]
 -- | to create a node with the nodeid and the given name and x y 
 makePoint i n x y = makeNode1 i n x y
 
--- makeNode :: (Show a) => Int -> (Int, (PtTuple a)) ->  [StoreElementList]
--- -- | the first is a offset for the node id
--- -- | same for both nodes and edges 
--- -- | id for edge (s t)
+makeNode ::  Int -> (Int, (Double, Double, Text)) ->  StoreElementList
+-- | the first is a offset for the node id
+-- | same for both nodes and edges 
+-- | id for edge (s t)
+makeNode ofs (i, (x,y, n)) = makeNode1 (ofs + 1) n x y 
 
 -- the base make node with text name and two doubles 
 makeNode1 ::  Int -> Text -> Double -> Double  ->  [StoreElement]
@@ -87,3 +87,12 @@ makeNode1  i n x y =
     [ (NodeTag node, xyMorph, PointTag (Point2d x y))
     , (NodeTag node, nameMorph, NameTag (Name n))]
     where node = Node i
+
+makeHQ :: Int -> (Int, Int) -> [(ObjPoint, MorphPoint, ObjPoint)]
+makeHQ offset (s, t) = [(HQTag hqid, sMorph, NodeTag (Node ( offset + s *100 + t)))
+    , (HQTag hqid, sMorph, NodeTag (Node (offset + t)))]
+    where 
+        hqid = HQ $ offset + 100 * s + t
+
+-- showT :: Node -> Node 
+-- showT x = ShowT x

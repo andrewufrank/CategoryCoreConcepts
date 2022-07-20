@@ -15,7 +15,8 @@ build-type:     Simple
 
 library
   exposed-modules:
-      ExampleData.ShortestPath
+      ExampleData.ShortestPathData
+      ExampleData.TriangulationData
       GIS.Functions
       GIS.FunGeometry
       GIS.Triangulation

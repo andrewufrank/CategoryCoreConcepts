@@ -16,7 +16,7 @@
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE DeriveAnyClass     #-}
 
-module ExampleData.Triangulation
+module ExampleData.TriangulationData
 
  
      where
@@ -37,8 +37,9 @@ import Vault.Triple4cat
  
 
 -- import GIS.Category
-import Storable.Sobj  
 import Storable.Store
+import Storable.Sobj  
+import Storable.Makes
 -- import GIS.Functions
 import GIS.FunGeometry
 import GIS.Triangulation
@@ -63,8 +64,7 @@ main3 =  do  -- with tests in other modules
     putIOwords ["the edgeTriple", showT edgeTriple_two]
     return ()
 
-wrapIns' :: a -> Action a
-wrapIns' a =   Ins  a
+
 
 catTwo0 :: CatStore ObjPoint MorphPoint
 catTwo0 = catStoreEmpty
