@@ -30,6 +30,7 @@ module Vault.Triple4cat
     , openSingleton
     , find2fun, find2rel
     , MorphSel (..) 
+    , wrapIns'
     ---- for tests
     -- , pageTriple4cat
     
@@ -56,8 +57,7 @@ import Control.Monad.State
 import UniformBase ( Generic, errorT, showT, fst3, trd3 )
     -- ( Generic, fst3, trd3, errorT, putIOwords, showT, Zeros(zero) )
 import Vault.NaiveTripleStore
-    ( Action(..), TripleStore(tsfind, tsinsert, tsdel) )
--- import Vault.Value
+    -- ( Action(..), TripleStore(tsfind, tsinsert, tsdel) )
 
 ---- helper for queries
 isSingleton :: Foldable t => t a -> Bool

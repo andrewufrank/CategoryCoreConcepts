@@ -15,7 +15,7 @@
 module Main     where      -- must have Main (main) or Main where
 
 import UniformBase
-import GIS.Category
+-- import GIS.Category
 import Storable.Store
 import GIS.Functions
 import GIS.FunGeometry
@@ -23,13 +23,14 @@ import GIS.Triangulation
 -- import Data.Store_data
 
 
--- import ExampleData.ShortestPath
+import ExampleData.ShortestPath
 -- import ExampleData.Triangulation
 
 main :: IO ()
 main =  do  -- with tests in other modules
 
     -- startProg "CatCore" mainErrIO 
+    -- main1
     -- main2
     -- main3
     res <- runErr $ mainErrIO
@@ -39,6 +40,6 @@ main =  do  -- with tests in other modules
 mainErrIO :: ErrIO ()
 mainErrIO = do 
 
-    pageStore
+    pageStore -- from ShortestPath
 
     return ()

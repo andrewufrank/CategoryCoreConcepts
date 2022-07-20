@@ -27,6 +27,7 @@ module Vault.NaiveTripleStore
     -- , pageNT
     , filterTriple
     , toMaybes
+    , wrapIns'
     -- for tests
     ,ts0,ts1,ts2,t1,t2,m1, k1,r1
     )    
@@ -66,6 +67,8 @@ instance (Eq o,Eq p, Eq v) => TripleStore o p v where
     tsbatch ((Ins t) : as) ts = tsinsert t . tsbatch as $ ts
     tsbatch ((Del t) : as) ts = tsdel t . tsbatch as $ ts
 
+wrapIns' :: a -> Action a
+wrapIns' a =   Ins  a
 
 pageNT :: IO ()
 pageNT = do

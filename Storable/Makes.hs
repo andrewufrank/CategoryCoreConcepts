@@ -34,7 +34,7 @@ module Storable.Makes
 -- -- end 
 
 import UniformBase
-    ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
+    -- ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
 import Control.Monad.State
 
 import Vault.Triple4cat
@@ -51,18 +51,39 @@ import Vault.Triple4cat
 import Storable.Store 
 
 ------------------------------------------------------------------
--- the makes for all ...
-makeEdgeStartNode :: Int -> Node -> (ObjPoint, MorphPoint, ObjPoint)
+-- the makes 
+-- produce a list of storeElements 
+-- they are colled with just the Int id and put the type around it
+
+makeEdgeStartNode :: Int -> Int -> StoreElementList
 -- | node, edge: value to store for an s (from edge to node, the from node)
-makeEdgeStartNode o1 o2 = (EdgeTag (Edge o1), sMorph, NodeTag ( o2))
+makeEdgeStartNode o1 o2 = [(EdgeTag (Edge o1), sMorph, NodeTag (Node o2))]
 
-makeEdgeEndNode :: Int -> Node ->   (ObjPoint, MorphPoint, ObjPoint)
-makeEdgeEndNode o1 o2 = (EdgeTag (Edge o1), tMorph, NodeTag ( o2))
+makeEdgeEndNode :: Int -> Int ->   StoreElementList
+makeEdgeEndNode o1 o2 = [(EdgeTag (Edge o1), tMorph, NodeTag (Node o2))]
 
+-- point is not storable, is a value
+-- store node
+-- makePoint :: Node ->  Double -> Double ->   StoreElementList
+-- -- add a function name if necessary
+-- makePoint i x y = (NodeTag ( i), xyMorph, PointTag (Point2d x y))
 
-makePoint :: Node ->  Double -> Double ->   (ObjPoint, MorphPoint, ObjPoint)
--- add a function name if necessary
-makePoint i x y = (NodeTag ( i), xyMorph, PointTag (Point2d x y))
-makeSCost e c = (EdgeTag (Edge e), scMorph, CostTag (Cost c))
+makeSCost e c = [(EdgeTag (Edge e), scMorph, CostTag (Cost c))]
 -- makeTCost e c = (EdgeTag (Edge e), tcMorph, CostTag (Cost c))
+-- cost is on edge, one direction only... 
 
+makePoint :: Int -> Text -> Double -> Double -> [StoreElement]
+-- | to create a node with the nodeid and the given name and x y 
+makePoint i n x y = makeNode1 i n x y
+
+-- makeNode :: (Show a) => Int -> (Int, (PtTuple a)) ->  [StoreElementList]
+-- -- | the first is a offset for the node id
+-- -- | same for both nodes and edges 
+-- -- | id for edge (s t)
+
+-- the base make node with text name and two doubles 
+makeNode1 ::  Int -> Text -> Double -> Double  ->  [StoreElement]
+makeNode1  i n x y = 
+    [ (NodeTag node, xyMorph, PointTag (Point2d x y))
+    , (NodeTag node, nameMorph, NameTag (Name n))]
+    where node = Node i

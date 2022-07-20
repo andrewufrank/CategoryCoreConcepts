@@ -30,6 +30,7 @@ module Storable.Store
 (module Storable.Store 
     , module Storable.Sobj 
     , module Storable.Srel
+    , module Vault.Triple4cat 
 
 ) where
 
@@ -67,4 +68,5 @@ import Storable.Srel -- the storable relations
 type Store = CatStore ObjPoint MorphPoint
 type StoreStateMonad = State Store  
 type StoreErrIO = StateT Store ErrIO
-
+type StoreElement = (ObjPoint, MorphPoint, ObjPoint)
+type StoreElementList = [StoreElement]

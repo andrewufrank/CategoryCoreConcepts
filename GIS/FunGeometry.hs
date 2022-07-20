@@ -113,95 +113,94 @@ dijkstra next target start = search mempty (Set.singleton start)
 -- Output:
 -- Just (3,'c')
 
-data PathChar a = PathChar {cost :: Int , trajectory :: [a]}
+data WayList a = WayList {cost :: Int , trajectory :: [a]}
     deriving (Show)
 
-instance Eq (PathChar a) where
+class WayLists a where 
+    extendWay :: Int -> a -> WayList a -> WayList a  
+
+instance WayLists a where 
+    extendWay c n (WayList c1 ns) = WayList (c1 +c) (n : ns)
+
+instance Eq (WayList a) where
     a == b = cost a == cost b
 
-instance Ord (PathChar a) where
+instance Ord (WayList a) where
     compare a b = compare (cost a) (cost b)
 
+type Way = WayList Node
 
 -- Output:
---     Just (PathChar {cost = 3, trajectory = "cba"},'c')
+--     Just (WayList {cost = 3, trajectory = "cba"},'c')
 
 
 
 -- try to run in state monad
 
-shortestPathCostOnly :: Store -> (Int, Node) -> Node -> Maybe (Int, Node)
-shortestPathCostOnly store startPath targetNode = 
-        dijkstra step targetNode startPath 
+-- shortestWayCostOnly :: Store -> (Int, Node) -> Node -> Maybe (Int, Node)
+-- shortestWayCostOnly store startWay targetNode = 
+--         dijkstra step targetNode startWay 
 
-    where
-        step :: (Int , Node) -> [(Int , Node)]
-        step (cost1 , node1) =
-            [ (cost1 + edgeCost , child)
-            | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (Node node1)) store
-            ]
+--     where
+--         step :: (Int , Node) -> [(Int , Node)]
+--         step (cost1 , node1) =
+--             [ (cost1 + edgeCost , child)
+--             | (Node child, Cost edgeCost ) <- evalState (costOutgoingEdges (node1)) store
+--             ]
 
 
--- shortestPathWithPathB :: MonadState (Store) m => PathChar Node -> m (Maybe (PathChar Node, Node)) 
--- shortestPathWithPathB cat11 startPath targetNode =  
---     dijkstra stepB  targetNode startPath  
+-- shortestWayWithWayB :: MonadState (Store) m => Way -> m (Maybe (Way, Node)) 
+-- shortestWayWithWayB cat11 startWay targetNode =  
+--     dijkstra stepB  targetNode startWay  
     
 --     where
         
--- stepB :: MonadState (Store) m => (PathChar Node , Node) -> m [(PathChar Node, Node)]
--- stepB (PathChar cost traj , node) =
---             [ (PathChar (cost + edgeCost) (child : traj) , child)
+-- stepB :: MonadState (Store) m => (Way , Node) -> m [(Way, Node)]
+-- stepB (WayList cost traj , node) =
+--             [ (WayList (cost + edgeCost) (child : traj) , child)
 --             | (Node child, Cost edgeCost) 
 --                 <- evalState (costOutgoingEdges (Node node)) cat11  
 --             ]
 
-shortestPathWithPath :: Store -> (PathChar Node, Node) -> Node -> Maybe (PathChar Node, Node)
-shortestPathWithPath cat11 startPath targetNode =  
-    dijkstra step  targetNode startPath  
+-- shortestWayWithWay :: Store -> (Way, Node) -> Node -> Maybe (Way, Node)
+-- shortestWayWithWay cat11 startWay targetNode =  
+--     dijkstra step  targetNode startWay  
     
-    where
-        step :: (PathChar Node , Node) -> [(PathChar Node, Node)]
-        step (PathChar cost1 traj , node1) =
-            [ (PathChar (cost1 + edgeCost) (child : traj) , child)
-            | (Node child, Cost edgeCost) 
-                <- evalState (costOutgoingEdges (Node node1)) cat11  
-            ]
+--     where
+--         -- step :: (Way , Node) -> [(Way, Node)]
+--         step pl@(WayList cost1 traj , node1) =
+--             [ extendWay edgeCost child pl
+--                 -- (WayList (cost1 + edgeCost) (child : traj) , child)
+--             | (Node child, Cost edgeCost) 
+--                 <- evalState (costOutgoingEdges (node1)) cat11  
+--             ]
 
 
 -- put in StateMonad 
 -- not worth the troubles, but could just pass the store...
--- shortB ::  Store -> (PathChar Node, Node) -> Node -> Maybe (PathChar Node, Node)
--- shortB store   startPath targetNode = evalState (opsB startPath targetNode) store 
+-- shortB ::  Store -> (Way, Node) -> Node -> Maybe (Way, Node)
+-- shortB store   startWay targetNode = evalState (opsB startWay targetNode) store 
 
--- opsB startPath targetNode = do 
+-- opsB startWay targetNode = do 
 --     st <- get 
---     res <- shortestPathWithPathB st startPath targetNode 
+--     res <- shortestWayWithWayB st startWay targetNode 
 --     return res
 
 
-shortA ::  Store -> (PathChar Node, Node) -> Node -> Maybe (PathChar Node, Node)
-shortA store   startPath targetNode = evalState (opsa startPath targetNode) store 
+-- shortA ::  Store -> (Way, Node) -> Node -> Maybe (Way, Node)
+-- shortA store   startWay targetNode = evalState (opsa startWay targetNode) store 
 
-opsa startPath targetNode = do 
-    st <- get 
-    let res = shortestPathWithPath st startPath targetNode 
-    return res
+-- opsa startWay targetNode = do 
+--     st <- get 
+--     let res = shortestWayWithWay st startWay targetNode 
+--     return res
 
--- may move again
-makeNode :: (Show a) => Int -> (Int, (PtTuple a)) ->  [(ObjPoint, MorphPoint, ObjPoint)]
--- | the first is a offset for the node id
--- | same for both nodes and edges 
--- | id for edge (s t)
-makeNode offset (n, (x,y,i)) = 
-    [ (NodeTag node, xyMorph, PointTag (Point2d x y))
-    , (NodeTag node, nameMorph, NameTag (Name . showT $ i))]
-    where node = Node (showT (offset + n))
 
-makeHQ :: Int -> (Int, Int) -> [(ObjPoint, MorphPoint, ObjPoint)]
-makeHQ offset (s, t) = [(HQTag hqid, sMorph, NodeTag (Node (showT $ offset + s)))
-    , (HQTag hqid, sMorph, NodeTag (Node (showT $ offset + t)))]
-    where 
-        hqid = HQ $ 100 * (offset + s)  + (offset + t)
+-- makeHQ :: Int -> (Int, Int) -> [(ObjPoint, MorphPoint, ObjPoint)]
+-- makeHQ offset (s, t) = [(HQTag hqid, sMorph, NodeTag (Node (showT $ offset + s)))
+--     , (HQTag hqid, sMorph, NodeTag (Node (showT $ offset + t)))]
+--     where 
+--         hqid = HQ $ 100 * (offset + s)  + (offset + t)
 
 -- showT :: Node -> Node 
 -- showT x = ShowT x
