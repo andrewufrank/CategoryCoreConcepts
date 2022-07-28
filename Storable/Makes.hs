@@ -98,8 +98,8 @@ makeHQ offset (s, t) =
     , (HQTag hqid2, twinMorph, HQTag (hqid1))
     ]
     where 
-        hqid1 = HQ $ offset + 100 * s + t
-        hqid2 = HQ $ offset + 100 * t + s
+        hqid1 = Hq $ offset + 100 * s + t
+        hqid2 = Hq $ offset + 100 * t + s
 
 -- showT :: Node -> Node 
 -- showT x = ShowT x

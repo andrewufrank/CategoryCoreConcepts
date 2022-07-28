@@ -56,7 +56,7 @@ import UniformBase
 -- | required for store
 --  
 data ObjPoint = NodeTag Node | EdgeTag Edge | FaceTag Face
-    | HQTag HQType
+    | HQTag HqType
     | PointTag (Point2d) 
     | LengthTag   Length  | CostTag Cost 
     | NameTag Name
@@ -100,7 +100,7 @@ unNameTag x = errorT ["unNameTag - not a Name", showT x]
 data NodeType i =  Node i deriving (Show, Read, Ord, Eq, Generic, Zeros)
 data EdgeType c = Edge c deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
-data HQType = HQ Int  
+data HqType = Hq Int  
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- the obj for the half-quad edge, derived by the two node ids from hgeometry, but just a simple int as id
 
@@ -114,6 +114,7 @@ data FaceType = Face Int
 type Node = NodeType Int
 type Edge = EdgeType Int
 type Face = FaceType 
+type Hq = HqType 
 
 --------------------------- Value 
 
