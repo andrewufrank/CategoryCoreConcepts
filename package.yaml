@@ -1,5 +1,5 @@
 name:           CatCoreConcepts
-version:        0.2
+version:        0.2.1
 
 ghc-options: -Wall
 synopsis: GIS as a category 
