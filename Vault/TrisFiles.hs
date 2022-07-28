@@ -29,6 +29,7 @@ objects: a sigle value (no theme yet)
 module Vault.TrisFiles
     (read8, write8, catStoreFileType
     , Store
+    , triplePerLine
     -- for test 
     , pageTris) where 
         
@@ -75,6 +76,11 @@ catStoreFileType = makeTyped (Extension "tris")  :: TypedFile5 Text Store
 instance TypedFiles7 Text Store where
   wrap7 = read . t2s
   unwrap7 = showT
+
+-- | to show a list of triples as one per line
+triplePerLine :: (Show a, Show b) => [[(a,b,a)]] -> Text
+triplePerLine =  (unlines' .map   ( unlines'.   map showT)) 
+        --hqTriple_two
 
 -- example state
 

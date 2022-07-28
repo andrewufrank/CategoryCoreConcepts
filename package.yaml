@@ -15,19 +15,19 @@ dependencies:
   - containers
   - mtl   # for vault
 #  for hgeometry
-  - hgeometry 
+  # - hgeometry 
   - linear
-  - hgeometry-combinatorial
-  - data-clist
+  # - hgeometry-combinatorial
+  # - data-clist
   # - aeson-pretty
-  - vector 
+  # - vector 
   # -- not used
   # - array                    >= 0.5
   # - hgeometry
   # # - hgeometry-ipe            >= 0.14
   # - lens
   # - semigroups
-  - vector-circular
+  # - vector-circular
 
 library:
   source-dirs: .

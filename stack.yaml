@@ -1,0 +1,56 @@
+# resolver: lts-19.16 # problem with toysolver, ambiguous occurence "singleton"
+resolver: lts-18.28 # 8.10.7
+# nightly-2017-12-13
+
+packages:
+- .
+
+# allow-newer: true
+
+extra-deps:
+
+- uniformBase-0.1.3@sha256:df960942c7047da4f8ec3b29831bfafa61c8a76078f98743c8837121f5fc3ccf,2467
+- uniform-algebras-0.1.3@sha256:b367633d547124f158e3db4b981ed05bdc9225c3bdbce53dd7127d542ac68132,1583
+- uniform-error-0.1.3@sha256:d7d1090c6900ec16229568b1ea167c4082bb65ab7bd3b0a52e2b873cb9fcaa3e,1870
+- uniform-fileio-0.1.3@sha256:574a17a2848c1fdf69554c3d208c6dcd13e652492794f15dcb5e97d4b1e05b98,2706
+- uniform-strings-0.1.3@sha256:8e5f482feedb9838ad485756fb9490d40bf27e1cf65b966558dc0ba0ee5e1097,1980
+- uniform-time-0.1.3@sha256:1605c2dd1bc617cb1237b29a5ba98b425dcd46ad75b750fdc6fe097acff55b0b,1430
+
+
+- test-invariant-0.4.5.0@sha256:d1aa6b61e0057a4065eeff3286208e947a0b44c6a2186210399f5e5e7fb0d0dd,1902
+
+- /home/frank/Workspace11/fromOthersExperiments/qhull
+# - qhull-0.1.0.1
+# - ../../qhullSplit/qhull
+
+#----------------------  from qhull 
+# - toysolver-0.7.0
+# 0.5.0
+# - OptDir-0.0.3
+# - data-interval-1.3.0
+# - extended-reals-0.2.2.0
+# - finite-field-0.9.0
+# - pseudo-boolean-0.1.10.0
+# # 0.1.6.0
+# - queue-0.1.2
+# - sign-0.4.3
+- combinat-0.2.10.0
+# # -0.2.8.2
+# # - permutation-0.5.0.5
+# # additions af 
+
+-  Unique-0.4.7
+- compact-word-vectors-0.2.0.2
+- toysolver-0.7.0@sha256:1db00f7d2d4c9904343269ce1418aeb51fdc28c46777684c710f52ba8812d881,27335
+
+- MIP-0.1.1.0@sha256:01bbc71cbeabb76c8e23a68e351ff1f73cfb841ba105114d34666849de79a24a,4442
+- OptDir-0.0.4@sha256:7a59a4e225a1ea402b82377c9057cf258e45d9d7913b2edd010f7ae8b9e4f8af,861
+- bytestring-encoding-0.1.2.0@sha256:e5678542336945984b129039647e4438da8fcf8784d75630a2f8fcb8c4bc91da,1921
+- finite-field-0.10.0@sha256:f676a7abf829f27fee189036219c0326dce68a435bcdddc26319afff4008d8f4,2164
+- pseudo-boolean-0.1.10.0@sha256:c6a8b6c23c84cce8cecb37683755bde54db80b1ca817ce72de772c98d31dae44,2552
+- queue-0.1.2@sha256:4efac395db09637ec7b667dc09b74ff80e0b83452088540e1d1b2ec262f4defa,1312
+- sign-0.4.4@sha256:7f7aa78b78f30b05155ec3709e1549b2f74fb5cec12522e44f10537223e922ea,2088
+- vector-algorithms-0.8.0.3@sha256:477ef5ac82fdd28a39536ed0a767faec3425802827abee485be31db5bc6f5e90,3488
+# -- for catCore
+- constrained-categories-0.4.1.0@sha256:388757eb8ec34aca27feec47d84e0407ddae452984e7ede3bd62f3b37afead3f,3482
+- trivial-constraint-0.4.0.0@sha256:819468024c1eab92abdbb52427a81a6e31bbd458cd0185b4709310569d08256a,1679
