@@ -55,7 +55,7 @@ import Vault.Triple4cat () -- for instance Zeros Double
 
 data XY = XY 
     deriving (Show, Read, Ord, Eq, Generic)
-data Distance = Distance 
+data Length = Length 
     deriving (Show, Read, Ord, Eq, Generic)
 
 data S = S  deriving (Show, Read, Ord, Eq, Generic)

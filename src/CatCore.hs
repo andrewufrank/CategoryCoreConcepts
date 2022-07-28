@@ -40,6 +40,6 @@ main =  do  -- with tests in other modules
 mainErrIO :: ErrIO ()
 mainErrIO = do 
 
-    pageStore -- from ShortestPath
+    -- pageStore -- from ShortestPath
 
     return ()

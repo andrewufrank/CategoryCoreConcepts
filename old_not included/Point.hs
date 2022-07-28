@@ -4,9 +4,9 @@
 {-  
 
 two objects: Point, Coord  (Point = Coord x Coord)
-two morphism: distance :: Point -> Point -> Distance 
+two morphism: distance :: Point -> Point -> Length 
 
-Coord and Distance are Double (simplistic)
+Coord and Length are Double (simplistic)
 
 for computation of distance use a couple of functions locally 
 
@@ -95,7 +95,7 @@ import Vault.Triple4cat
 
 data XY = XY 
     deriving (Show, Read, Ord, Eq, Generic)
-data Distance = Distance 
+data Length = Length 
     deriving (Show, Read, Ord, Eq, Generic)
 
 data S = S  deriving (Show, Read, Ord, Eq, Generic)
@@ -108,7 +108,7 @@ data TC = TC  deriving (Show, Read, Ord, Eq, Generic)
 -- | the cost of the edge in direction towards t (forward)
 
 -- | the morphism in the category, required for store
-data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Distance 
+data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Length 
         | SCosttag SC 
         -- | TCcosttag TC -- probably never used, cost of incoming edge?
         | ZZm 
@@ -119,7 +119,7 @@ data MorphPoint = Stag S | Ttag T | XYtag XY | DistTag Distance
 xyMorph :: MorphPoint
 xyMorph = XYtag XY 
 distanceMorph :: MorphPoint
-distanceMorph = DistTag Distance 
+distanceMorph = DistTag Length 
 sMorph :: MorphPoint
 sMorph = Stag S 
 tMorph :: MorphPoint

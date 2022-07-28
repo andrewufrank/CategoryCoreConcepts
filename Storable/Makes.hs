@@ -85,14 +85,21 @@ makeNode ofs (i, (x,y, n)) = makeNode1 (ofs + 1) n x y
 makeNode1 ::  Int -> Text -> Double -> Double  ->  [StoreElement]
 makeNode1  i n x y = 
     [ (NodeTag node, xyMorph, PointTag (Point2d x y))
-    , (NodeTag node, nameMorph, NameTag (Name n))]
+    , (NodeTag node, namedMorph, NameTag (Name n))]
     where node = Node i
 
 makeHQ :: Int -> (Int, Int) -> [(ObjPoint, MorphPoint, ObjPoint)]
-makeHQ offset (s, t) = [(HQTag hqid, sMorph, NodeTag (Node ( offset + s *100 + t)))
-    , (HQTag hqid, sMorph, NodeTag (Node (offset + t)))]
+makeHQ offset (s, t) = 
+    [ (HQTag hqid1, sMorph, NodeTag (Node ( offset + s)))
+    -- , (HQTag hqid1, sMorph, NodeTag (Node (offset + t)))
+    , (HQTag hqid1, twinMorph, HQTag (hqid2))
+    -- , (HQTag hqid2, sMorph, NodeTag (Node ( offset + s)))
+    , (HQTag hqid2, sMorph, NodeTag (Node (offset + t)))
+    , (HQTag hqid2, twinMorph, HQTag (hqid1))
+    ]
     where 
-        hqid = HQ $ offset + 100 * s + t
+        hqid1 = HQ $ offset + 100 * s + t
+        hqid2 = HQ $ offset + 100 * t + s
 
 -- showT :: Node -> Node 
 -- showT x = ShowT x

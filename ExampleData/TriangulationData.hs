@@ -49,19 +49,21 @@ import GIS.Triangulation
 
 
 offset_two :: Int
-offset_two = 200 :: Int
+offset_two = 0 :: Int
 
 posTriple_two :: [[(ObjPoint, MorphPoint, ObjPoint)]]
 posTriple_two = map (makeNode offset_two) pos_two
-edgeTriple_two :: [[(ObjPoint, MorphPoint, ObjPoint)]]
-edgeTriple_two = map (makeHQ offset_two)    $ edge_two
+hqTriple_two :: [[(ObjPoint, MorphPoint, ObjPoint)]]
+hqTriple_two = map (makeHQ offset_two)    $ edge_two
+
 main3 :: IO ()
 main3 =  do  -- with tests in other modules
-    putIOwords ["loading the data from triangulation two"] 
-    putIOwords ["the node data", showT pos_two]
-    putIOwords ["the edge data", showT edge_two]
-    putIOwords ["the nodeTriple", showT posTriple_two]
-    putIOwords ["the edgeTriple", showT edgeTriple_two]
+    putIOwords ["\n main3\n"]
+    putIOwords ["\n loading the data from triangulation two"] 
+    putIOwords ["\n the node data", showT pos_two]
+    putIOwords ["\n the edge data", showT edge_two]
+    putIOwords ["\n the nodeTriple", showT posTriple_two]
+    putIOwords ["\n the hqTriple", showT hqTriple_two]
     return ()
 
 
@@ -71,7 +73,7 @@ catTwo0 = catStoreEmpty
 catTwo1 :: CatStore ObjPoint MorphPoint
 catTwo1 = catStoreBatch (map wrapIns' . concat $ posTriple_two) catTwo0
 catTwo2 :: CatStore ObjPoint MorphPoint
-catTwo2 = catStoreBatch (map wrapIns' . concat $ edgeTriple_two) catTwo1
+catTwo2 = catStoreBatch (map wrapIns' . concat $ hqTriple_two) catTwo1
 
 
 {- 
