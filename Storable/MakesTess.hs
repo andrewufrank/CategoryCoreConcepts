@@ -69,36 +69,65 @@ makeFaceSurface :: (FaceID, Double) -> StoreElement
 -- | convert trip_surface2, used hqf
 makeFaceSurface (fid, val) = (FaceTag . Face . fromIntegral . unFaceID $ fid, surfacedMorph, AreaTag . Area $ val ) 
 
--- -- makeXY  :: (a, [Coord]) -> [StoreElement]
--- -- | convert trip_xy   hqnx,   
--- -- a is NodeID or FaceID (for center )
--- -- note: the Face is the dual of the Node 
--- makeXY  (oid, val) = [(fromGeomID oid, xyMorph, PointTag . fromList2P2d $ val)]
---     where
---         fromGeomID (Tess.N i)    = NodeTag . Node . fromIntegral  $ i
---         -- fromGeomID (Tess.F i)    = FaceTag . Face . fromIntegral  $ i
+makeXYnode  :: (NodeID, [Coord]) -> StoreElement
+-- | convert trip_xy   hqnx,   
+-- a is NodeID or FaceID (for center )
+-- note: the Face is the dual of the Node 
+makeXYnode  (oid, val) = (fromGeomIDnode oid, xyMorph, PointTag . fromList2P2d $ val)
+    -- where
+fromGeomIDnode (Tess.N i)    = NodeTag . Node . fromIntegral  $ i
 
--- makeHQlength :: (HqID, Double) -> [StoreElement]
--- -- from trip_hq_lengthX and 2X 
--- -- half the length of the edge between two nodes
--- makeHQlength (hqid, val) = [(HQTag . Hq . fromIntegral . Tess.unHqID $ hqid, DistTag Distant, LengthTag . Length $ val)]
+makeXYface  :: (FaceID, [Coord]) -> StoreElement
+-- | convert trip_xy   hqfxy,   
+-- a is NodeID or FaceID (for center )
+-- note: the Face is the dual of the Node 
+makeXYface  (oid, val) = (fromGeomIDface oid, xyMorph, PointTag . fromList2P2d $ val)
+    -- where
+        -- fromGeomID (Tess.N i)    = NodeTag . Node . fromIntegral  $ i        
+fromGeomIDface (Tess.F i)    = FaceTag . Face . fromIntegral  $ i
 
--- fromGeomID2 :: HqID -> ObjPoint
--- fromGeomID2 a@(Hq i)= HQTag . Hq . fromIntegral . Tess.unHqID $ a
+makeHQlength :: (Tess.HqID, Double) -> [StoreElement]
+-- from trip_hq_lengthX and 2X 
+-- half the length of the edge between two nodes
+makeHQlength (hqid, val) = [(HQTag . Hq . fromIntegral . Tess.unHqID $ hqid, DistTag Distant, LengthTag . Length $ val)]
+
+fromGeomID2hq :: Tess.HqID -> ObjPoint
+fromGeomID2hq a@(Tess.Hq i)= HQTag . Hq . fromIntegral $ i
 
 
--- makeHQnode :: (HqID, a) -> [StoreElement]
--- -- make the HQ with the node and the faces. from trip_hqs_faces
--- makeHQnode  (hqid, a@(Tess.N id)) = [(fromGeomID2 hqid, hqNodeMorph, fromGeomID  a)]
--- makeHQnode  (hqid, a@(Tess.F id)) = [(fromGeomID2 hqid, hqFaceMorph, fromGeomID  a)]
+makeHQnode :: (Tess.HqID, Tess.NodeID) -> [StoreElement]
+-- make the HQ with the node and the faces. from trip_hqs_faces
+makeHQnode  (hqid, a@(Tess.N id)) = [(fromGeomID2hq hqid, hqNodeMorph, fromGeomIDnode  a)]
+makeHQhq (hqid, a@(Tess.Hq id)) = [(fromGeomID2hq hqid, hqFaceMorph, fromGeomID2hq  a)]
+makeHQface  (hqid, a@(Tess.F id)) = [(fromGeomID2hq hqid, hqFaceMorph, fromGeomIDface  a)]
 
-makeTesselation :: Integer -> Tess.Tesselation -> StoreElementList
+makeTesselation :: Integer -> Tess.Tesselation -> [StoreElement]
 -- | make all the triples for a tesselation
 -- set the offset for all 
-makeTesselation offs tess =   [] 
+makeTesselation offs res4 = concat [se_faceSurface, se_xynode, se_xyface, se_hqlength, se_hqs1, se_hqs2, se_hqs3]
     where
-        hqsurfaces = trip_surface2 offs tess
-        se_faceSurface =  map makeFaceSurface hqsurfaces
+        hqfaces = trip_surface2 offs res4       -- faces surface areas
+        se_faceSurface =  map makeFaceSurface hqfaces :: [StoreElement]
+
+        hqnxy = trip_xy N 400 (vertices res4)  -- the node coords
+                -- should not be N from geometry
+        se_xynode = map makeXYnode hqnxy::[StoreElement]
+
+        hqfxy = trip_xy F 400 (vertices res4)  -- the face coords
+                -- should not be N from geometry
+        se_xyface = map makeXYface hqfxy ::[StoreElement]
+
+        hqlength = trip_hq_lengthX 400 res4
+        hqlength2 = trip_hq_length2X 400 res4
+        se_hqlength = concat $ map makeHQlength (hqlength ++ hqlength2)
+                                :: [StoreElement]
+
+        hqs = trip_hqs_faces 400 res4
+        se_hqs1 = concat $ map makeHQnode (concat . map fst3 $ hqs)
+        se_hqs2 = concat $ map makeHQhq   (concat . map snd3 $ hqs)
+        se_hqs3 = concat $ map makeHQface (concat . map trd3 $ hqs)
+        
+
 
 mainMakeTess :: ErrIO () 
 mainMakeTess = do 
@@ -110,36 +139,3 @@ mainMakeTess = do
 
     return ()
 -----------------old
-
--- makePoint :: Int -> Text -> Double -> Double -> [StoreElement]
--- -- | to create a node with the nodeid and the given name and x y 
--- makePoint i n x y = makeNode1 i n x y
-
--- makeNode ::  Int -> (Int, (Double, Double, Text)) ->  StoreElementList
--- -- | the first is a offset for the node id
--- -- | same for both nodes and edges 
--- -- | id for edge (s t)
--- makeNode ofs (i, (x,y, n)) = makeNode1 (ofs + 1) n x y 
-
--- -- the base make node with text name and two doubles 
--- makeNode1 ::  Int -> Text -> Double -> Double  ->  [StoreElement]
--- makeNode1  i n x y = 
---     [ (NodeTag node, xyMorph, PointTag (Point2d x y))
---     , (NodeTag node, namedMorph, NameTag (Name n))]
---     where node = Node i
-
--- makeHQ :: Int -> (Int, Int) -> [(ObjPoint, MorphPoint, ObjPoint)]
--- makeHQ offset (s, t) = 
---     [ (HQTag hqid1, sMorph, NodeTag (Node ( offset + s)))
---     -- , (HQTag hqid1, sMorph, NodeTag (Node (offset + t)))
---     , (HQTag hqid1, twinMorph, HQTag (hqid2))
---     -- , (HQTag hqid2, sMorph, NodeTag (Node ( offset + s)))
---     , (HQTag hqid2, sMorph, NodeTag (Node (offset + t)))
---     , (HQTag hqid2, twinMorph, HQTag (hqid1))
---     ]
---     where 
---         hqid1 = Hq $ offset + 100 * s + t
---         hqid2 = Hq $ offset + 100 * t + s
-
--- showT :: Node -> Node 
--- showT x = ShowT x
