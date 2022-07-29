@@ -49,7 +49,7 @@ import UniformBase
 
 -- | the sum type for the relation names
 data MorphPoint = Stag S | Ttag T | TwinTag Twin| XYtag XY | DistTag Distant
-    | CenterTag Center | SurfacedTag Surfaced 
+    | CenterTag Center | SurfacedTag Surfaced   
     | HqNodeTag HqNode | HqFaceTag HqFace 
         | SCosttag SC 
         -- | TCcosttag TC -- probably never used, cost of incoming edge?
@@ -73,8 +73,8 @@ scMorph = SCosttag SC
 namedMorph = NamedTag 
 centerMorph = CenterTag 
 surfacedMorph = SurfacedTag Surfaced
-hqNodeMorph = HqNodeTag
-hqFaceMorph = HqFaceTag 
+hqNodeMorph = HqNodeTag HqNode
+hqFaceMorph = HqFaceTag HqFace
 
 data XY = XY 
     deriving (Show, Read, Ord, Eq, Generic)

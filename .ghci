@@ -13,5 +13,5 @@
 :set -fno-warn-duplicate-exports
 :set -fno-warn-missing-methods
 :set -isrc
-:load 
-:module GIS.Triangulation
+:load app/CatCore.hs
+-- :module GIS.Triangulation

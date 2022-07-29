@@ -52,7 +52,8 @@ import Vault.Triple4cat
 -- import Storable.Srel -- the storable relations
 import Storable.Store 
 
-import Uniform.DelaunayTriples -- hiding (Hq (..))
+import  Uniform.DelaunayTriples hiding (HqID(..)) 
+import  qualified Uniform.DelaunayTriples as Tess
 -- should export all what is needed
 
 ------------------------------------------------------------------
@@ -62,18 +63,53 @@ import Uniform.DelaunayTriples -- hiding (Hq (..))
 
 -- store node
 
-makeFaceSurface :: (FaceID, Double) -> [StoreElement]
--- | convert trip_surface2, used hqf
-makeFaceSurface (fid, val) = [(FaceTag . Face . fromIntegral . unFaceID $ fid, surfacedMorph, AreaTag . Area $ val )] 
+-- make returns one, list only if requred
 
-makeXY  :: (a, Coord) -> [StoreElement]
--- | convert trip_xy   hqnx,   
--- a is NodeID or FaceID (for center )
--- note: the Face is the dual of the Node 
-makeXY  (oid, val) = [(toSub oid, xyMorph, PointTag . Point2d . fromList2P2d $ val)]
-    where 
-        toSub (N i) = NodeTag . Node . fromIntegral . unNodeID $ i
-        toSub (F i) = FaceTag . Face . fromIntegral . unFaceID $ i
+makeFaceSurface :: (FaceID, Double) -> StoreElement
+-- | convert trip_surface2, used hqf
+makeFaceSurface (fid, val) = (FaceTag . Face . fromIntegral . unFaceID $ fid, surfacedMorph, AreaTag . Area $ val ) 
+
+-- -- makeXY  :: (a, [Coord]) -> [StoreElement]
+-- -- | convert trip_xy   hqnx,   
+-- -- a is NodeID or FaceID (for center )
+-- -- note: the Face is the dual of the Node 
+-- makeXY  (oid, val) = [(fromGeomID oid, xyMorph, PointTag . fromList2P2d $ val)]
+--     where
+--         fromGeomID (Tess.N i)    = NodeTag . Node . fromIntegral  $ i
+--         -- fromGeomID (Tess.F i)    = FaceTag . Face . fromIntegral  $ i
+
+-- makeHQlength :: (HqID, Double) -> [StoreElement]
+-- -- from trip_hq_lengthX and 2X 
+-- -- half the length of the edge between two nodes
+-- makeHQlength (hqid, val) = [(HQTag . Hq . fromIntegral . Tess.unHqID $ hqid, DistTag Distant, LengthTag . Length $ val)]
+
+-- fromGeomID2 :: HqID -> ObjPoint
+-- fromGeomID2 a@(Hq i)= HQTag . Hq . fromIntegral . Tess.unHqID $ a
+
+
+-- makeHQnode :: (HqID, a) -> [StoreElement]
+-- -- make the HQ with the node and the faces. from trip_hqs_faces
+-- makeHQnode  (hqid, a@(Tess.N id)) = [(fromGeomID2 hqid, hqNodeMorph, fromGeomID  a)]
+-- makeHQnode  (hqid, a@(Tess.F id)) = [(fromGeomID2 hqid, hqFaceMorph, fromGeomID  a)]
+
+makeTesselation :: Integer -> Tess.Tesselation -> StoreElementList
+-- | make all the triples for a tesselation
+-- set the offset for all 
+makeTesselation offs tess =   [] 
+    where
+        hqsurfaces = trip_surface2 offs tess
+        se_faceSurface =  map makeFaceSurface hqsurfaces
+
+mainMakeTess :: ErrIO () 
+mainMakeTess = do 
+    putIOwords ["\nmainDelaunayTriples\n"]
+    -- putIOwords ["\nthe hq for faces\n", showT ]
+    res4 <- liftIO $ delaunay2 fourV2    
+    let trips = makeTesselation 400 res4
+    putIOwords ["triples produces\n", showT trips]
+
+    return ()
+-----------------old
 
 -- makePoint :: Int -> Text -> Double -> Double -> [StoreElement]
 -- -- | to create a node with the nodeid and the given name and x y 

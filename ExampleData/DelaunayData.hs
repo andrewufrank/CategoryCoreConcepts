@@ -42,7 +42,7 @@ import GIS.FunGeometry
 import Storable.Makes
 import Storable.Retrieve
 
-import Uniform.DelaunayTriples
+import Uniform.DelaunayTriples  hiding (HqID(..))
     -- should export all what is needed 
 
 mainDel :: ErrIO () 
@@ -66,8 +66,9 @@ mainDel = do
     let hqlength2 = trip_hq_length2X 400 res4
     putIOwords ["\nhqs length for res4\n", showT hqlength, showT hqlength2]
 
-    -- let hqs = trip_hqs_faces 400 res4
-    -- putIOwords ["\nall the face hqs for res4\n", showT hqs]
+    let hqs = trip_hqs_faces 400 res4
+    putIOwords ["\nall the face hqs for res4\n", showT hqs]
+----
 
 
 
