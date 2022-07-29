@@ -15,6 +15,7 @@ dependencies:
   - containers
   - mtl   # for vault
 #  for hgeometry
+  - uniform-geometry
   # - hgeometry 
   - linear
   # - hgeometry-combinatorial
@@ -35,7 +36,7 @@ library:
 executables:
   core:
     main: CatCore.hs
-    source-dirs: src
+    source-dirs: app
     dependencies: 
       - CatCoreConcepts
 

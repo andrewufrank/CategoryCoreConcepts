@@ -1,6 +1,8 @@
 -----------------------------------------------------------------------------
 --
 -- Module      :  makeXX are the functions to store sobj 
+--                  for Tesselations only 
+
 {-  
 
  uses the storage to put relations into store!
@@ -21,7 +23,7 @@
 {-# HLINT ignore "Redundant return" #-}
 -- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
-module Storable.Makes
+module Storable.MakesTess
  
      where
 
@@ -50,45 +52,45 @@ import Vault.Triple4cat
 -- import Storable.Srel -- the storable relations
 import Storable.Store 
 
+import Uniform.DelaunayTriples -- hiding (Hq (..))
+-- should export all what is needed
+
 ------------------------------------------------------------------
--- the makes 
+-- the makes for tesselations (delaunay etc.)
 -- produce a list of storeElements 
 -- they are colled with just the Int id and put the type around it
 
+-- store node
 
+makeFaceSurface :: (FaceID, Double) -> [StoreElement]
+-- | convert trip_surface2, used hqf
+makeFaceSurface (fid, val) = [(FaceTag . Face . fromIntegral . unFaceID $ fid, surfacedMorph, AreaTag . Area $ val )] 
 
-makeSCost :: Int -> Int -> [(ObjPoint, MorphPoint, ObjPoint)]
-makeSCost e c = [(EdgeTag (Edge e), scMorph, CostTag (Cost c))]
--- makeTCost e c = (EdgeTag (Edge e), tcMorph, CostTag (Cost c))
--- cost is on edge, one direction only... 
+makeXY  :: (a, Coord) -> [StoreElement]
+-- | convert trip_xy   hqnx,   
+-- a is NodeID or FaceID (for center )
+-- note: the Face is the dual of the Node 
+makeXY  (oid, val) = [(toSub oid, xyMorph, PointTag . Point2d . fromList2P2d $ val)]
+    where 
+        toSub (N i) = NodeTag . Node . fromIntegral . unNodeID $ i
+        toSub (F i) = FaceTag . Face . fromIntegral . unFaceID $ i
 
--- for shortest path 
+-- makePoint :: Int -> Text -> Double -> Double -> [StoreElement]
+-- -- | to create a node with the nodeid and the given name and x y 
+-- makePoint i n x y = makeNode1 i n x y
 
-makeEdgeStartNode :: Int -> Int -> StoreElementList
--- | node, edge: value to store for an s (from edge to node, the from node)
-makeEdgeStartNode o1 o2 = [(EdgeTag (Edge o1), sMorph, NodeTag (Node o2))]
+-- makeNode ::  Int -> (Int, (Double, Double, Text)) ->  StoreElementList
+-- -- | the first is a offset for the node id
+-- -- | same for both nodes and edges 
+-- -- | id for edge (s t)
+-- makeNode ofs (i, (x,y, n)) = makeNode1 (ofs + 1) n x y 
 
-makeEdgeEndNode :: Int -> Int ->   StoreElementList
-makeEdgeEndNode o1 o2 = [(EdgeTag (Edge o1), tMorph, NodeTag (Node o2))]
-
--- point is not storable, is a value
-
-makePoint :: Int -> Text -> Double -> Double -> [StoreElement]
--- | to create a node with the nodeid and the given name and x y 
-makePoint i n x y = makeNode1 i n x y
-
-makeNode ::  Int -> (Int, (Double, Double, Text)) ->  StoreElementList
--- | the first is a offset for the node id
--- | same for both nodes and edges 
--- | id for edge (s t)
-makeNode ofs (i, (x,y, n)) = makeNode1 (ofs + 1) n x y 
-
--- the base make node with text name and two doubles 
-makeNode1 ::  Int -> Text -> Double -> Double  ->  [StoreElement]
-makeNode1  i n x y = 
-    [ (NodeTag node, xyMorph, PointTag (Point2d x y))
-    , (NodeTag node, namedMorph, NameTag (Name n))]
-    where node = Node i
+-- -- the base make node with text name and two doubles 
+-- makeNode1 ::  Int -> Text -> Double -> Double  ->  [StoreElement]
+-- makeNode1  i n x y = 
+--     [ (NodeTag node, xyMorph, PointTag (Point2d x y))
+--     , (NodeTag node, namedMorph, NameTag (Name n))]
+--     where node = Node i
 
 -- makeHQ :: Int -> (Int, Int) -> [(ObjPoint, MorphPoint, ObjPoint)]
 -- makeHQ offset (s, t) = 
@@ -103,5 +105,5 @@ makeNode1  i n x y =
 --         hqid1 = Hq $ offset + 100 * s + t
 --         hqid2 = Hq $ offset + 100 * t + s
 
--- -- showT :: Node -> Node 
--- -- showT x = ShowT x
+-- showT :: Node -> Node 
+-- showT x = ShowT x

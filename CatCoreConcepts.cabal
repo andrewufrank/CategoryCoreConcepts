@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           CatCoreConcepts
-version:        0.2
+version:        0.2.1
 synopsis:       GIS as a category
 description:    experiment to build the core concept data models with categories 
                 the focus is on query not update
@@ -15,13 +15,14 @@ build-type:     Simple
 
 library
   exposed-modules:
+      ExampleData.DelaunayData
       ExampleData.ShortestPathData
-      ExampleData.TriangulationData
       GIS.Functions
       GIS.FunGeometry
       Lib.Rules
       Lib.STproductTriple
       Storable.Makes
+      Storable.MakesTess
       Storable.Retrieve
       Storable.Sobj
       Storable.Srel
@@ -42,6 +43,7 @@ library
     , extra
     , linear
     , mtl
+    , uniform-geometry
     , uniformBase
   default-language: Haskell2010
 
@@ -50,7 +52,7 @@ executable core
   other-modules:
       Paths_CatCoreConcepts
   hs-source-dirs:
-      src
+      app
   ghc-options: -Wall
   build-depends:
       CatCoreConcepts
@@ -60,6 +62,7 @@ executable core
     , extra
     , linear
     , mtl
+    , uniform-geometry
     , uniformBase
   default-language: Haskell2010
 
@@ -86,5 +89,6 @@ test-suite test1
     , linear
     , mtl
     , test-invariant
+    , uniform-geometry
     , uniformBase
   default-language: Haskell2010

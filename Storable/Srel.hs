@@ -72,7 +72,7 @@ scMorph = SCosttag SC
 -- tcMorph = TCcosttag TC
 namedMorph = NamedTag 
 centerMorph = CenterTag 
-surfacedMorph = SurfacedTag 
+surfacedMorph = SurfacedTag Surfaced
 hqNodeMorph = HqNodeTag
 hqFaceMorph = HqFaceTag 
 

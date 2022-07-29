@@ -22,26 +22,13 @@ module GIS.Functions
  
      where
 
--- change prelude for constrainded-categories
--- import Prelude ()
--- import Control.Category.Constrained.Prelude
- 
--- import qualified Control.Category.Hask as Hask
--- import Control.Monad.Constrained  
--- -- end 
 
 import UniformBase
     ( Generic, Zeros(zero), errorT, ErrIO, putIOwords, showT ) 
 import Control.Monad.State
-
-
-
 -- import GIS.Category
 -- import Storable.Store
 
 
 
-
-
--- f1 op = evalState op cat11
 

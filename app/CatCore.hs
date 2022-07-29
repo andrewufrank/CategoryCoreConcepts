@@ -19,12 +19,13 @@ import UniformBase
 import Storable.Store
 import GIS.Functions
 import GIS.FunGeometry
-import GIS.Triangulation
+-- import GIS.Triangulation
 -- import Data.Store_data
+import ExampleData.DelaunayData
 
 
-import ExampleData.ShortestPathData
-import ExampleData.TriangulationData
+-- import ExampleData.ShortestPathData
+-- import ExampleData.TriangulationData
 
 main :: IO ()
 main =  do  -- with tests in other modules
@@ -32,7 +33,7 @@ main =  do  -- with tests in other modules
     -- startProg "CatCore" mainErrIO 
     -- main1
     -- main2
-    main3  -- triangulation
+    -- main3  -- triangulation
     res <- runErr $ mainErrIO
     putIOwords ["\n--------------error in mainErrIO", showT res]
     return ()
@@ -41,5 +42,6 @@ mainErrIO :: ErrIO ()
 mainErrIO = do 
 
     -- pageStore -- from ShortestPath
-
+    -- runWithState
+    mainDel
     return ()

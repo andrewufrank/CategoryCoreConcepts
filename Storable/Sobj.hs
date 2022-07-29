@@ -58,7 +58,7 @@ import UniformBase
 data ObjPoint = NodeTag Node | EdgeTag Edge | FaceTag Face
     | HQTag HqType
     | PointTag (Point2d) 
-    | LengthTag   Length  | CostTag Cost 
+    | LengthTag   Length  | AreaTag Area | CostTag Cost 
     | NameTag Name
     | ZZpoint
     deriving (Show, Read, Ord, Eq, Generic)
@@ -84,6 +84,9 @@ unCostTag x = errorT ["unCostTag -  not a Cost", showT x]
 unLengthTag :: ObjPoint -> Length
 unLengthTag (LengthTag t) = t 
 unLengthTag x = errorT ["unLengthTag - not a Length", showT x]
+unAreaTag :: ObjPoint -> Area
+unAreaTag (AreaTag t) = t 
+unAreaTag x = errorT ["unAreaTag - not an Area", showT x]
 unNameTag :: ObjPoint -> Name
 unNameTag (NameTag t) = t 
 unNameTag x = errorT ["unNameTag - not a Name", showT x]
@@ -116,6 +119,7 @@ type Edge = EdgeType Int
 type Face = FaceType 
 type Hq = HqType 
 
+
 --------------------------- Value 
 
 
@@ -132,7 +136,14 @@ data Point2d = Point2d Double Double
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 -- | to replace Point2, the data type to represent all 2 coordinate pairs 
 
+-- from [Double] to V2 
+fromList2P2d :: [Double] -> Point2d
+fromList2P2d [x,y] = Point2d x y 
+
 data Length = Length Double  
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+data Area = Area Double  
 -- a distance value, should be a subobj of Value 
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 

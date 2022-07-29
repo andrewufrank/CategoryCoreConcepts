@@ -11,4 +11,9 @@ Journal of work in CategorCoreConcepts
 - build hq for triangulation
     disadvantage : runs in IO
     advantage - can build the hq (done in uniform-geometry)
+- change delaunay2 with input list of V2 (rest default)
+    then the hqs are produced with 
+    `trip_hqs_faces` applied to result 
+
+- using stack 
     
