@@ -113,7 +113,7 @@ makeTesselation offs res4 = concat [se_faceSurface, se_xynode, se_xyface, se_hql
                 -- should not be N from geometry
         se_xynode = map makeXYnode hqnxy::[StoreElement]
 
-        hqfxy = trip_xy F 400 (vertices res4)  -- the face coords
+        hqfxy = trip_xy F 400 (center res4)  -- the face coords
                 -- should not be N from geometry
         se_xyface = map makeXYface hqfxy ::[StoreElement]
 
