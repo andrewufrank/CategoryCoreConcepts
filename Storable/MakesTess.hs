@@ -58,6 +58,64 @@ import Uniform.Point2dData
 -- import  qualified Uniform.DelaunayTriples as Tess
 -- -- should export all what is needed
 
+        
+{- 
+data NodeHQ = NodeHQ V2d
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+data FaceHQ = FaceHQ {circumcenter ::V2d} deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+data HQ = HQ 
+    { node:: Int    -- ^ end of hq (start or end of edge)
+    , face::Maybe Int -- ^ face right of the hq
+    , twin::Int     -- the other hq for the edge
+    , halflength :: Double  -- the half of the length of the edge
+    } 
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+data TesselationHQ = TesselationHQ {
+          _Nodes      :: [NodeHQ]
+        , _Faces      :: [FaceHQ]
+        , _HQs       :: [HQ]      -- ^ the tileface starting and ending, alternating
+        } deriving Show
+
+-}
+
+data TesselationHQtriples = TesselationHQtriples 
+    { _NodesTrip :: [StoreElement]
+    , _FacesTrip :: [StoreElement]
+    , _HQtrips   :: [StoreElement]
+    }
+    deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+makeTripNode :: Int -> NodeHQ -> StoreElement
+-- -- | convert trip_xy   hqnx,   
+-- -- a is NodeID or FaceID (for center )
+-- -- note: the Face is the dual of the Node 
+makeTripNode  i (NodeHQ v2) = (NodeTag . Node $ i, xyMorph, PointTag . fromV2toP2d $ v2)
+
+-- makeTripNode  i v = (fromGeomIDnode oid, xyMorph, PointTag . fromList2P2d $ val)
+--     -- where
+-- fromGeomIDnode (Tess.N i)    = NodeTag . Node . fromIntegral  $ i
+
+hqToTrip :: Int -> TesselationHQ ->  TesselationHQtriples
+hqToTrip offset teshq  = TesselationHQtriples
+    { _NodesTrip = zipWith (makeTripNode) [offset ..] (_Nodes teshq) 
+    , _FacesTrip = []
+    , _HQtrips   = []
+    } 
+
+
+mainMakeTess :: ErrIO () 
+mainMakeTess = do 
+    putIOwords ["\nmainDelaunayTriples\n"]
+    -- putIOwords ["\nthe hq for faces\n", showT ]
+    tess <- liftIO $ delaunay2 fourV2    
+    let trips = hqToTrip 400 . toHq1 $ tess 
+    putIOwords ["triples produces\n", showT trips]
+
+    return ()
+-----------------old
+
 -- ------------------------------------------------------------------
 -- -- the makes for tesselations (delaunay etc.)
 -- -- produce a list of storeElements 
@@ -128,16 +186,4 @@ import Uniform.Point2dData
 --         se_hqs1 = concat $ map makeHQnode (concat . map fst3 $ hqs)
 --         se_hqs2 = concat $ map makeHQhq   (concat . map snd3 $ hqs)
 --         se_hqs3 = concat $ map makeHQface (concat . map trd3 $ hqs)
-        
 
-
-mainMakeTess :: ErrIO () 
-mainMakeTess = do 
-    putIOwords ["\nmainDelaunayTriples\n"]
-    -- putIOwords ["\nthe hq for faces\n", showT ]
-    res4 <- liftIO $ delaunay2 fourV2    
-    -- let trips = makeTesselation 400 res4
-    -- putIOwords ["triples produces\n", showT trips]
-
-    return ()
------------------old

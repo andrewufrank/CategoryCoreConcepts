@@ -42,6 +42,7 @@ import qualified Control.Category.Hask as Hask
 -- -- end 
 
 import UniformBase
+import Uniform.Point2d
 -- import Vault.Triple4cat () -- for instance Zeros Double
 
 -- import Lib.Points 
@@ -140,6 +141,9 @@ data Point2d = Point2d Double Double
 fromList2P2d :: [Double] -> Point2d
 fromList2P2d [x,y] = Point2d x y 
 
+fromV2toP2d :: V2d -> Point2d 
+fromV2toP2d (V2 x y) = Point2d x y 
+
 data Length = Length Double  
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
@@ -157,5 +161,5 @@ data Name  = Name Text
 -- perhaps better all text?
     deriving (Show, Read, Ord, Eq, Generic, Zeros)
 
-instance Zeros Double where 
-        zero = 0.0 
+-- instance Zeros Double where 
+--         zero = 0.0 
