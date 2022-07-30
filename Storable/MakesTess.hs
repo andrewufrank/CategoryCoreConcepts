@@ -91,17 +91,43 @@ makeTripNode :: Int -> NodeHQ -> StoreElement
 -- -- | convert trip_xy   hqnx,   
 -- -- a is NodeID or FaceID (for center )
 -- -- note: the Face is the dual of the Node 
-makeTripNode  i (NodeHQ v2) = (NodeTag . Node $ i, xyMorph, PointTag . fromV2toP2d $ v2)
+makeTripNode  i (NodeHQ v2x) = (NodeTag . Node $ i, xyMorph, PointTag . fromV2toP2d $ v2x)
 
 -- makeTripNode  i v = (fromGeomIDnode oid, xyMorph, PointTag . fromList2P2d $ val)
 --     -- where
 -- fromGeomIDnode (Tess.N i)    = NodeTag . Node . fromIntegral  $ i
 
+makeTripFace :: Int -> FaceHQ -> StoreElement
+-- ^ convert to trip; contains only circumcenter
+-- dual to node 
+makeTripFace  i fhq = (FaceTag . Face $ i, xyMorph, PointTag . fromV2toP2d . circumcenter $ fhq)
+
+-- data HQ = HQ 
+--     { node:: Int    -- ^ end of hq (start or end of edge)
+--     , face::Maybe Int -- ^ face right of the hq
+--     , twin::Int     -- the other hq for the edge
+--     , halflength :: Double  -- the half of the length of the edge
+--     } 
+--     deriving (Show, Read, Ord, Eq, Generic, Zeros)
+
+makeTripHq :: Int -> Int -> HQ -> [StoreElement]
+-- convert the HQ data to storeelements
+makeTripHq offset i hq = catMaybes [hqnode, hqface, hqtwin, hqhalflength]
+    where
+        hqid = HQTag . Hq $ i 
+        hqnode, hqface, hqtwin, hqhalflength :: Maybe StoreElement
+        hqnode = Just $ (hqid, hqNodeMorph, NodeTag . Node   . (+offset) . node $ hq)
+        hqface = fmap  (\fi -> (hqid, hqFaceMorph, FaceTag . Face  . (+offset) $ fi)) (face hq)
+        hqtwin = Just $ (hqid, twinMorph, HQTag . Hq  . (+offset) . twin $ hq)
+        hqhalflength = Just $ (hqid, distanceMorph, LengthTag . Length . halflength $ hq) 
+
+
+
 hqToTrip :: Int -> TesselationHQ ->  TesselationHQtriples
 hqToTrip offset teshq  = TesselationHQtriples
     { _NodesTrip = zipWith (makeTripNode) [offset ..] (_Nodes teshq) 
-    , _FacesTrip = []
-    , _HQtrips   = []
+    , _FacesTrip = zipWith (makeTripFace) [offset ..] (_Faces teshq)
+    , _HQtrips   = concat $ zipWith (makeTripHq offset)   [offset ..] (_HQs teshq)
     } 
 
 
