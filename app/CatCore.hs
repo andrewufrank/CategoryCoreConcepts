@@ -21,7 +21,7 @@ import GIS.Functions
 import GIS.FunGeometry
 -- import GIS.Triangulation
 -- import Data.Store_data
-import ExampleData.DelaunayData
+-- import ExampleData.DelaunayData
 import Storable.MakesTess
 
 -- import ExampleData.ShortestPathData
@@ -43,6 +43,6 @@ mainErrIO = do
 
     -- pageStore -- from ShortestPath
     -- runWithState
-    mainDel
+    -- mainDel
     mainMakeTess
     return ()

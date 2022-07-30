@@ -15,7 +15,7 @@ dependencies:
   - containers
   - mtl   # for vault
 #  for hgeometry
-  - uniform-geometry
+  - uniform-geometry ==0.0.1.3
   # - hgeometry 
   - linear
   # - hgeometry-combinatorial
